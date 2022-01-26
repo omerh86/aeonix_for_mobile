@@ -1,0 +1,634 @@
+﻿using System;
+using System.Collections.Generic;
+using Linphone;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Util;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Runtime.CompilerServices;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+using static LinphoneXamarin.Entities.LoginInfo;
+using System.Text.RegularExpressions;
+using LinphoneXamarin.components.userControllers;
+
+namespace LinphoneXamarin.Services
+{
+
+    public sealed class LoginService : LinphoneRegistrationListener, MyRegistrationListener, Tr87stateListener
+    {
+        RegistrationService registrationService;
+        public LoginRegistrationListener loginRegistrationListener { set; get; }
+        public LoginRegistrationListener loginRegistrationUiListener1 { set; get; }
+        public LoginRegistrationListener loginRegistrationUiListener2 { set; get; }
+
+        private static LoginService instance = null;
+        private static readonly object padlock = new object();
+        public RegistrationProcess registrationProcess;
+
+        AeonixInfoRepository aeonixInfoRepository;
+        CallService callService;
+        AeonixInfoService aeonixInfoService;
+        MyFileSystem fileSystem;
+
+        private int reconnectIterationCounter = 0;
+
+        LoginService()
+        {
+            registrationService = RegistrationService.Instance;
+
+            registrationProcess = new RegistrationProcess();
+            registrationProcess.MyRegistrationListener = this;
+            aeonixInfoRepository = AeonixInfoRepository.Instance;
+            aeonixInfoRepository.setTr87Listener(this);
+            callService = CallService.Instance;
+            callService.setTr87Listener(this);
+            aeonixInfoService = AeonixInfoService.Instance;
+            fileSystem = MyFileSystem.Instance;
+
+        }
+
+        public static LoginService Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new LoginService();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public LoginInfo getTr87Cardential()
+        {
+            return MyFileSystem.Instance.loadLoginCardential(CardentialState.TR87);
+        }
+
+        public void saveTr87Cardential(LoginInfo loginInfo)
+        {
+            MyFileSystem.Instance.saveLoginCardential(loginInfo, CardentialState.TR87);
+        }
+
+        public bool isRegistered()
+        {
+            RegistrationState r = registrationService.registrationState;
+            if (r == RegistrationState.Ok)
+                return true;
+            else
+                return false;
+
+        }
+
+        public void register(RegisterCommands command)
+        {
+            registrationService.setRegistrationListener(this);
+            try
+            {
+
+                new Task(() =>
+                {
+                    registrationProcess.MoveNext(command);
+                }).Start();
+
+                //throw new TimeoutException();
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+                //  resetLoginProccesss(true, LoginError.TimeOut);
+
+            }
+
+        }
+
+        private void loginTR87()
+        {
+            LoginInfo loginInfo = getTr87Cardential();
+
+            addLog("loginTR87: " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].ip + " : " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].port + " proxy: " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].proxyIp + " : " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].proxyPort + " transport is: " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].transport);
+            if (loginInfo != null)
+            {
+                registrationService.register("AITCreateCnxn_" + loginInfo.loginName, loginInfo.password, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].ip, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].port, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].proxyIp, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].proxyPort, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].transport, false);
+                new Task(() =>
+                {
+
+                    Thread.Sleep(10000);
+                    if (registrationProcess.CurrentState == MyRegistrationState.ConnectingTR87)
+                    {
+                        this.resetLoginProccesss(LoginError.InvalidDomain);
+                    }
+                }).Start();
+            }
+            else
+            {
+                fireLoginFailed(LoginError.InvalidCardentials);
+            }
+        }
+
+        private void loginAeonix()
+        {
+            LoginInfo loginInfo = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+            if (loginInfo != null)
+            {
+                addLog("loginAeonix: " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].ip + " : " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].port + " proxy: " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].proxyIp + " : " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].proxyPort + " transport is: " + loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].transport);
+                addLog($"favorite Sip Adress Index: {loginInfo.favoriteSipAdressIndex}, reconnect Iteration Counter: {reconnectIterationCounter}, ");
+                reconnectIterationCounter++;
+                registrationService.register(loginInfo.loginName, loginInfo.password, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].ip, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].port, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].proxyIp, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].proxyPort, loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].transport, true);
+                addLog("loginAeonix: ask the ContactService to refresh the user");
+                ContactService.Instance.resetMyContact();
+            }
+            else
+            {
+                //TODO 
+            }
+        }
+
+        private void fireLoginFailed(LoginError error, bool onlyUI = false)
+        {
+            if (loginRegistrationListener != null && !onlyUI)
+            {
+                loginRegistrationListener.onLoginFailedAsync(error);
+            }
+
+            if (loginRegistrationUiListener1 != null)
+                loginRegistrationUiListener1.onLoginFailedAsync(error);
+            if (loginRegistrationUiListener2 != null)
+                loginRegistrationUiListener2.onLoginFailedAsync(error);
+        }
+
+        private void fireLoginSuccsess()
+        {
+            if (loginRegistrationListener != null)
+                loginRegistrationListener.onLoginSuccsses();
+
+            if (loginRegistrationUiListener1 != null)
+                loginRegistrationUiListener1.onLoginSuccsses();
+            if (loginRegistrationUiListener2 != null)
+                loginRegistrationUiListener2.onLoginSuccsses();
+
+        }
+
+        private void fireLoginLevelUp(int precent)
+        {
+            if (loginRegistrationListener != null)
+            {
+                loginRegistrationListener.onLoginLevelUp(precent, this.registrationProcess.CurrentState);
+            }
+        }
+
+        public void onLinphoneStatusChanged(RegistrationState state, string message, ProxyConfig config)
+        {
+#if WINDOWS_UWP
+
+#else
+            try
+            {
+                if (registrationService.pc.nativePtr != null)
+                {
+                    var x = registrationService.pc.nativePtr;
+                    addLog($"default configPtr: {x.ToString("x")}, current configPtr: {config.nativePtr.ToString("x")}");
+                    if (x != config.nativePtr)
+                    {
+                        addLog("onLinphoneStatusChanged, ignoring event since its an irrelevant proxy config obj");
+                        return;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+#endif
+
+            string domain = config.Domain;
+            string logMessage = "LoginService:onLinphoneStatusChanged, address: " + config.ServerAddr + " CurrentState: " + registrationProcess.CurrentState + ", state: " + state + ", message: " + message;
+            addLog(logMessage);
+
+            if (registrationProcess.CurrentState == MyRegistrationState.ConnectingAeonix ||
+                   registrationProcess.CurrentState == MyRegistrationState.ConnectingTR87 ||
+                   registrationProcess.CurrentState == MyRegistrationState.DisconnectingTR87 ||
+                  registrationProcess.CurrentState == MyRegistrationState.ReConnectingAeonix ||
+                  registrationProcess.CurrentState == MyRegistrationState.AfterAeonix)
+            {
+
+                if (state != RegistrationState.Progress && registrationProcess.CurrentState == MyRegistrationState.AfterAeonix)
+                {
+
+                    switch (message)
+                    {
+                        case "Unauthorized":
+                            addLog("refreshing Auth ");
+                            registrationService.refreshAuth(CardentialState.Aeonix);
+                            break;
+
+                        case "Registration successful":
+#if WINDOWS_UWP
+                            if (!AeonixInfoRepository.Instance.isSubscribed())
+                            {
+                                AeonixInfoService.Instance.subscribetr87();
+                            }
+#else
+                            addLog("Registration successful - do nothing!");
+#endif
+                            break;
+                        case "io error":
+                            LinphoneBase.Instance.linphoneCore.TerminateAllCalls();
+                            if (((App)App.Current).isForeground)
+                            {
+                                fireLoginFailed(LoginError.Unknown, true);
+                                addLog("app is in forground, registering");
+                                registrationService.unRegister();
+                            }
+                            else
+                            {
+                                addLog("app is in background, closing app");
+                                Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity.FinishAndRemoveTask();
+                            }
+                            break;
+                        case "Unregistration done":
+                        case "Registration disabled":
+                            addLog("will make register");
+                            registrationProcess.MoveNext(RegisterCommands.ReRegister);
+                            break;
+
+                        default:
+
+                            resetLoginProccesss(LoginError.RegistrationFailed);
+                            break;
+                    }
+                    return;
+                }
+                switch (state)
+                {
+                    case RegistrationState.Ok:
+                        addLog("registration was successfully ");
+                        registrationProcess.MoveNext(RegisterCommands.Continue);
+                        fireLoginLevelUp(20);
+                        break;
+                    case RegistrationState.Progress:
+                        if (registrationProcess.CurrentState == MyRegistrationState.AfterAeonix)
+                        {
+                            if (message == "Service unavailable, retrying")
+                            {
+                                addLog("restart registration");
+                                registrationService.unRegister(true);
+                            }
+                        }
+                        break;
+                    case RegistrationState.Failed:
+                    case RegistrationState.Cleared:
+                    case RegistrationState.None:
+
+                        if (registrationProcess.CurrentState == MyRegistrationState.ConnectingTR87)
+                        {
+                            resetLoginProccesss(LoginError.RegistrationFailed);
+                        }
+
+                        else if (registrationProcess.CurrentState == MyRegistrationState.DisconnectingTR87)
+                        {
+                            if (message.Equals("Unregistration done"))
+                            {
+                                registrationProcess.MoveNext(RegisterCommands.Continue);
+                                fireLoginLevelUp(20);
+                            }
+                        }
+                        else
+                        {
+
+                            var credentials = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+                            if (credentials == null)
+                            {
+                                resetLoginProccesss(LoginError.RegistrationFailed);
+                            }
+                            else
+                            {
+                                bool handleTheError = true;
+                                if (domain != null && domain != "")
+                                {
+                                    if (credentials.favoriteSipAdressIndex < credentials.sipAdresses.Count)
+                                    {
+                                        string currentDomain = credentials.sipAdresses[credentials.favoriteSipAdressIndex].ip;
+                                        if (domain != currentDomain)
+                                        {
+                                            handleTheError = false;
+                                            string debugMessage = "Ignore this error since the current domain " + currentDomain + " is not the same as the message domain " + domain;
+                                            addLog(debugMessage);
+                                        }
+                                    }
+                                }
+                                if (handleTheError)
+                                {
+                                    switch (message)
+                                    {
+                                        case "Unauthorized":
+                                            addLog("refreshing Auth");
+                                            registrationService.refreshAuth(CardentialState.Aeonix);
+                                            fireLoginLevelUp((20 / credentials.sipAdresses.Count) - 1);
+                                            break;
+
+                                        default:
+                                            if (credentials != null && reconnectIterationCounter < credentials.sipAdresses.Count)
+                                            {
+                                                credentials.favoriteSipAdressIndex = (credentials.favoriteSipAdressIndex + 1) % credentials.sipAdresses.Count;
+                                                addLog("trying to connect new server");
+                                                MyFileSystem.Instance.saveLoginCardential(credentials, CardentialState.Aeonix);
+                                                registrationProcess.MoveNext(RegisterCommands.Repeat);
+                                                fireLoginLevelUp(20 / credentials.sipAdresses.Count);
+                                            }
+                                            else
+                                            {
+                                                addLog("no more servers to connect , there are " + credentials.sipAdresses.Count + " servers and try to connect " + reconnectIterationCounter + " times");
+                                                resetLoginProccesss(LoginError.RegistrationFailed);
+                                            }
+                                            break;
+                                    }
+                                }
+                            }
+
+                        }
+                        break;
+                }
+            }
+        }
+
+        public void resetLoginProccesss(LoginError loginError = LoginError.Unknown)
+        {
+            if (registrationProcess.CurrentState != MyRegistrationState.BeforeTR87)
+            {
+                registrationProcess.MoveNext(RegisterCommands.Clear);
+                fireLoginFailed(loginError);
+            }
+        }
+
+        public void forceResetLoginProccesss()
+        {
+            registrationProcess.MoveNext(RegisterCommands.Clear);
+            fireLoginFailed(LoginError.ForcedStop);
+        }
+
+        private void inviteTr87Call()
+        {
+            callService.inviteTr87Call();
+        }
+
+        private void gettingLoginInfo()
+        {
+            var loginName = MyFileSystem.Instance.loadLoginCardential(CardentialState.TR87).loginName;
+            var deviceId = Plugin.DeviceInfo.CrossDeviceInfo.Current.Id;
+            string strToSend = "";
+            if (Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform.ToString().Equals("Windows"))
+            {
+                Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+                var trimedDeviceId = rgx.Replace(deviceId, "");
+                strToSend = MySendRequestHelper.Instance.getCreateAccountRequest(new CreateAccountProp(loginName, "PC", true, loginName + trimedDeviceId, false));
+            }
+            else
+            {
+                strToSend = MySendRequestHelper.Instance.getCreateAccountRequest(new CreateAccountProp(loginName, Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform.ToString().Equals("iOS") ? "iOS" : "Android", true, loginName + deviceId, true));
+            }
+
+            addLog(strToSend);
+            aeonixInfoRepository.sendInviteInfo(strToSend);
+        }
+
+        public void onMyRegistrationStateChanged(MyRegistrationState state)
+        {
+            string logMessage = "LoginService:onMyRegistrationStateChanged( " + state + " )";
+            addLog(logMessage);
+            switch (state)
+            {
+                case MyRegistrationState.BeforeTR87:
+                    //make sure disconnection
+                    reconnectIterationCounter = 0;
+                    registrationService.unRegister();
+                    break;
+                case MyRegistrationState.ConnectingTR87:
+                    this.loginTR87();
+                    break;
+                case MyRegistrationState.InviteTr87:
+                    this.inviteTr87Call();
+                    break;
+                case MyRegistrationState.gettingLoginInfo:
+                    this.gettingLoginInfo();
+                    break;
+                case MyRegistrationState.DisconnectingTR87:
+                    LinphoneBase.Instance.linphoneCore.TerminateAllCalls();
+                    break;
+                case MyRegistrationState.ConnectingAeonix:
+                    this.loginAeonix();
+                    break;
+                case MyRegistrationState.ReConnectingAeonix:
+                    this.loginAeonix();
+                    break;
+
+                case MyRegistrationState.AfterAeonix:
+                    reconnectIterationCounter = 0;
+                    fireLoginSuccsess();
+                    //do nothing
+                    break;
+            }
+        }
+
+
+
+        public void onTr87Invited()
+        {
+            if (registrationProcess.CurrentState == MyRegistrationState.InviteTr87)
+            {
+                registrationProcess.MoveNext(RegisterCommands.Continue);
+                fireLoginLevelUp(20);
+            }
+        }
+
+        public void onTr87Ended()
+        {
+            addLog("onTr87Ended()");
+            if (registrationProcess.CurrentState == MyRegistrationState.DisconnectingTR87)
+            {
+                registrationService.unRegister();
+            }
+            else if (registrationProcess.CurrentState == MyRegistrationState.gettingLoginInfo)
+            {
+                addLog("tr87 call ended unexpectedly!");
+                resetLoginProccesss(LoginError.InfoFailed);
+            }
+        }
+
+        public void onTr87ConnectionInfoResponse(InfoMessage infoMessage)
+        {
+            if (registrationProcess.CurrentState == MyRegistrationState.gettingLoginInfo)
+            {
+                addLog(infoMessage.Content.StringBuffer);
+                ConnectionconfigurationRootobjectResponse connectionconfigurationRootobjectResponse = MySendRequestHelper.Instance.getServerConnectionconfigurationRootObject(infoMessage.Content.StringBuffer);
+
+                var endponintId = connectionconfigurationRootobjectResponse.ConnectionConfiguration.deviceConnectionConfiguration.endponintId;
+                SharedData.Instance.resetLastSessionDataHandler(endponintId);
+                char[] a = { '@', ':' };
+                var names = endponintId.Split(a);
+
+                var password = connectionconfigurationRootobjectResponse.ConnectionConfiguration.deviceConnectionConfiguration.endpointPassword;
+                List<IPInfo> ipInfoList = new List<IPInfo>();
+
+
+                foreach (var s in connectionconfigurationRootobjectResponse.ConnectionConfiguration.serverList)
+                {
+                    ipInfoList.Add(getIpInfo(s));
+                }
+
+
+                var userName = connectionconfigurationRootobjectResponse.ConnectionConfiguration.userName;
+                var loginInfo = new LoginInfo(names[1], userName, password, ipInfoList);
+                if (connectionconfigurationRootobjectResponse.ConnectionConfiguration.versionInfo != null)
+                    loginInfo.aeonixVersion = connectionconfigurationRootobjectResponse.ConnectionConfiguration.versionInfo.aeonixVersion;
+
+                if (connectionconfigurationRootobjectResponse.ConnectionConfiguration.deviceConnectionConfiguration != null)
+                    loginInfo.tenantPrefix = connectionconfigurationRootobjectResponse.ConnectionConfiguration.deviceConnectionConfiguration.tenantPrefix;
+
+                MyFileSystem.Instance.saveLoginCardential(loginInfo, CardentialState.Aeonix);
+                registrationProcess.MoveNext(RegisterCommands.Continue);
+                fireLoginLevelUp(20);
+            }
+        }
+
+
+        private IPInfo getIpInfo(Serverlist serverlist)
+        {
+            char[] b = { ':' };
+            var ip = "";
+            var port = -1;
+            var proxyIp = "";
+            var proxyPort = -1;
+
+            var transport = serverlist.transport.ToLower().Equals("tcp") ? TransportType.Tcp : TransportType.Tls;
+            if (serverlist.server != null)
+            {
+                var domainParts = serverlist.server.Split(b);
+                ip = domainParts[0];
+                port = Int32.Parse(domainParts[1]);
+            }
+            if (serverlist.proxy != null)
+            {
+                var domainParts = serverlist.proxy.Split(b);
+                proxyIp = domainParts[0];
+                proxyPort = Int32.Parse(domainParts[1]);
+            }
+
+            return new IPInfo(ip, port, proxyIp, proxyPort, transport);
+        }
+
+        private void addLog(string message)
+        {
+            fileSystem.writeDebug(message, "login_service");
+            Console.WriteLine("omer40: " + message);
+        }
+
+        public void onTr87InviteFailed()
+        {
+            if (registrationProcess.CurrentState == MyRegistrationState.InviteTr87)
+            {
+                addLog("onTr87InviteFailed()");
+                this.resetLoginProccesss(LoginError.InvalidCardentials);
+            }
+        }
+
+        public class RegistrationProcess
+        {
+            private void addLog(string tag, string message)
+            {
+                MyFileSystem.Instance.writeDebug(message, "login_service");
+                Console.WriteLine(tag + message);
+            }
+
+            class StateTransition
+            {
+                readonly MyRegistrationState CurrentState;
+                readonly RegisterCommands Command;
+
+
+                public StateTransition(MyRegistrationState currentState, RegisterCommands command)
+                {
+                    CurrentState = currentState;
+                    Command = command;
+                }
+
+                public override int GetHashCode()
+                {
+                    return 17 + 31 * CurrentState.GetHashCode() + 31 * Command.GetHashCode();
+                }
+
+                public override bool Equals(object obj)
+                {
+                    StateTransition other = obj as StateTransition;
+                    return other != null && this.CurrentState == other.CurrentState && this.Command == other.Command;
+                }
+            }
+
+            Dictionary<StateTransition, MyRegistrationState> transitions;
+            public MyRegistrationListener MyRegistrationListener { get; set; }
+            public MyRegistrationState CurrentState { get; private set; }
+            public RegistrationProcess()
+            {
+                CurrentState = MyRegistrationState.BeforeTR87;
+                transitions = new Dictionary<StateTransition, MyRegistrationState>
+            {
+                { new StateTransition(MyRegistrationState.BeforeTR87, RegisterCommands.StartAll), MyRegistrationState.ConnectingTR87},
+                { new StateTransition(MyRegistrationState.BeforeTR87, RegisterCommands.StartAeonix), MyRegistrationState.ConnectingAeonix},
+                { new StateTransition(MyRegistrationState.BeforeTR87, RegisterCommands.ReRegister), MyRegistrationState.ReConnectingAeonix},
+                { new StateTransition(MyRegistrationState.BeforeTR87, RegisterCommands.Continue), MyRegistrationState.ConnectingTR87},
+                { new StateTransition( MyRegistrationState.ConnectingTR87, RegisterCommands.Continue), MyRegistrationState.InviteTr87},
+                { new StateTransition(MyRegistrationState.InviteTr87, RegisterCommands.Continue), MyRegistrationState.gettingLoginInfo},
+                { new StateTransition(MyRegistrationState.gettingLoginInfo, RegisterCommands.Continue), MyRegistrationState.DisconnectingTR87},
+                { new StateTransition(MyRegistrationState.DisconnectingTR87, RegisterCommands.Continue), MyRegistrationState.ConnectingAeonix},
+                { new StateTransition(MyRegistrationState.ConnectingAeonix, RegisterCommands.Continue), MyRegistrationState.AfterAeonix},
+                { new StateTransition(MyRegistrationState.ConnectingAeonix, RegisterCommands.Repeat), MyRegistrationState.ConnectingAeonix},
+                { new StateTransition(MyRegistrationState.ReConnectingAeonix, RegisterCommands.Continue), MyRegistrationState.AfterAeonix},
+                { new StateTransition(MyRegistrationState.ReConnectingAeonix, RegisterCommands.Repeat), MyRegistrationState.ReConnectingAeonix},
+                { new StateTransition(MyRegistrationState.AfterAeonix, RegisterCommands.ReRegister), MyRegistrationState.ReConnectingAeonix},
+               { new StateTransition(MyRegistrationState.AfterAeonix, RegisterCommands.Continue), MyRegistrationState.AfterAeonix},
+                { new StateTransition(MyRegistrationState.BeforeTR87, RegisterCommands.Clear), MyRegistrationState.BeforeTR87},
+                { new StateTransition(MyRegistrationState.ConnectingTR87, RegisterCommands.Clear), MyRegistrationState.BeforeTR87},
+                { new StateTransition(MyRegistrationState.InviteTr87, RegisterCommands.Clear), MyRegistrationState.BeforeTR87},
+                { new StateTransition(MyRegistrationState.gettingLoginInfo, RegisterCommands.Clear), MyRegistrationState.BeforeTR87},
+                { new StateTransition(MyRegistrationState.DisconnectingTR87, RegisterCommands.Clear), MyRegistrationState.BeforeTR87},
+                { new StateTransition(MyRegistrationState.ConnectingAeonix, RegisterCommands.Clear), MyRegistrationState.BeforeTR87},
+                { new StateTransition(MyRegistrationState.ReConnectingAeonix, RegisterCommands.Clear), MyRegistrationState.BeforeTR87},
+               { new StateTransition(MyRegistrationState.AfterAeonix, RegisterCommands.Clear), MyRegistrationState.BeforeTR87},
+                { new StateTransition(MyRegistrationState.BeforeTR87, RegisterCommands.End), MyRegistrationState.AfterAeonix},
+                { new StateTransition(MyRegistrationState.ConnectingTR87, RegisterCommands.End), MyRegistrationState.AfterAeonix},
+                { new StateTransition(MyRegistrationState.InviteTr87, RegisterCommands.End), MyRegistrationState.AfterAeonix},
+                { new StateTransition(MyRegistrationState.gettingLoginInfo, RegisterCommands.End), MyRegistrationState.AfterAeonix},
+                { new StateTransition(MyRegistrationState.DisconnectingTR87, RegisterCommands.End), MyRegistrationState.AfterAeonix},
+                { new StateTransition(MyRegistrationState.ConnectingAeonix, RegisterCommands.End), MyRegistrationState.AfterAeonix},
+                { new StateTransition(MyRegistrationState.ReConnectingAeonix, RegisterCommands.End), MyRegistrationState.AfterAeonix},
+               { new StateTransition(MyRegistrationState.AfterAeonix, RegisterCommands.End), MyRegistrationState.AfterAeonix}
+            };
+            }
+
+            public MyRegistrationState GetNext(RegisterCommands command)
+            {
+                StateTransition transition = new StateTransition(CurrentState, command);
+                MyRegistrationState nextState;
+                if (!transitions.TryGetValue(transition, out nextState))
+                    throw new Exception("Invalid transition: " + CurrentState + " -> " + command);
+                return nextState;
+            }
+
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            public void MoveNext(RegisterCommands command)
+            {
+                addLog("Omer40: ", "LoginService.RegistrationProcess:MoveNext(command:" + command + ", CurrentState:" + CurrentState + ")");
+                MyRegistrationState previewState = CurrentState;
+                CurrentState = GetNext(command);
+                if (this.MyRegistrationListener != null)
+                {
+                    MyRegistrationListener.onMyRegistrationStateChanged(CurrentState);
+                }
+            }
+        }
+
+
+    }
+}

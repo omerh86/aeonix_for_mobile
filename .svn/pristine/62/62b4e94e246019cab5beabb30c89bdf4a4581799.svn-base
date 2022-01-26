@@ -1,0 +1,514 @@
+﻿using System;
+using System.Threading;
+
+using Xamarin.Forms;
+using LinphoneXamarin.components;
+
+using Linphone;
+using LinphoneXamarin.Util;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Device = Xamarin.Forms.Device;
+using Xamarin.Forms.Xaml;
+
+using System.Linq;
+
+#if __IOS__
+using LinphoneXamarin.MyCallKit;
+#endif
+[assembly: XamlCompilation(XamlCompilationOptions.Compile)]
+namespace LinphoneXamarin
+{
+
+    public partial class App : Application, LoginRegistrationListener, MyInfoProccessListener, ISDKContactListener
+    {
+
+        public Core LinphoneCore { get; set; }
+        public bool isForeground { get; set; }
+        public bool isImageProcessfinished { get; set; }
+        public bool isSDKContactsArrived { get; set; }
+
+        ToolbarItem statusIcon;
+        ToolbarItem searchIcon;
+        int statusCounter;
+        public App(string rc_path = null)
+        {
+
+            LinphoneWrapper.setNativeLogHandler();
+            LinphoneCore = LinphoneBase.Instance.linphoneCore;
+            Plugin.LocalNotifications.CrossLocalNotifications.Current.Cancel(101);
+            isImageProcessfinished = false;
+            isSDKContactsArrived = false;
+            settingsHandler();
+
+#if DEBUG
+            //do nothing
+            // AppCenter.Start("ios=fd1c018f-d6a5-4d7a-851c-d22dec7f6bd2;android=40acd8f2-bcb1-4e9f-833c-6ebd048df85f;uwp=4544e6ce-d515-4269-bba6-1419ee646aa8", typeof(Analytics), typeof(Crashes));
+            // Analytics.SetEnabledAsync(true);
+#else
+            AppCenter.Start("ios=fd1c018f-d6a5-4d7a-851c-d22dec7f6bd2;android=40acd8f2-bcb1-4e9f-833c-6ebd048df85f;uwp=4544e6ce-d515-4269-bba6-1419ee646aa8", typeof(Analytics), typeof(Crashes));
+#endif
+#if WINDOWS_UWP
+            SetLaunchOnLogin_UWP_Async(true);
+#endif
+
+            LoginInfo aeonixLoginInfo = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+            AeonixInfoService.Instance.myInfoProccessListener = this;
+            LoginService.Instance.loginRegistrationListener = this;
+            ContactService.Instance.sDKContactListener = this;
+
+            if (aeonixLoginInfo != null)
+            {
+                loadData();
+
+                if (LoginService.Instance.registrationProcess.CurrentState != MyRegistrationState.AfterAeonix)
+                {
+                    addLog("doing ReRegister");
+                    LoginService.Instance.register(RegisterCommands.ReRegister);
+                }
+
+                addLog("launch action: " + SharedData.Instance.launchAction);
+                switch (SharedData.Instance.launchAction)
+                {
+                    case LaunchAction.INCOMING_CALL:
+                        addLog("goToCallView");
+                        MyAudioManager.Instance.setAudioState(MYAudioState.BT, false);
+
+                        SharedData.Instance.isCallView = true;
+                        var page = new NavigationPage(new MainPage());
+                        page.BarBackgroundColor = Color.FromHex("#313E82");
+                        page.Title = "Aeonix Touch";
+                        MainPage = page;
+#if __IOS__
+                AppDelegate.screenHandler(true);  
+#endif
+                        break;
+                    case LaunchAction.REGISTRATION_LOST:
+                        LoginService.Instance.loginRegistrationListener = this;
+                        var p = new NavigationPage(new RegistrationLostPage());
+                        p.BarBackgroundColor = Color.FromHex("#313E82");
+                        p.Title = "Aeonix Touch";
+                        MainPage = p;
+                        break;
+                    default:
+                        goToRootPage();
+                        break;
+                }
+
+            }
+            else
+            {
+                var page = new NavigationPage(new Login());
+                setPageColors(page);
+                MainPage = page;
+            }
+
+        }
+
+        public void goToRootPage()
+        {
+            LoginService.Instance.loginRegistrationListener = this;
+            var page = new NavigationPage(new RootPage());
+            setPageColors(page);
+            MainPage = page;
+        }
+
+        public void setBarPageColors(bool isCall)
+        {
+            var page = MainPage as NavigationPage;
+            if (isCall)
+            {
+                page.BarBackgroundColor = Color.FromHex("#142665");
+                page.BarTextColor = Color.White;
+            }
+            else
+            {
+                page.BarBackgroundColor = Color.Transparent;
+                page.BarTextColor = Color.Black;
+            }
+
+        }
+
+        private void setPageColors(NavigationPage page)
+        {
+            page.BarBackgroundColor = Color.Transparent;
+            page.BarTextColor = Color.Black;
+            page.BackgroundColor = Color.FromHex("#F8FBFC");
+        }
+
+        private async Task<bool> SetLaunchOnLogin_UWP_Async(bool shouldLaunchOnLogin)
+        {
+#if WINDOWS_UWP
+
+            Device.BeginInvokeOnMainThread(async () =>
+            {
+                try
+                {
+
+                    var startupTask = await Windows.ApplicationModel.StartupTask.GetAsync("MyStartupId");
+                    addLog("startup task: " + startupTask.State);
+                    switch (startupTask.State)
+                    {
+                        case Windows.ApplicationModel.StartupTaskState.Disabled:
+                            var newState = await startupTask.RequestEnableAsync();
+                            addLog("startup task: " + newState);
+                            break;
+                        case Windows.ApplicationModel.StartupTaskState.DisabledByUser:
+                            //            Windows.UI.Popups.MessageDialog dialog = new Windows.UI.Popups.MessageDialog(
+                            //"I know you don't want this app to run " +
+                            //"as soon as you sign in, but if you change your mind, " +
+                            //"you can enable this in the Startup tab in Task Manager.",
+                            //"Aeonix touch");
+                            //            await dialog.ShowAsync();
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        "SpecificPlatformFunctions_UWP - SetLaunchOnLogin_UWP_Async ERROR: "
+                        + ex.ToString());
+                }
+            });
+#endif
+            return false;
+        }
+
+        public void goVMPage()
+        {
+            var page = (Page)new VoiceMailPage();
+            MainPage.Navigation.PushAsync(page, false);
+        }
+
+        private void loadData()
+        {
+            ContactService cs = ContactService.Instance;
+            cs.resetMyContact();
+            cs.loadContact();
+            cs.setMyVoiceMailGroup();
+            cs.getPhoneBookContacts();
+        }
+
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "APP");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        private void settingsHandler()
+        {
+            try
+            {
+                var settings = MyFileSystem.Instance.loadSettings();
+                addLog($"IsFirstLaunchForCurrentVersion: {Xamarin.Essentials.VersionTracking.IsFirstLaunchForCurrentVersion}");
+                addLog($"IsFirstLaunchForCurrentBuild: {Xamarin.Essentials.VersionTracking.IsFirstLaunchForCurrentBuild}");
+                var sd = SharedData.Instance;
+                if (settings == null || Xamarin.Essentials.VersionTracking.IsFirstLaunchForCurrentVersion || Xamarin.Essentials.VersionTracking.IsFirstLaunchForCurrentBuild)
+                {
+                    settings = new MySettings(true, true, true, true, Language.ENGLISH);
+                    MyFileSystem.Instance.saveSettings(settings);
+                    sd.shouldUploadAllcontacts = true;
+                }
+                settings.loadlangResources();
+                LinphoneBase.Instance.linphoneCore.MicGainDb = settings.micGain;
+                sd.isCollaborateAllowed = MyFileSystem.Instance.loadIsCollaborateAllowed();
+
+
+#if ANDROID
+                var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as RingListener;
+                x.onRingSoundToggled(settings.isRingSound);
+#endif
+#if __IOS__
+                   ProviderDelegate.Instance.Provider.Configuration.RingtoneSound = settings.ringFile;   
+#endif
+#if WINDOWS_UWP
+
+                if (!settings.micDevice.Equals("Default"))
+                {
+                    LinphoneBase.Instance.linphoneCore.CaptureDevice = settings.micDevice;
+                }
+                if (!settings.ringDevice.Equals("Default"))
+                {
+                    LinphoneBase.Instance.linphoneCore.RingerDevice = settings.ringDevice;
+                }
+                if (!settings.inAcallDevice.Equals("Default"))
+                {
+                    LinphoneBase.Instance.linphoneCore.PlaybackDevice = settings.inAcallDevice;
+                }
+                if (!settings.videoDevice.Equals("Default"))
+                {
+                    LinphoneBase.Instance.linphoneCore.VideoDevice = settings.videoDevice;
+                }
+
+                if (settings.isRingSound)
+                {
+                    LinphoneBase.Instance.linphoneCore.Ring = "Assets/" + settings.ringFile;
+                }
+                else
+                {
+                    LinphoneBase.Instance.linphoneCore.Ring = null;
+                }
+#endif
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+
+        protected override void OnStart()
+        {
+            // Handle when your app starts
+            isForeground = true;
+            LinphoneBase.Instance.startForgroundItreation();
+            addLog("OnStart()");
+        }
+
+        protected override void OnSleep()
+        {
+
+            addLog("OnSleep()");
+            isForeground = false;
+            ContactService cs = ContactService.Instance;
+            MyFileSystem fs = MyFileSystem.Instance;
+            List<BaseContact> baseContacts = new List<BaseContact>();
+
+            try
+            {
+                List<Contact> c = cs.allContacts;
+                foreach (var i in c)
+                {
+                    if (i.type == ContactType.Aeonix || i.type == ContactType.PhoneBook)
+                    {
+                        BaseContact temp = new BaseContact();
+                        temp.imageSignature = i.imageSignature;
+                        temp.isFav = i.isFav;
+                        temp.presenceStatus = i.presenceStatus;
+                        temp.primaryAlias = i.primaryAlias;
+                        temp.type = i.type;
+                        temp.userName = i.userName;
+                        temp.allAliases = i.allAliases;
+                        temp.allExternalAliases = i.allExternalAliases;
+                        temp.displayName = i.displayName;
+                        temp.description = i.description;
+                        temp.department = i.department;
+                        temp.company = i.company;
+                        temp.homeAddress = i.homeAddress;
+                        temp.phonebook = i.phonebook;
+                        temp.email = i.email;
+                        baseContacts.Add(temp);
+                    }
+                }
+                fs.saveContacts(baseContacts);
+
+                Contact myContact = cs.myContact;
+                BaseContact tempMyContact = new BaseContact();
+                tempMyContact.imageSignature = myContact.imageSignature;
+                tempMyContact.presenceStatus = myContact.presenceStatus;
+                tempMyContact.primaryAlias = myContact.primaryAlias;
+                tempMyContact.type = myContact.type;
+                tempMyContact.userName = myContact.userName;
+                tempMyContact.allAliases = myContact.allAliases;
+                tempMyContact.allExternalAliases = myContact.allExternalAliases;
+                tempMyContact.displayName = myContact.displayName;
+                tempMyContact.description = myContact.description;
+                tempMyContact.department = myContact.department;
+                tempMyContact.company = myContact.company;
+                tempMyContact.homeAddress = myContact.homeAddress;
+                tempMyContact.phonebook = myContact.phonebook;
+                tempMyContact.email = myContact.email;
+                fs.saveMyContact(tempMyContact);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
+        protected override void OnResume()
+        {
+            addLog("OnResume()");
+            isForeground = true;
+        }
+
+        public async Task onLoginFailedAsync(LoginError loginError)
+        {
+
+
+            if (SharedData.Instance.launchAction != LaunchAction.DEFAULT)
+            {
+                addLog("onLoginFailedAsync(): do destroyApp");
+
+#if ANDROID
+                var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as lifeCycleHandler;
+                x.doDestroy();
+#elif __IOS__
+                AppDelegate.destroyApp();
+#endif
+            }
+            else
+            {
+#if WINDOWS_UWP
+                var alertHelper = AlertHelper.Instance;
+                alertHelper.clearBadge();
+                //alertHelper.ShowUwpMessage("You Are Not Registered!");
+#endif
+
+                if (loginError == LoginError.ForcedStop)
+                {
+                    MyFileSystem.Instance.saveLoginCardential(null, CardentialState.Aeonix);
+                    ContactService.Instance.resetMyContact();
+                    MainPage = new NavigationPage(new components.Login());
+                }
+                else
+                {
+
+                    new Task(() =>
+                    {
+                        addLog("onLoginFailed will ReRegister in 5 seconds");
+
+                        Thread.Sleep(5000);
+                        if (MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix) != null)
+                        {
+                            addLog("doing ReRegister");
+
+                            LoginService.Instance.register(RegisterCommands.ReRegister);
+
+                        }
+
+                    }).Start();
+                }
+            }
+        }
+
+        public void onLoginSuccsses()
+        {
+            addLog("onLoginSuccsses(), launch action is: " + SharedData.Instance.launchAction);
+            switch (SharedData.Instance.launchAction)
+            {
+                case LaunchAction.REGISTRATION_LOST:
+                case LaunchAction.NEW_IM:
+                case LaunchAction.ISSUE_MWI:
+                    addLog("onLoginSuccsses(): do destroyApp");
+#if ANDROID
+                    var notificationManager = global::AndroidX.Core.App.NotificationManagerCompat.From(Plugin.CurrentActivity.CrossCurrentActivity.Current.AppContext);
+                    notificationManager.CancelAll();
+                    var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as lifeCycleHandler;
+                    x.doDestroy();
+#elif __IOS__
+                AppDelegate.destroyApp();
+#endif
+                    return;
+                case LaunchAction.INCOMING_CALL:
+
+                    Device.StartTimer(TimeSpan.FromMilliseconds(6000), () =>
+                    {
+
+                        if (LinphoneBase.Instance.linphoneCore.CallsNb == 0)
+                        {
+                            addLog("destroy app since expecting incoming call that did not arrived!");
+#if ANDROID
+                            var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as lifeCycleHandler;
+                            x.doDestroy();
+#elif __IOS__
+                            AppDelegate.destroyApp();
+#endif
+                        }
+                        return false;
+                    });
+                    break;
+                default:
+                    if (!isWifiNetwork() && MyFileSystem.Instance.loadSettings().showWIFIAlert)
+                        displayWifiAlertAsync();
+
+                    break;
+
+            }
+            AeonixInfoService.Instance.subscribetr87();
+        }
+
+        private bool isWifiNetwork()
+        {
+            var profiles = Xamarin.Essentials.Connectivity.ConnectionProfiles;
+            return profiles.Contains(Xamarin.Essentials.ConnectionProfile.WiFi);
+        }
+
+        private async Task displayWifiAlertAsync()
+        {
+            bool answer = await MainPage.DisplayAlert("", (string)Application.Current.Resources["wifi_alert"], (string)Application.Current.Resources["ok"], (string)Application.Current.Resources["dont_show"], (FlowDirection)Application.Current.Resources["FlowDirection"]);
+            if (!answer)
+            {
+                addLog("don't show again Wi-Fi alert again!");
+                var fs = MyFileSystem.Instance;
+                var settings = fs.loadSettings();
+                settings.showWIFIAlert = false;
+                fs.saveSettings(settings);
+            }
+        }
+
+        public void onLoginLevelUp(int precent, MyRegistrationState registrationState)
+        {
+
+        }
+
+        public void onInfoProccessFinished()
+        {
+            addLog("onInfoProccessFinished(), launch action is: " + SharedData.Instance.launchAction);
+            var calls = CallService.Instance.myCalls;
+            SharedData.Instance.launchAction = LaunchAction.DEFAULT;
+            if (calls != null)
+            {
+                var b = false;
+                foreach (var i in calls)
+                {
+                    if (i != null && i.callid.Equals(""))
+                        b = true;
+                }
+                if (b)
+                {
+                    AeonixInfoService.Instance.getSnapShotDeviceRequest();
+                    return;
+                }
+            }
+            var imageService = ImgService.Instance;
+            imageService.myInfoProccessListener = this;
+            imageService.updateImageproccess(true);
+        }
+
+        public void onImageProccessFinished()
+        {
+            addLog("onImageProccessFinished");
+            isImageProcessfinished = true;
+            if (isSDKContactsArrived)
+                updateExternalContacts();
+        }
+
+        public void onSDKContactArrived()
+        {
+            addLog("onSDKContactArrived()");
+            isSDKContactsArrived = true;
+            if (isImageProcessfinished)
+                updateExternalContacts();
+
+        }
+
+        private void updateExternalContacts()
+        {
+            var settings = MyFileSystem.Instance.loadSettings();
+            if (settings.IsSyncContacts)
+            {
+                addLog("Fire updateExternalContacts()");
+                AeonixInfoService.Instance.updateExternalContacts(SharedData.Instance.shouldUploadAllcontacts);
+            }
+            else
+                addLog("Sync external contacts is disabled!");
+        }
+    }
+}
