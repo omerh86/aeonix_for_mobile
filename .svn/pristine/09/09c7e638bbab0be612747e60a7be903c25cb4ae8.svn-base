@@ -1,0 +1,117 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+using System.Windows.Input;
+using Xamarin.Essentials;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class FavotireComponent : ContentView, FavListener
+    {
+        ContactService contactService;
+        private bool _isRefreshing = false;
+        public bool IsRefreshing
+        {
+            get { return _isRefreshing; }
+            set
+            {
+                _isRefreshing = value;
+                OnPropertyChanged(nameof(IsRefreshing));
+            }
+        }
+        public ICommand RefreshCommand
+        {
+            get
+            {
+                return new Command(() =>
+                {
+                    IsRefreshing = true;
+
+                    AeonixInfoService.Instance.getFavorites();
+                    new Thread(refresherGurd).Start();
+                });
+            }
+        }
+        public ICommand searchFieldNotEmptyCommand { get; private set; }
+        public ICommand ContactinfoCommand { get; private set; }
+        public ICommand MessageCommand { get; private set; }
+        public ICommand CallCommand { get; private set; }
+        public FavotireComponent()
+        {
+            addLog("FavotireComponent()");
+            InitializeComponent();
+            BindingContext = this;
+            contactService = ContactService.Instance;
+            ContactinfoCommand = new Command<string>(onContactInfoPressed);
+            MessageCommand = new Command<string[]>(onMessagePressed);
+            CallCommand = new Command<string[]>(onCallPressed);
+            onFavListChanged();
+
+            contactService.favListener = this;
+            AeonixInfoService.Instance.favListener = this;
+            ImgService.Instance.favListener = this;
+        }
+
+        ~FavotireComponent()
+        {
+            addLog("~FavotireComponent()");
+        }
+
+        public void refresherGurd()
+        {
+            Thread.Sleep(5000);
+            IsRefreshing = false;
+        }
+
+        public void onPresenceListChanged()
+        {
+            addLog("onPresenceListChanged");
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                IsRefreshing = false;
+            });
+        }
+
+        public void onFavListChanged()
+        {
+            addLog("onFavListChanged");
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                favList.ItemsSource = await contactService.getAllFavAsync();
+            });
+            if (IsRefreshing)
+                AeonixInfoService.Instance.getPresencelistAsync();
+        }
+
+        void onContactInfoPressed(string userName)
+        {
+            var page = (Page)new contactDetail(userName);
+            Navigation.PushAsync(page, false);
+        }
+
+        void onMessagePressed(string[] names)
+        {
+            Console.WriteLine("omer60: " + names[0]);
+            var page = (Page)new Messages(names[0], names[1]);
+            Navigation.PushAsync(page, false);
+        }
+
+        void onCallPressed(string[] names)
+        {
+            CallService.Instance.callAsync(names[0], names[1], names[2].Equals("True") ? true : false, names[3]);
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "FavoritesComponent");
+            Console.WriteLine($"omer5226: {message}");
+        }
+    }
+}

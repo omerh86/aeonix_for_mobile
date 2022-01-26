@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage  xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.contactDetail"
+             Title="Contact Info"
+              x:Name="Detailview"
+               xmlns:Helpers="clr-namespace:LinphoneXamarin.Util"
+              xmlns:render="clr-namespace:LinphoneXamarin.components.userControllers"
+              xmlns:controls="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+              FlowDirection="{StaticResource FlowDirection}">
+    <StackLayout x:Name="info_layout">
+        <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand" >
+            <StackLayout.Background>
+                <LinearGradientBrush  EndPoint="0,1">
+                    <GradientStop Color="#0091D3" Offset=".01" />
+                    <GradientStop Color="#BAE9FF" Offset="1.0" />
+                </LinearGradientBrush>
+            </StackLayout.Background>
+            <Button Clicked="onBackClicked" HorizontalOptions="Start" Text="&#xf053;" BorderColor="Transparent" BackgroundColor="Transparent" TextColor="White" FontSize="Large" >
+                <Button.FontFamily>
+                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                </Button.FontFamily>
+            </Button>
+
+            <controls:CircleImage Source="{Binding image}"  HeightRequest="80" WidthRequest="80"/>
+            <Label  ClassId="{StaticResource favorites}"  x:Name="favBtn"  Margin="0,-15,0,5"   Text="&#xf005;" HorizontalOptions="Center"  FontSize="Large">
+                <Label.FontFamily>
+                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"/>
+                </Label.FontFamily>
+            </Label>
+            <render:SelectableLabel Margin="2" Text="{Binding displayName}" HorizontalOptions="Center" VerticalOptions="Center" FontSize="Large" TextColor="White"></render:SelectableLabel>
+
+            <StackLayout Orientation="Horizontal" Padding="5">
+                <Button Margin="10" Clicked="onEmailpressed" ClassId="{StaticResource mail}"  x:Name="emailBtn"   Text="&#xf0e0;" HorizontalOptions="Center"  BackgroundColor="#BAE9FF" WidthRequest="50" HeightRequest="50" CornerRadius="25" TextColor="White" FontSize="Large">
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-regular-400.ttf#Font Awesome 5 Free" Android="fa-regular-400.ttf#Font Awesome 5 Free Regular" iOS="Font Awesome 5 Free"  />
+                    </Button.FontFamily>
+
+                </Button>
+                <Button Margin="10" Clicked="onMessageClicked" ClassId="{StaticResource chat}"  x:Name="messageBtn"  Text="&#xf075;" HorizontalOptions="Center"   BackgroundColor="#BAE9FF" WidthRequest="50" HeightRequest="50" CornerRadius="25" TextColor="White" FontSize="Large">
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+                <Button Margin="10" Clicked="onCallClicked"  Text="&#xf095;"  HorizontalOptions="Center"   BackgroundColor="#BAE9FF" WidthRequest="50" HeightRequest="50" CornerRadius="25" TextColor="White" FontSize="Small">
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+            </StackLayout>
+        </StackLayout>
+        <StackLayout x:Name="callLogListContainer" IsVisible="False" Margin="5">
+            <Label x:Name="callLogListTitle" HorizontalOptions="Start" TextColor="#102347" FontSize="Large" />
+            <ListView x:Name="callLogList"  SeparatorVisibility="None"  VerticalOptions="Fill" >
+                <ListView.ItemTemplate>
+                    <DataTemplate >
+                        <ViewCell>
+                            <StackLayout  Orientation="Horizontal"  Padding="5">
+                                <Label VerticalOptions="Center" TextColor="#9EA6B4" Text="{x:Binding formattedTime}"  />
+                                <Label Rotation="-45" VerticalOptions="Center" FontSize="Small"  TextColor="{Binding callDirection, Converter={Helpers:CallDirectionColorConverter}}"  Text="{x:Binding callDirection, Converter={Helpers:CallDirectionConverter}}">
+                                    <Label.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="Font Awesome 5 Free"  />
+                                    </Label.FontFamily>
+                                </Label>
+                                <Label VerticalOptions="Center" TextColor="#9EA6B4"  Text="{x:Binding callDirection}"/>
+                                <Label VerticalOptions="Center" TextColor="#9EA6B4"  Text="{x:Binding duration}"/>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <BoxView BackgroundColor="#B4D0DE" Opacity=".2" HeightRequest="1"  HorizontalOptions="FillAndExpand"></BoxView>
+        </StackLayout>
+
+        <ListView  x:Name="allAliases" HasUnevenRows="True" SeparatorVisibility="None"  VerticalOptions="Fill" HorizontalOptions="FillAndExpand"  Margin="5" >
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell >
+                        <StackLayout Padding="5" Orientation="Vertical" HorizontalOptions="FillAndExpand">
+                            <StackLayout  Orientation="Horizontal" VerticalOptions="Center"  HorizontalOptions="FillAndExpand">
+                                <StackLayout  HorizontalOptions="StartAndExpand">
+                                    <render:SelectableLabel Text="{Binding type, Converter={Helpers:AliasTypeConverter}}"  VerticalOptions="Center"  TextColor="#9EA6B4" HorizontalOptions="Start" WidthRequest="100"  FontSize="Medium"/>
+                                    <render:SelectableLabel  Text="{Binding number}" VerticalOptions="Center"  HorizontalOptions="FillAndExpand" FontAttributes="Bold" TextColor="#102347"  FontSize="Small"></render:SelectableLabel>
+                                </StackLayout>
+
+
+                                <Button IsVisible="{Binding isVideo}" Command="{Binding Source={x:Reference Detailview}, Path=BindingContext.VideoCallClickedCommand}" CommandParameter="{Binding number}" Text="&#xf03d;" ClassId="{StaticResource video}" VerticalOptions="Center" BackgroundColor="Transparent"  TextColor="#B4D0DE" FontSize="Small">
+                                    <Button.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                    </Button.FontFamily>
+                                </Button>
+                                <Button  Command="{Binding Source={x:Reference Detailview}, Path=BindingContext.CallClickedCommand}"  CommandParameter="{Binding number}"  ClassId="{StaticResource audiocall}" Text="&#xf095;"  BackgroundColor="Transparent" VerticalOptions="Center" TextColor="#B4D0DE"  FontSize="Small">
+                                    <Button.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                    </Button.FontFamily>
+                                </Button>
+                            </StackLayout>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <ScrollView>
+
+            <StackLayout Margin="5">
+                <BoxView BackgroundColor="#B4D0DE" Opacity=".2" HeightRequest="1"  HorizontalOptions="FillAndExpand"></BoxView>
+                <StackLayout IsVisible="{Binding email , Converter={Helpers:FieldVisibility}}"  Padding="5">
+                    <render:SelectableLabel Text="{StaticResource mail}"  FontSize="Medium"  TextColor="#9EA6B4" WidthRequest="100"></render:SelectableLabel>
+                    <render:SelectableLabel Text="{Binding email}" VerticalOptions="Center" FontAttributes="Bold" TextColor="#102347" FontSize="Small"></render:SelectableLabel>
+                    <BoxView BackgroundColor="#B4D0DE" Opacity=".2" HeightRequest="1"  HorizontalOptions="FillAndExpand"></BoxView>
+                </StackLayout>
+                <StackLayout IsVisible="{Binding company , Converter={Helpers:FieldVisibility}}"  Padding="5">
+                    <render:SelectableLabel Text="{StaticResource company}"   TextColor="#9EA6B4" FontSize="Medium" ></render:SelectableLabel>
+                    <render:SelectableLabel Text="{Binding company}" VerticalOptions="Center" FontAttributes="Bold" TextColor="#102347" FontSize="Small" ></render:SelectableLabel>
+                    <BoxView BackgroundColor="#B4D0DE" Opacity=".2" HeightRequest="1"  HorizontalOptions="FillAndExpand"></BoxView>
+                </StackLayout>
+                <StackLayout IsVisible="{Binding department , Converter={Helpers:FieldVisibility}}" Padding="5">
+                    <render:SelectableLabel Text="{StaticResource department}" FontSize="Medium"   TextColor="#9EA6B4" ></render:SelectableLabel>
+                    <render:SelectableLabel Text="{Binding department}" FontAttributes="Bold" TextColor="#102347"  FontSize="Small"></render:SelectableLabel>
+                    <BoxView BackgroundColor="#B4D0DE" Opacity=".2" HeightRequest="1"  HorizontalOptions="FillAndExpand"></BoxView>
+                </StackLayout>
+                <StackLayout IsVisible="{Binding description , Converter={Helpers:FieldVisibility}}"  Padding="5">
+                    <render:SelectableLabel Text="{StaticResource notes}" FontSize="Medium"  TextColor="#9EA6B4"></render:SelectableLabel>
+                    <render:SelectableLabel Text="{Binding description}" FontAttributes="Bold" TextColor="#102347"  FontSize="Small" ></render:SelectableLabel>
+                    <BoxView BackgroundColor="#B4D0DE" Opacity=".2" HeightRequest="1"  HorizontalOptions="FillAndExpand"></BoxView>
+                </StackLayout>
+                <StackLayout IsVisible="{Binding homeAddress, Converter={Helpers:FieldVisibility}}" Padding="5">
+                    <render:SelectableLabel Text="{StaticResource address}" FontSize="Medium"  TextColor="#9EA6B4"></render:SelectableLabel>
+                    <render:SelectableLabel Text="{Binding homeAddress}"   FontAttributes="Bold" TextColor="#102347"  FontSize="Small" ></render:SelectableLabel>
+                    <BoxView BackgroundColor="#B4D0DE" Opacity=".2" HeightRequest="1"  HorizontalOptions="FillAndExpand"></BoxView>
+                </StackLayout>
+                <StackLayout IsVisible="{Binding phonebook, Converter={Helpers:FieldVisibility}}"  Padding="5">
+                    <render:SelectableLabel Text="{StaticResource phonebook}" FontSize="Medium"  TextColor="#9EA6B4"></render:SelectableLabel>
+                    <render:SelectableLabel Text="{Binding phonebook}"   FontAttributes="Bold" TextColor="#102347"  FontSize="Small" ></render:SelectableLabel>
+                </StackLayout>
+            </StackLayout>
+
+        </ScrollView>
+    </StackLayout>
+</ContentPage>

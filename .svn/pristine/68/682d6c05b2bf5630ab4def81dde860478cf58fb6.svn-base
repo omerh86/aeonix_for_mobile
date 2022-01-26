@@ -1,0 +1,101 @@
+﻿using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Essentials;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class Groups : ContentPage, GroupListener
+    {
+        ContactService contactService;
+
+        public ICommand ContactinfoCommand { get; private set; }
+        public ICommand MessageCommand { get; private set; }
+        public ICommand CallCommand { get; private set; }
+        private bool _isRefreshing = false;
+        public bool IsRefreshing
+        {
+            get { return _isRefreshing; }
+            set
+            {
+                _isRefreshing = value;
+                OnPropertyChanged(nameof(IsRefreshing));
+            }
+        }
+        public ICommand RefreshCommand
+        {
+            get
+            {
+                return new Command(() =>
+                {
+                    AeonixInfoService.Instance.getGroups();
+                });
+            }
+        }
+        public Groups()
+        {
+            InitializeComponent();
+            contactService = ContactService.Instance;
+            ContactinfoCommand = new Command<string>(onContactInfoPressed);
+            CallCommand = new Command<string[]>(onCallPressed);
+            BindingContext = this;
+            onGroupListChanged();
+            AeonixInfoService.Instance.groupListener = this;
+
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            addLog("OnAppearing group page");
+
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            addLog("OnDisappearing favorite page");
+        }
+
+        void onCallPressed(string[] names)
+        {
+            CallService.Instance.callAsync(names[0], names[1], names[2].Equals("True") ? true : false, names[3]);
+        }
+
+        void onContactInfoPressed(string userName)
+        {
+            var page = (Page)new contactDetail(userName);
+            Navigation.PushAsync(page, false);
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "Navigation");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        public void onGroupListChanged()
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                addLog("onGroupListChanged");
+                groups.ItemsSource = await contactService.getGroupsAsync();
+                IsRefreshing = false;
+            });
+
+        }
+
+    }
+}

@@ -1,0 +1,245 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class MessageViewCell : ViewCell
+    {
+
+        public ICommand longPressCommand { get; private set; }
+        private bool isPendingDelete;
+
+        public MessageViewCell()
+        {
+            InitializeComponent();
+            longPressCommand = new Command<string>(onlongPressed);
+
+            // this.BindingContext = this;
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            message_layout.BindingContext = longPressCommand;
+            stack.BindingContext = this;
+            setMessageColor();
+            var e = messageText;
+            if (isMine)
+            {
+                message_layout.HorizontalOptions = LayoutOptions.End;
+                message_layout.Margin = new Thickness(20, 0, 0, 0);
+            }
+            else
+            {
+                message_layout.HorizontalOptions = LayoutOptions.Start;
+                message_layout.Margin = new Thickness(0, 0, 20, 0);
+            }
+        }
+
+        void onlongPressed(string val)
+        {
+#if WINDOWS_UWP
+            if (val.Equals("long"))
+            {
+
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+            {
+                doLongPress();
+            });
+            }
+
+#else
+            doLongPress();
+#endif
+        }
+
+        private void doLongPress()
+        {
+            isPendingDelete = !isPendingDelete;
+            setMessageColor();
+            Execute(longActionPressedCommand, messageId);
+        }
+
+
+        public static readonly BindableProperty longActionPressedCommandProperty =
+BindableProperty.Create("longActionPressedCommand", typeof(ICommand), typeof(MessageViewCell), null);
+        public ICommand longActionPressedCommand
+        {
+            get { return (ICommand)GetValue(longActionPressedCommandProperty); }
+            set { SetValue(longActionPressedCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty messageTextProperty =
+BindableProperty.Create("messageText", typeof(string), typeof(MessageViewCell), null);
+
+        public string messageText
+        {
+            get
+            {
+                string messageText = (string)GetValue(messageTextProperty);
+                return messageText;
+            }
+            set
+            {
+                SetValue(messageTextProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty messageIdProperty =
+BindableProperty.Create("messageId", typeof(string), typeof(MessageViewCell), null);
+
+        public string messageId
+        {
+            get
+            {
+                string messageId = (string)GetValue(messageIdProperty);
+                return messageId;
+            }
+            set
+            {
+                SetValue(messageIdProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty formattedTimeProperty =
+BindableProperty.Create("formattedTime", typeof(string), typeof(MessageViewCell), null);
+
+        public string formattedTime
+        {
+            get
+            {
+                string formattedTime = (string)GetValue(formattedTimeProperty);
+                return formattedTime;
+            }
+            set
+            {
+                SetValue(formattedTimeProperty, value);
+
+            }
+        }
+
+
+        public static readonly BindableProperty isTempProperty =
+BindableProperty.Create("isTemp", typeof(bool), typeof(MessageViewCell), true);
+
+        public bool isTemp
+        {
+            get
+            {
+                bool isTemp = (bool)GetValue(isTempProperty);
+                return isTemp;
+            }
+            set
+            {
+                SetValue(isTempProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty isMineProperty =
+BindableProperty.Create("isMine", typeof(bool), typeof(MessageViewCell), true);
+
+        public bool isMine
+        {
+            get
+            {
+                bool isMine = (bool)GetValue(isMineProperty);
+                return isMine;
+            }
+            set
+            {
+                SetValue(isMineProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty isRedMessageProperty =
+BindableProperty.Create("isRedMessage", typeof(bool), typeof(MessageViewCell), true);
+
+        public bool isRedMessage
+        {
+            get
+            {
+                bool isRedMessage = (bool)GetValue(isRedMessageProperty);
+                return isRedMessage;
+            }
+            set
+            {
+                SetValue(isRedMessageProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty searchResultTextProperty =
+BindableProperty.Create("searchResultText", typeof(string), typeof(MessageViewCell), "bbb");
+
+        public string searchResultText
+        {
+            get
+            {
+                string searchResultText = (string)GetValue(searchResultTextProperty);
+                return searchResultText;
+            }
+            set
+            {
+                SetValue(searchResultTextProperty, value);
+
+            }
+        }
+
+        public static void Execute(ICommand command, object val)
+        {
+            if (command == null) return;
+            if (command.CanExecute(null))
+            {
+                command.Execute(val);
+            }
+        }
+
+        private void setMessageColor()
+        {
+            if (isPendingDelete)
+            {
+                message_layout.BackgroundColor = Color.LightBlue;
+                message_layout.Opacity = 0.5;
+            }
+            else if (searchResultText != null && searchResultText.Length > 0 && messageText != null && messageText.ToLower().IndexOf(searchResultText.ToLower()) > -1)
+            {
+                message_layout.BackgroundColor = Color.Yellow;
+                message_layout.Opacity = 1;
+            }
+            else
+            {
+                message_layout.BackgroundColor = isMine ? Color.FromHex("#DCF8C6") : Color.FromHex("#FFFFFF");
+                message_layout.Opacity = 1;
+            }
+        }
+
+        protected override void OnPropertyChanged(string propertyName)
+        {
+            base.OnPropertyChanged(propertyName);
+
+            switch (propertyName)
+            {
+                case "searchResultText":
+                    this.setMessageColor();
+                    break;
+
+
+
+            }
+        }
+
+    }
+}

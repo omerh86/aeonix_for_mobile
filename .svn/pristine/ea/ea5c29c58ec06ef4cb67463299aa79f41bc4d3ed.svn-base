@@ -1,0 +1,65 @@
+﻿using LinphoneXamarin.Entities;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.Util
+{
+
+    public class SpeedDialIconConverter : IValueConverter, IMarkupExtension
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var result = value;
+            switch ((SpeedDialType)value)
+            {
+                case SpeedDialType.Speedial:
+                    return "speedial.png";
+                case SpeedDialType.VM:
+                    return "voicemailspeedbtn.png";
+                case SpeedDialType.Rod:
+                    return "rod.png";
+                case SpeedDialType.Emergency:
+                    return "emergency.png";
+                case SpeedDialType.GroupPickup:
+                    return "pickup.png";
+                case SpeedDialType.Url:
+                    return "collaborate.png";
+                case SpeedDialType.Acc_EndWrapUP:
+                    return "acc_end_wrap_up.png";
+                case SpeedDialType.Acc_ExtendWrapUp:
+                    return "acc_extend_wrap_up.png";
+                case SpeedDialType.Acc_GroupLog:
+                    return "acc_login.png";
+                case SpeedDialType.Acc_GroupQInfo:
+                    return "acc_group_queue_info.png";
+                case SpeedDialType.Acc_LogPrimaryGroup:
+                    return "acc_login.png";
+                case SpeedDialType.Acc_Release_Resume:
+                    return "acc_release.png";
+                case SpeedDialType.Acc_Release_ResumeWithCode:
+                    return "acc_release_with_code.png";
+                case SpeedDialType.Acc_WrapUpWithcode:
+                    return "acc_wrap_up_with_code.png";
+                default:
+                    return "";
+
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+            //throw new NotImplementedException();
+        }
+
+        public object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+    }
+}

@@ -1,0 +1,488 @@
+﻿
+using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using Plugin.Clipboard;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+using Device = Xamarin.Forms.Device;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class Messages : ContentPage, MYImMessagesListener
+    {
+        public ICommand longPressedCommand { get; private set; }
+        public List<MyMessage> allMessages;
+        public string searchResultText { set; get; }
+        private List<string> messageIDToDelete;
+        private ObservableCollection<MessageGroup> _groupedMessages;
+
+        public ObservableCollection<MessageGroup> groupedMessages
+        {
+            get { return _groupedMessages; }
+            set
+            {
+                addLog("groupedMessages set()");
+                _groupedMessages = value;
+                //OnPropertyChanged("groupedMessages");
+            }
+        }
+        private MessagesService messagesService;
+
+        private List<MyMessage> searchResult;
+        private int searchIndex = 0;
+        private string chatId;
+        private string chatName;
+
+        ToolbarItem deleteBarIem;
+        ToolbarItem searchBarItem;
+        ToolbarItem copyBarItem;
+        public Messages(string chatId, string chatName)
+        {
+            InitializeComponent();
+
+            this.chatId = chatId;
+            this.chatName = chatName;
+            this.Title = chatName;
+            searchInput.BindingContext = searchResultText;
+            longPressedCommand = new Command<string>(onlongPressed);
+            messageListView.BindingContext = longPressedCommand;
+            addingLabelsGestures();
+            copyBarItem = new ToolbarItem("", "copy.png", copyToClipBoard);
+            deleteBarIem = new ToolbarItem("", "delete.png", alertDeleteMessage);
+            searchBarItem = new ToolbarItem("", "search.png", () =>
+              {
+                  searchComponent.IsVisible = !searchComponent.IsVisible;
+              });
+
+#if WINDOWS_UWP || ANDROID
+            messageEntry.AutoSize = EditorAutoSizeOption.TextChanges;
+#endif
+        }
+
+        void onlongPressed(string val)
+        {
+            addLog("onlongPressed: " + val);
+            var index = messageIDToDelete.FindIndex(i => i.Equals(val));
+            if (index > -1)
+                messageIDToDelete.RemoveAt(index);
+            else
+                messageIDToDelete.Add(val);
+            addLog("messageIDToDelete count: " + messageIDToDelete.Count);
+            toolbarIconHandler();
+        }
+
+        private void toolbarIconHandler()
+        {
+            if (messageIDToDelete.Count == 0)
+            {
+                ToolbarItems.Remove(deleteBarIem);
+                ToolbarItems.Remove(copyBarItem);
+                if (!ToolbarItems.Contains(searchBarItem))
+                    ToolbarItems.Add(searchBarItem);
+            }
+            else if (messageIDToDelete.Count == 1 && ToolbarItems.Contains(searchBarItem))
+            {
+                ToolbarItems.Remove(searchBarItem);
+                ToolbarItems.Add(deleteBarIem);
+                ToolbarItems.Add(copyBarItem);
+            }
+        }
+
+        private void copyToClipBoard()
+        {
+            var textToCopy = "";
+            if (messageIDToDelete.Count == 1)
+            {
+                var message = allMessages.Find(m => m.messageId.Equals(messageIDToDelete[0]));
+                if (message != null)
+                    textToCopy = message.messageText;
+            }
+            else
+            {
+
+                foreach (var i in messageIDToDelete)
+                {
+                    var message = allMessages.Find(m => m.messageId.Equals(i));
+                    if (message != null)
+                        textToCopy += "\n" + message.messageText;
+
+                }
+            }
+            CrossClipboard.Current.SetText(textToCopy);
+            messageIDToDelete.Clear();
+            toolbarIconHandler();
+            //TO DO erase highlited messages
+            updateMessageList();
+        }
+
+        private void addingLabelsGestures()
+        {
+            upLbl.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => onUp()),
+            });
+            downLbl.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => onDown()),
+            });
+            clearLbl.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => onClearSearch()),
+            });
+
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            messageIDToDelete = new List<string>();
+
+            messagesService = MessagesService.Instance;
+            messagesService.mYImMessagesListener = this;
+            messagesService.enterChat(chatId);
+            new Task(() =>
+            {
+                allMessages = messagesService.getAllMessages();
+                if (allMessages.Count > 0)
+                    updateMessageList();
+            }).Start();
+            Device.StartTimer(TimeSpan.FromMilliseconds(200), () =>
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    //  ((App)App.Current).removeSearchIcon();
+
+                    messageIDToDelete.Clear();
+                    toolbarIconHandler();
+                });
+                return false;
+            });
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            //  ((App)App.Current).addSearchIcon();
+            messageIDToDelete.Clear();
+
+            //SharedData.Instance.isOverideBackBtn = true;
+            messagesService.mYImMessagesListener = null;
+            messagesService.leaveChat();
+        }
+
+        async void alertDeleteMessage()
+        {
+            bool answer = await DisplayAlert("", (string)Application.Current.Resources["want_to_delete"], (string)Application.Current.Resources["yes"], (string)Application.Current.Resources["no"]);
+            addLog("alertDeleteMessage: " + answer);
+            if (answer)
+            {
+                foreach (var i in messageIDToDelete)
+                {
+                    var result = allMessages.Find(m => m.messageId.Equals(i));
+                    if (result != null)
+                        messagesService.deleteMessage(result);
+
+                }
+
+                messageIDToDelete.Clear();
+                toolbarIconHandler();
+                new Task(() =>
+                {
+                    allMessages = messagesService.getAllMessages();
+                    if (allMessages.Count > 0)
+                        updateMessageList();
+                    else
+                    {
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            Navigation.PopAsync(false);
+                        });
+
+                    }
+                }).Start();
+            }
+        }
+
+        private void onSend(object sender, EventArgs e)
+        {
+            if (messageEntry.Text != null && messageEntry.Text != "")
+            {
+                retrySendCounter = 0;
+                disableSend();
+                doSend();
+            }
+
+        }
+
+        private void doSend()
+        {
+            var text = messageEntry.Text.TrimEnd();
+            addLog("doSend(): " + text);
+            messagesService.sendMessage(text);
+        }
+
+        private void updateMessageList()
+        {
+            addLog("updateMessageList()");
+            Device.BeginInvokeOnMainThread(() =>
+             {
+                 populateGroupedMessages();
+                 messageListView.ItemsSource = groupedMessages;
+                 messageListView.ScrollTo(allMessages[allMessages.Count - 1], ScrollToPosition.End, false);
+             });
+        }
+
+        private void addMessage(MyMessage myMessage)
+        {
+            addLog("addMessage()");
+            if (allMessages.Count == 0)
+            {
+                allMessages.Add(myMessage);
+                updateMessageList();
+            }
+            else
+            {
+                allMessages.Add(myMessage);
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    TimeHelper th = TimeHelper.Instance;
+                    var currentDate = th.FromUnixTime(myMessage.messageTime);
+                    if (!th.isSameDay(currentDate, th.FromUnixTime(allMessages[allMessages.Count - 2].messageTime)))
+                    {
+                        groupedMessages.Add(new MessageGroup(getDateTitle(th, currentDate)));
+                    }
+                    groupedMessages[groupedMessages.Count - 1].Add(myMessage);
+
+                    addLog("addMessage(): " + groupedMessages[groupedMessages.Count - 1].Count);
+                    messageListView.ScrollTo(allMessages[allMessages.Count - 1], ScrollToPosition.End, false);
+                });
+            }
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "message_page");
+            Console.WriteLine("omer222: " + message);
+        }
+
+        public void onMessageRecieved(MyMessage myMessage, Destination d)
+        {
+            messageIDToDelete.Clear();
+            toolbarIconHandler();
+            if (myMessage.isMine)
+            {
+                if (!sendBtn.IsEnabled)
+                    enableSend();
+            }
+
+            if (allMessages.Count == 0 || !myMessage.messageId.Equals(allMessages[allMessages.Count - 1].messageId))
+            {
+                if (myMessage.isMine)
+                    MyAudioManager.Instance.playFile("notification_sound.mp3");
+
+                // this.updateMessageList();
+                addMessage(myMessage);
+            }
+        }
+
+        private void enableSend()
+        {
+            Console.WriteLine("omer929: enableSend");
+            pending.IsVisible = false;
+            messageEntry.Text = "";
+            messageEntry.IsEnabled = true;
+            messageEntry.Opacity = 1;
+            messageEntry.Unfocus();
+            sendBtn.IsEnabled = true;
+            sendBtn.Opacity = 1;
+        }
+
+        private void disableSend()
+        {
+            Console.WriteLine("omer929: disableSend");
+            pending.IsVisible = true;
+            sendBtn.IsEnabled = false;
+            sendBtn.Opacity = 0.5;
+            messageEntry.IsEnabled = false;
+            messageEntry.Opacity = 0.5;
+        }
+
+        public class MessageGroup : ObservableCollection<MyMessage>
+        {
+            public string Title { get; set; }
+
+            public MessageGroup(string title) : base()
+            {
+                Title = title;
+            }
+
+            public static ObservableCollection<MyMessage> All { private set; get; }
+
+        }
+
+        private void populateGroupedMessages()
+        {
+            groupedMessages = new ObservableCollection<MessageGroup>
+            {
+               new MessageGroup ((string)Application.Current.Resources["noMessages"])
+             };
+            TimeHelper th = TimeHelper.Instance;
+            var currentDate = th.FromUnixTime(allMessages[0].messageTime);
+            groupedMessages[0].Title = getDateTitle(th, currentDate);
+
+            for (int i = 0; i < allMessages.Count; i++)
+            {
+                if (!th.isSameDay(currentDate, th.FromUnixTime(allMessages[i].messageTime)))
+                {
+                    currentDate = th.FromUnixTime(allMessages[i].messageTime);
+                    groupedMessages.Add(new MessageGroup(getDateTitle(th, currentDate)));
+                }
+                groupedMessages[groupedMessages.Count - 1].Add(allMessages[i]);
+            }
+        }
+
+        private string getDateTitle(TimeHelper th, DateTime date)
+        {
+            if (th.isSameDay(date, DateTime.Now))
+                return (string)Application.Current.Resources["today"];
+            else
+                return date.ToShortDateString();
+        }
+
+        private void onSearchedClicked(object sender, TextChangedEventArgs e)
+        {
+            if (searchInput != null)
+            {
+                searchResultText = searchInput.Text;
+                searchInput.BindingContext = searchResultText;
+                doSearch(searchResultText);
+            }
+        }
+
+        private void onClearSearch()
+        {
+            searchInput.Text = "";
+            searchComponent.IsVisible = false;
+        }
+
+        private void onUp()
+        {
+            if (searchResult != null && searchResult.Count > 0)
+            {
+                searchIndex++;
+                if (searchIndex >= searchResult.Count)
+                    searchIndex = 0;
+
+                Console.WriteLine("omer200 searchIndex: " + searchIndex);
+                messageListView.ScrollTo(searchResult[searchIndex], ScrollToPosition.Center, false);
+            }
+        }
+
+        private void onDown()
+        {
+            if (searchResult != null && searchResult.Count > 0)
+            {
+                searchIndex--;
+                if (searchIndex < 0)
+                    searchIndex = searchResult.Count - 1;
+
+
+                messageListView.ScrollTo(searchResult[searchIndex], ScrollToPosition.Center, false);
+
+            }
+        }
+
+        private void doSearch(string text)
+        {
+            searchResult = new List<MyMessage>();
+            foreach (var i in allMessages)
+            {
+                if (i.messageText.ToLower().IndexOf(text.ToLower()) > -1)
+                {
+                    searchResult.Add(i);
+                }
+
+            }
+            if (searchResult.Count > 0)
+            {
+                searchIndex = 0;
+
+                messageListView.ScrollTo(searchResult[0], ScrollToPosition.Center, false);
+            }
+
+        }
+
+        public void onMessageIdRecieved(string messageId)
+        {
+
+        }
+
+
+        int retrySendCounter = 0;
+        public void onMessageSendErr(InfoErr err)
+        {
+            addLog("onMessageSendErr() reason: " + err.ToString());
+
+            if (err == InfoErr.BUSY)
+            {
+                Device.StartTimer(TimeSpan.FromMilliseconds(8000), () =>
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                        {
+                            if (retrySendCounter == 0)
+                            {
+                                doSend();
+                            }
+                            else
+                            {
+                                //todo
+                                enableSend();
+                                errorLblHandler();
+                            }
+                            retrySendCounter++;
+                        });
+                    return false;
+                });
+
+            }
+            if (err == InfoErr.NO_DATA)
+            {
+                enableSend();
+                errorLblHandler();
+            }
+        }
+
+        private void errorLblHandler()
+        {
+            errorLbl.IsVisible = true;
+            Device.StartTimer(TimeSpan.FromMilliseconds(5000), () =>
+            {
+                errorLbl.IsVisible = false;
+                return false;
+            });
+
+        }
+
+        public void onMessageRead(string myMessageId, bool isRead)
+        {
+            var result = allMessages.Find(i => i.messageId.Equals(myMessageId));
+            if (result != null)
+                result.isRedMessage = isRead;
+        }
+    }
+}

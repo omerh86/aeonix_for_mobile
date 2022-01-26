@@ -1,0 +1,18 @@
+﻿using Android.App;
+using Android.Content;
+using System;
+
+namespace LinphoneXamarin.Android
+{
+    //[BroadcastReceiver(Exported = true)]
+    //[IntentFilter(new[] { "android.bluetooth.adapter.action.STATE_CHANGED" })]
+    class BtStatusListener : BroadcastReceiver
+    {
+        public bool BluetoothIsEnabled { get; set; }
+        public override void OnReceive(Context context, Intent intent)
+        {
+            Console.WriteLine("omer128: bt status changed");
+
+        }
+    }
+}

@@ -1,0 +1,83 @@
+﻿using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class navBarMaster : ContentPage
+    {
+        public ListView ListView;
+        private MyContanctVM a;
+
+        public navBarMaster()
+        {
+            InitializeComponent();
+            //a = new MyContanctVM();
+            BindingContext = a;
+            ListView = MenuItemsListView;
+            AvaliableLbl.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => OnAvaliableTapped()),
+            });
+            dndLbl.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => OnDNDTapped()),
+            });
+            busyLbl.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => OnMeetingTapped()),
+            });
+
+        }
+
+        public void OnImageTapped(object sender, EventArgs e)
+        {
+            presenceList.IsVisible = !presenceList.IsVisible;
+        }
+
+        public void OnLayoutTapped(object sender, EventArgs e)
+        {
+            presenceList.IsVisible = false;
+
+        }
+
+        public void OnAvaliableTapped()
+        {
+            doPresenceLblTapped(Presence.ONLINE);
+        }
+
+        public void OnDNDTapped()
+        {
+            doPresenceLblTapped(Presence.DND);
+        }
+
+        public void OnMeetingTapped()
+        {
+            doPresenceLblTapped(Presence.MEETING);
+        }
+
+        private void doPresenceLblTapped(Presence p)
+        {
+            Contact contatct = ContactService.Instance.myContact;
+            var before = contatct.presenceStatus;
+            contatct.presenceStatus = p;
+            AeonixInfoService.Instance.SetPresenceStatusRequest(ContactService.Instance.myContact.presenceStatus, before);
+            a.onMyInfoChanged(false);
+            presenceList.IsVisible = false;
+        }
+
+       
+    }
+}

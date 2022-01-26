@@ -1,0 +1,563 @@
+﻿using System;
+using LinphoneXamarin.Entities;
+using Linphone;
+using LinphoneXamarin.Util;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System.Threading;
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class AeonixInfoRepository
+    {
+
+        private static AeonixInfoRepository instance = null;
+        private static readonly object padlock = new object();
+        private byte[] currentDataBuffer;
+        private Core LinphoneCore;
+        private CoreListener Listener;
+        MyInfoListener myInfoListener;
+        private Tr87stateListener tr87StateListener;
+        private Event subscribeIn;
+        private Event subscribeOut;
+        private bool isBusyCreateSubscribe;
+        MyFileSystem fileSystem;
+
+        public const string TR87_SUBSCRIPTION = "Tr87Subscription";
+
+        private int counterC = 0;
+        private bool isExpired;
+
+        AeonixInfoRepository()
+        {
+            LinphoneCore = LinphoneBase.Instance.linphoneCore;
+            Listener = LinphoneBase.Instance.coreListener;
+            Listener.OnInfoReceived = OnInfoRecived;
+            Listener.OnSubscriptionStateChanged = onSubscriptionStateChanged;
+            Listener.OnNotifyReceived = onNotifyReceived;
+            fileSystem = MyFileSystem.Instance;
+        }
+
+        public static AeonixInfoRepository Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new AeonixInfoRepository();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        private void OnInfoRecived(Core lc, Call call, InfoMessage msg)
+        {
+            try
+            {
+                fireTr87connectionResponse(msg);
+            }
+            catch (Exception e)
+            {
+                addLog($"OnInfoRecived exeption {e}");
+            }
+
+        }
+
+        private void onSubscriptionStateChanged(Core lc, Event lev, SubscriptionState state)
+        {
+            if (TR87_SUBSCRIPTION.Equals(lev.Name))
+            {
+#if WINDOWS_UWP
+                addLog("onSubscriptionStateChanged: " + state + ", reason: " + lev.Reason);
+                addLog("is in: " + lev.Equals(subscribeIn) + ", is out: " + lev.Equals(subscribeOut));
+#else
+                addLog($"onSubscriptionStateChanged: {state}, reason: {lev.Reason} ,subscriber is: {lev.Resource.nativePtr}");
+#endif
+
+                switch (lev.SubscriptionState)
+                {
+                    case SubscriptionState.Expiring:
+                        isExpired = true;
+                        lev.Terminate();
+                        break;
+                    case SubscriptionState.IncomingReceived:
+                        addLog("Accept Subscription");
+                        subscribeIn = lev;
+                        subscribeIn.AcceptSubscription();
+                        initialNotifty();
+                        this.fireOnSubscribed();
+                        break;
+
+                    case SubscriptionState.Active:
+                        if (lev.Equals(subscribeIn))
+                            lockCreateSubscribeHandler(false);
+                        break;
+
+                    case SubscriptionState.Terminated:
+                        if (isExpired)
+                        {
+                            isExpired = false;
+                            keepAliveHandler();
+                        }
+                        break;
+                }
+
+            }
+
+        }
+
+        private void lockCreateSubscribeHandler(bool shouldLock)
+        {
+            isBusyCreateSubscribe = shouldLock;
+            addLog($"is create subscribe locked: {isBusyCreateSubscribe}");
+        }
+
+        private void keepAliveHandler()
+        {
+            new Task(() =>
+            {
+                fireOnSubscribedTerminated();
+                addLog("keepAliveHandler(): subscribetr87");
+                AeonixInfoService.Instance.subscribetr87();
+            }).Start();
+        }
+
+        public bool isSubscribed()
+        {
+            return (subscribeIn != null && subscribeIn.SubscriptionState == SubscriptionState.Active);
+        }
+
+        public void terminateSubscribe()
+        {
+            if (subscribeOut != null)
+                subscribeOut.Terminate();
+        }
+
+        public void initialNotifty()
+        {
+            subscribeIn.AddCustomHeader("Subscription-State", "active");
+            subscribeIn.AddCustomHeader("Content-Disposition", "signal; handling=required");
+            // subscribeIn.Notify(null);
+        }
+
+        private void onNotifyReceived(Core lc, Object ev, string eventName, Content content)
+        {
+            addLog("onNotifyReceived()");
+
+            try
+            {
+                if (TR87_SUBSCRIPTION.Equals(eventName))
+                {
+#if WINDOWS_UWP
+
+#else
+                    if (subscribeOut == null || subscribeOut.nativePtr != ((Event)ev).nativePtr)
+                    {
+                        addLog("ignoring this response since its from irrelevant subscriber");
+                        return;
+                    }
+#endif
+                    var isMoreDataNumber = ((Event)ev).GetCustomHeader("xMoreData");
+                    int length = Int32.Parse(content.GetCustomHeader("Content-Length"));
+                    addLog("isMoreDataNumber: " + isMoreDataNumber);
+                    addLog("length: " + length);
+
+                    bool isMoreData = false;
+                    if (isMoreDataNumber != null)
+                    {
+                        isMoreData = int.Parse(isMoreDataNumber) > 0;
+                    }
+
+                    byte[] infoDataArr = null;
+                    try
+                    {
+                        if (content.Buffer != IntPtr.Zero && length > 0)
+                        {
+                            infoDataArr = new byte[length];
+                            Marshal.Copy(content.Buffer, infoDataArr, 0, length);
+
+                            if (content.Encoding != null && content.Encoding.Equals("gzip"))
+                            {
+                                infoDataArr = MyFileSystem.Instance.Decompress(infoDataArr);
+                                addLog("Decompress GZIP sucssesfully ");
+                            }
+                        }
+
+                        updateInfo(infoDataArr);
+                        if (isMoreData)
+                        {
+                            getMoreInfo();
+                        }
+                        else
+                        {
+                            var info = Encoding.UTF8.GetString(currentDataBuffer);
+                            addLog("Encoding UTF8 sucssesfully ");
+                            currentDataBuffer = null;
+                            this.firetSubscribeInfoRecived(info, getInfoType(info));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        addLog("err: " + e);
+                        currentDataBuffer = null;
+                        this.firetSubscribeInfoRecived("", getInfoType(""));
+                    }
+                }
+                else if (eventName.Equals("message-summary"))
+                {
+                    int length = Int32.Parse(content.GetCustomHeader("Content-Length"));
+                    byte[] infoDataArr = null;
+                    var counter = 0;
+
+                    if (content.Buffer != IntPtr.Zero && length > 0)
+                    {
+                        infoDataArr = new byte[length];
+                        Marshal.Copy(content.Buffer, infoDataArr, 0, length);
+
+                    }
+                    var info = Encoding.UTF8.GetString(infoDataArr).Trim();
+
+                    if (info.IndexOf("Voice-Message:") > -1)
+                    {
+                        addLog("Voice-Message info:" + info);
+                        try
+                        {
+                            var split = info.Split("Voice-Message:");
+                            split = split[1].Split("/");
+                            int num;
+                            if (int.TryParse(split[0], out num))
+                            {
+                                addLog("Voice-Message counter is " + num);
+                                MyFileSystem.Instance.saveVMCounter(num);
+                                CallLogService.Instance.setVMCounter(num);
+                            }
+                            else
+                                addLog($"Attempted conversion of '{split[0] ?? "<null>"}' failed.");
+                        }
+                        catch (Exception e)
+                        {
+                            addLog(e.ToString());
+                        }
+                    }
+                }
+                else if (eventName.Equals("yealink-xml"))
+                {
+                    var info = encodeData(content);
+                    if (info != null && info.IndexOf("FeatureButtons") > -1)
+                        this.firetSubscribeInfoRecived(info, InfoRecivedType.FEATUREBUTTONS);
+
+
+                }
+                else if (eventName.Equals("action-uri"))
+                {
+                    var info = encodeData(content);
+                    if (info != null)
+                    {
+                        if (info.IndexOf("FeatureButtons") > -1)
+                            this.firetSubscribeInfoRecived(info, InfoRecivedType.FEATUREBUTTONS);
+                        else if (info.IndexOf("key=DND") > -1)
+                        {
+                            this.firetSubscribeInfoRecived(info, InfoRecivedType.MY_CONTACT_PRESENCE);
+                        }
+                        else if (info.IndexOf("ESFCommand") > -1)
+                        {
+                            this.firetSubscribeInfoRecived(info, InfoRecivedType.ESFCommand);
+                        }
+                        else if (info.IndexOf("OfferCollaborationRequest") > -1)
+                        {
+                            this.firetSubscribeInfoRecived(info, InfoRecivedType.OFFER_COLLAB_REQUEST);
+                        }
+                        else if (info.IndexOf("OfferCollaborationStatus") > -1)
+                        {
+                            this.firetSubscribeInfoRecived(info, InfoRecivedType.OFFER_COLLAB_STATUS);
+                        }
+                        else if (info.IndexOf("StartCollaborationError") > -1)
+                        {
+                            this.firetSubscribeInfoRecived(info, InfoRecivedType.COLLABORATION_ERR);
+                        }
+                        else if (info.IndexOf("CancelCollaborationRequest") > -1)
+                        {
+                            this.firetSubscribeInfoRecived(info, InfoRecivedType.COLLAB_CANCELD);
+                        }
+
+                    }
+
+                }
+            }
+            catch (Exception err)
+            {
+                addLog(err.ToString());
+            }
+        }
+
+        private string encodeData(Content content)
+        {
+            int length = Int32.Parse(content.GetCustomHeader("Content-Length"));
+            if (content.Buffer != IntPtr.Zero && length > 0)
+            {
+                byte[] infoDataArr = null;
+                infoDataArr = new byte[length];
+                Marshal.Copy(content.Buffer, infoDataArr, 0, length);
+                return Encoding.UTF8.GetString(infoDataArr).Trim();
+            }
+            return null;
+        }
+
+        private void getMoreInfo()
+        {
+            string strToSend = MySendRequestHelper.Instance.GetNextResponseRequest();
+            sendSubscribeInfo(strToSend);
+        }
+
+        private InfoRecivedType getInfoType(string content)
+        {
+            var arr = content.Split(':');
+            if (arr != null && arr[0] != null)
+            {
+                if (arr[0].IndexOf("Event") > -1)
+                {
+                    if (arr[0].IndexOf("PresenceStateEvent") > -1)
+                    {
+                        return InfoRecivedType.FAV_PRESENCE;
+                    }
+                    return InfoRecivedType.EVENT;
+                }
+                if (arr[0].IndexOf("InstantMessage") > -1)
+                {
+                    return InfoRecivedType.IMMESSAGE;
+                }
+            }
+            return InfoRecivedType.INFO;
+        }
+
+
+
+        public void subscribeTr87(MyInfoListener myInfoListener)
+        {
+            addLog("Creating subscription");
+
+            if (LoginService.Instance.registrationProcess.CurrentState != MyRegistrationState.AfterAeonix)
+            {
+                addLog("canceling creating subscription, reason: not registered!");
+                return;
+            }
+
+            if (isBusyCreateSubscribe)
+            {
+                addLog("canceling creating subscription, reason: allready trying!");
+                return;
+            }
+            lockCreateSubscribeHandler(true);
+            new Task(() =>
+            {
+                Thread.Sleep(5000);
+                if (isBusyCreateSubscribe)
+                    lockCreateSubscribeHandler(false);
+            }).Start();
+
+            if (subscribeOut != null)
+                subscribeOut.Terminate();
+
+            subscribeIn = null;
+
+            this.myInfoListener = myInfoListener;
+            LoginInfo l = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+            var addr = LinphoneCore.CreateAddress("sip:1234@" + l.sipAdresses[l.favoriteSipAdressIndex].ip + ":" + l.sipAdresses[l.favoriteSipAdressIndex].port);
+
+            subscribeOut = LinphoneCore.CreateSubscribe(addr, "Tr87Subscription", 60 * 20);
+            subscribeOut.AddCustomHeader("Content-Disposition", "signal;handling=required");
+            subscribeOut.AddCustomHeader("TR87-Mode", "true");
+            subscribeOut.AddCustomHeader("User-Agent", SharedData.Instance.USER_AGENT);
+
+            Address address = subscribeOut.From;
+            string domain = address.Domain;
+            string name = address.Username;
+            if (address != null && domain != null && name != null)
+            {
+                int port = address.Port;
+                bool isSecure = address.Secure;
+                string contact = "sip:" + name + "@" + domain + ":" + port.ToString() + ";transport=";
+                if (isSecure)
+                {
+                    contact += "tls";
+                }
+                else
+                {
+                    contact += "tcp";
+                }
+                subscribeOut.AddCustomHeader("Contact", contact);
+
+                subscribeOut.SendSubscribe(null);
+            }
+            else
+            {
+                addLog("Creating subscription failed due to invalid credentials");
+            }
+
+        }
+
+        public void sendInviteInfo(string info)
+        {
+            Call call = CallService.Instance.tr87Call;
+            string sendInfo = info + "\r\n";
+
+            InfoMessage infoMessage = LinphoneCore.CreateInfoMessage();
+            infoMessage.AddHeader("Content-Disposition", "signal; handling=required");
+            infoMessage.AddHeader("Content-Type", "application/csta+v6+json");
+
+            Content content = LinphoneCore.CreateContent();
+            content.Type = "application";
+            content.Subtype = "csta+v6+json";
+
+            UTF8Encoding encoding = new UTF8Encoding();
+            byte[] sendInfoBytes = encoding.GetBytes(sendInfo);
+            IntPtr unmanagedPointer = System.Runtime.InteropServices.Marshal.AllocHGlobal(sendInfoBytes.Length);
+            System.Runtime.InteropServices.Marshal.Copy(sendInfoBytes, 0, unmanagedPointer, sendInfoBytes.Length);
+            content.SetBuffer(unmanagedPointer, sendInfoBytes.Length);
+
+            // Call unmanaged code
+            System.Runtime.InteropServices.Marshal.FreeHGlobal(unmanagedPointer);
+            infoMessage.Content = content;
+            call.SendInfoMessage(infoMessage);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void sendSubscribeInfo(string info, bool gzip = false)
+        {
+            if (subscribeIn != null)
+            {
+
+                string sendInfo = info + "\r\n";
+                addLog("request: " + info);
+                Content content = LinphoneCore.CreateContent();
+                content.Type = "application";
+                content.Subtype = "csta+v6+json";
+                byte[] bytes = Encoding.UTF8.GetBytes(info);
+                UTF8Encoding encoding = new UTF8Encoding();
+                byte[] sendInfoBytes = encoding.GetBytes(sendInfo);
+                addLog("info request size is " + sendInfoBytes.Length);
+                if (gzip)
+                {
+                    content.Encoding = "gzip";
+                    sendInfoBytes = MyFileSystem.Instance.compress(sendInfoBytes);
+                    addLog("new info request size is " + sendInfoBytes.Length);
+                }
+                IntPtr unmanagedPointer = Marshal.AllocHGlobal(sendInfoBytes.Length);
+                Marshal.Copy(sendInfoBytes, 0, unmanagedPointer, sendInfoBytes.Length);
+                content.SetBuffer(unmanagedPointer, sendInfoBytes.Length);
+                //  content.StringBuffer = sendInfo;
+                subscribeIn.Notify(content);
+            }
+        }
+
+        private void firetSubscribeInfoRecived(string info, InfoRecivedType infoRecivedType)
+        {
+            addLog("firetSubscribeInfoRecived:content: " + info);
+            if (this.myInfoListener != null)
+            {
+                switch (infoRecivedType)
+                {
+                    case InfoRecivedType.EVENT:
+                        this.myInfoListener.onInfoSubscribeEvent(info);
+                        break;
+                    case InfoRecivedType.IMMESSAGE:
+                        this.myInfoListener.onInfoSubscribeMessage(info);
+                        break;
+                    case InfoRecivedType.INFO:
+                        this.myInfoListener.onInfoSubscribeResponse(info);
+                        break;
+                    case InfoRecivedType.FAV_PRESENCE:
+                        this.myInfoListener.onFavPresenceSubscribeEvent(info);
+                        break;
+                    case InfoRecivedType.FEATUREBUTTONS:
+                        this.myInfoListener.onInfoFeatureButtonEvent(info);
+                        break;
+                    case InfoRecivedType.ESFCommand:
+                        this.myInfoListener.onESFCommandEvent(info);
+                        break;
+                    case InfoRecivedType.COLLABORATION_ERR:
+                        this.myInfoListener.onStartCollaborationErr(info);
+                        break;
+                    case InfoRecivedType.OFFER_COLLAB_REQUEST:
+                        this.myInfoListener.onOffercollaborationRequest(info);
+                        break;
+                    case InfoRecivedType.OFFER_COLLAB_STATUS:
+                        this.myInfoListener.onOffercollaborationStatus(info);
+                        break;
+                    case InfoRecivedType.COLLAB_CANCELD:
+                        this.myInfoListener.onCollaborationCancledResponse(info);
+                        break;
+                    case InfoRecivedType.MY_CONTACT_PRESENCE:
+                        this.myInfoListener.onMYContactPresenceChanged();
+                        break;
+                }
+
+            }
+        }
+
+
+        private void updateInfo(byte[] newData)
+        {
+            if (currentDataBuffer == null)
+            {
+                currentDataBuffer = newData;
+            }
+            else
+            {
+                currentDataBuffer = combine(currentDataBuffer, newData);
+            }
+        }
+
+        private byte[] combine(byte[] a, byte[] b)
+        {
+            byte[] rv = new byte[a.Length + b.Length];
+
+            System.Buffer.BlockCopy(a, 0, rv, 0, a.Length);
+            System.Buffer.BlockCopy(b, 0, rv, a.Length, b.Length);
+            return rv;
+        }
+
+        private void addLog(string message)
+        {
+            Console.WriteLine("omer40: " + message);
+            fileSystem.writeDebug(message, "tr87_repository");
+#if WINDOWS_UWP
+            System.Diagnostics.Debug.Write("omer:40 " + message);
+#endif
+        }
+
+        public void setTr87Listener(Tr87stateListener tr87StateListener)
+        {
+            this.tr87StateListener = tr87StateListener;
+        }
+
+        private void fireOnSubscribed()
+        {
+            if (this.myInfoListener != null)
+            {
+                this.myInfoListener.onTr87subscribed();
+            }
+        }
+
+        private void fireOnSubscribedTerminated()
+        {
+            if (this.myInfoListener != null)
+            {
+                this.myInfoListener.onTr87terminated();
+            }
+        }
+
+        private void fireTr87connectionResponse(InfoMessage infoMessage)
+        {
+            if (this.tr87StateListener != null)
+            {
+                this.tr87StateListener.onTr87ConnectionInfoResponse(infoMessage);
+            }
+        }
+    }
+}

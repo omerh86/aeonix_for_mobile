@@ -1,0 +1,238 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class CallListView : ContentView, CallsListener, UIMessageListener, LoginRegistrationListener
+    {
+        CallService callService;
+        LoginService loginService;
+        List<MyCall> callsList = new List<MyCall>();
+        MyFileSystem fileSystem;
+
+        private int labelTag;
+
+        public CallListView()
+        {
+            InitializeComponent();
+
+            loginService = LoginService.Instance;
+            callService = CallService.Instance;
+            baseFrame.IsVisible = false;
+            tempFrame.IsVisible = false;
+            fileSystem = MyFileSystem.Instance;
+            if (loginService.registrationProcess.CurrentState != MyRegistrationState.AfterAeonix)
+                this.onLoginFailedAsync(LoginError.Reconnect);
+            else
+                this.onListUpdated(callService.myCalls);
+
+
+            addLog("CallListView()");
+
+        }
+        ~CallListView()
+        {
+            addLog("~CallListView()");
+        }
+
+
+        public void onListUpdated(List<MyCall> list)
+        {
+            try
+            {
+                if (list == null)
+                    return;
+
+                addLog($"calls list size is {list.Count}");
+
+                Device.BeginInvokeOnMainThread(() =>
+                {
+
+                    callsList = list;
+                    baseFrame.BackgroundColor = Color.FromHex("#1AB800");
+                    switch (list.Count)
+                    {
+                        case 0:
+                            baseFrame.IsVisible = false;
+                            break;
+                        case 1:
+                            infoLabel.Text = (string)Application.Current.Resources["tapToReturnCall"];
+                            baseFrame.IsVisible = true;
+                            if (list[0] != null && (list[0].state == Linphone.CallState.Released || list[0].state == Linphone.CallState.End || list[0].state == Linphone.CallState.Error || list[0].state == Linphone.CallState.OutgoingProgress || list[0].state == Linphone.CallState.OutgoingInit))
+                                baseFrame.IsVisible = false;
+                            break;
+                        default:
+                            infoLabel.Text = list.Count + (string)Application.Current.Resources["activeCalls"];
+                            baseFrame.IsVisible = true;
+                            break;
+                    }
+
+                });
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        public void onTransfered(List<MyCall> list)
+        {
+
+        }
+
+        private void onCallListTapped(object sender, EventArgs e)
+        {
+            if (callsList != null && callsList.Count > 0)
+                Navigation.PushAsync((Page)new MainPage());
+        }
+
+        public void onCallFailed(string reason)
+        {
+            addLog($"onCallFailed {reason}");
+            labelTag = new Random().Next();
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                tempFrame.BackgroundColor = Color.Red;
+                tempLabel.Text = getErrReason(reason);
+                tempFrame.IsVisible = true;
+
+                MyAudioManager.Instance.playErrorNotification();
+                var formerLabelTag = labelTag;
+                Device.StartTimer(TimeSpan.FromSeconds(4), () =>
+                {
+                    MyAudioManager.Instance.stopPlayer();
+                    if (formerLabelTag == labelTag)
+                    {
+                        tempFrame.IsVisible = false;
+                    }
+                    return false;
+                });
+            });
+
+        }
+
+        public void setCollaborationMessage(string message)
+        {
+
+        }
+
+        private string getErrReason(string reason)
+        {
+            switch (reason)
+            {
+                case "doNotDisturb":
+                    return (string)Application.Current.Resources["doNotDisturb"];
+                case "invalidNumberFormat":
+                    return (string)Application.Current.Resources["invalid_number_format"];
+                case "busy":
+                    return "Busy";
+                default:
+                    return (string)Application.Current.Resources["call_failed"];
+            }
+        }
+
+        public async Task onLoginFailedAsync(LoginError loginError)
+        {
+            if (!baseFrame.IsVisible)
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    if (loginError == LoginError.Reconnect)
+                    {
+                        infoLabel.Text = (string)Application.Current.Resources["connecting"];
+                        baseFrame.BackgroundColor = Color.Orange;
+                    }
+                    else
+                    {
+                        infoLabel.Text = (string)Application.Current.Resources["tryconnect"];
+                        baseFrame.BackgroundColor = Color.Red;
+                    }
+                    baseFrame.IsVisible = true;
+                });
+            }
+        }
+
+        public void onLoginSuccsses()
+        {
+            baseFrame.IsVisible = false;
+            if (callsList != null && callsList.Count > 0)
+                onListUpdated(callsList);
+        }
+
+        public void onLoginLevelUp(int precent, MyRegistrationState registrationState)
+        {
+
+        }
+
+        private void addLog(string message)
+        {
+            fileSystem.writeDebug(message, "info_bar_component");
+            Console.WriteLine("omer40: " + message);
+        }
+
+        public void onEstablished(List<MyCall> list)
+        {
+
+        }
+
+        public void onCurrentCallChanged(List<MyCall> list)
+        {
+
+        }
+
+        public void onInfoEvent(string title, string body, int duration, bool isCollab)
+        {
+            try
+            {
+                labelTag = new Random().Next();
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    tempLabel.Text = $"{title} {body}";
+                    tempFrame.BackgroundColor = Color.DarkBlue;
+                    tempFrame.IsVisible = true;
+
+                    var formerLabelTag = labelTag;
+                    Device.StartTimer(TimeSpan.FromSeconds(duration), () =>
+                    {
+                        if (formerLabelTag == labelTag)
+                        {
+                            tempFrame.IsVisible = false;
+                        }
+
+                        return false;
+                    });
+                });
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+
+        }
+
+        public void onCallReleased()
+        {
+
+        }
+
+        public void onDelivered(List<MyCall> list)
+        {
+
+        }
+
+        private enum LableType
+        {
+            DEFAULT, LOGIN, CALLS, ERROR, INFO, COLLAB
+        }
+    }
+}

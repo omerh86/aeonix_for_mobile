@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.Groups"
+          FlowDirection="{StaticResource FlowDirection}"
+             Title="Groups"
+            xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers">
+
+    <StackLayout x:Name="abslayout" VerticalOptions="Fill" HorizontalOptions="FillAndExpand" >
+
+        <ListView Margin="5,25,5,0" IsPullToRefreshEnabled="True"
+                             RefreshCommand="{x:Binding Source={x:Reference abslayout} , Path=BindingContext.RefreshCommand}"
+           IsRefreshing="{x:Binding Source={x:Reference abslayout} , Path=BindingContext.IsRefreshing}"
+       HasUnevenRows="True" SeparatorVisibility="None" x:Name="groups" >
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <control:ContactCell  contactType="{Binding type}" 
+                                         ContactInfoCommand="{x:Binding Source={x:Reference groups} , Path=BindingContext.ContactinfoCommand}"
+                                          CallCommand="{x:Binding Source={x:Reference groups} , Path=BindingContext.CallCommand}"
+                                          image="{x:Binding image}"  isFav="{x:Binding isFav}" userName="{x:Binding userName}"
+                                          displayName="{x:Binding displayName}" primaryAlias="{x:Binding primaryAlias}" 
+                                          presence="{x:Binding presenceStatus}"
+                                          description="{x:Binding firstName}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.Footer>
+                <BoxView  BackgroundColor="Transparent" HeightRequest="130"  />
+            </ListView.Footer>
+        </ListView>
+    </StackLayout>
+</ContentPage>

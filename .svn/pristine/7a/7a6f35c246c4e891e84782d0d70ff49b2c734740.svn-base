@@ -1,0 +1,36 @@
+﻿<Properties StartupConfiguration="{5DCDACFC-1F05-490B-8874-6425AB95BBBF}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Main.cs">
+    <Files>
+      <File FileName="AppDelegate.cs" Line="26" Column="1" />
+      <File FileName="../LinphoneXamarin/LinphoneWrapper.cs" Line="14470" Column="70" />
+      <File FileName="Info.plist" />
+      <File FileName="Entitlements.plist" />
+      <File FileName="Main.cs" Line="17" Column="1" />
+      <File FileName="Properties/AssemblyInfo.cs" Line="1" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="LinphoneXamarin.iOS" expanded="True">
+            <Node name="LinphoneXamarin.iOS" expanded="True">
+              <Node name="Properties" expanded="True" />
+              <Node name="Main.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|iPhoneSimulator" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint enabled="false" file="/Users/tadirantelecom/Downloads/liblinphone-xamarin-sdk-latest/LinphoneXamarin/LinphoneXamarin/LinphoneXamarin/LinphoneWrapper.cs" line="45" column="1" />
+      <Breakpoint file="/Users/tadirantelecom/Downloads/liblinphone-xamarin-sdk-latest/LinphoneXamarin/LinphoneXamarin/LinphoneXamarin/LinphoneWrapper.cs" line="36" column="1" />
+      <Breakpoint file="/Users/tadirantelecom/Downloads/liblinphone-xamarin-sdk-latest/LinphoneXamarin/LinphoneXamarin/LinphoneXamarin/LinphoneWrapper.cs" line="98" column="1" />
+      <Breakpoint file="/Users/tadirantelecom/Downloads/liblinphone-xamarin-sdk-latest/LinphoneXamarin/LinphoneXamarin/LinphoneXamarin/LinphoneWrapper.cs" line="14474" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.LinphoneXamarin.iOS PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.B905FA0A-5484-48F7-9250-963EED1D3A94" automaticSigning="False" />
+</Properties>

@@ -1,0 +1,1503 @@
+using System;
+using LinphoneXamarin.Entities;
+using System.Collections.Generic;
+using Linphone;
+
+using System.Runtime.CompilerServices;
+using LinphoneXamarin.Util;
+using Xamarin.Forms;
+using Plugin.Vibrate;
+#if __IOS__
+using LinphoneXamarin.MyCallKit;
+#endif
+using System.Threading.Tasks;
+using System.Threading;
+using LinphoneXamarin.components.userControllers;
+using System.Text;
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class CallService : ICallEventListener
+    {
+
+        public List<MyCall> myCalls;
+        public Call tr87Call { set; get; }
+        private Tr87stateListener tr87StateListener;
+        private static CallService instance = null;
+        private static readonly object padlock = new object();
+        private CallsListener callsListener;
+        public CallListView componentCallsListener1 { set; get; }
+        public CallListView componentCallsListener2 { set; get; }
+        public CallViewInitiater callViewInitiater { set; get; }
+        public UIVideoListener uIVideoListener { set; get; }
+        public UIVideoListener UWPVideoListener { set; get; }
+        public MYAudioListener myAudioListener { set; get; }
+        public MyConferenceCallListener myConferenceCallListener { set; get; }
+        public bool isVMPressed { set; get; }
+        private bool shouldResumeCall;
+#if __IOS__
+        public bool isIOSAnswerWasPressed { set; get; }
+#endif
+        private Core LinphoneCore;
+        private CoreListener Listener;
+        private int counter = 0;
+        private int tr87CallRetryCounter = 0;
+        public bool _shouldUpdateIOSCall;
+        MyFileSystem fileSystem;
+
+
+        CallService()
+        {
+            myCalls = new List<MyCall>();
+            LinphoneCore = LinphoneBase.Instance.linphoneCore;
+            Listener = LinphoneBase.Instance.coreListener;
+            Listener.OnCallStateChanged = OnCall;
+            AeonixInfoService.Instance.callEventListener = this;
+            fileSystem = MyFileSystem.Instance;
+            _shouldUpdateIOSCall = false;
+        }
+
+        public static CallService Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new CallService();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        private void addLog(string message)
+        {
+            fileSystem.writeDebug(message, "call_service");
+            Console.WriteLine("omer400: " + message);
+        }
+
+        private void OnCall(Core lc, Call lcall, CallState state, string message)
+        {
+            counter++;
+
+
+            addLog($"OnCall() counter: {counter}, state: {state}, message: {message}, address: {lcall.RemoteAddressAsString}");
+
+
+            if (lcall.RemoteAddressAsString.Contains("sip:1234"))
+            {
+                if (message.Equals("Unauthorized"))
+                {
+                    tr87CallRetryCounter++;
+                    if (tr87CallRetryCounter == 2)
+                    {
+                        this.fireTr87InviteFailed();
+                    }
+                    else
+                    {
+                        RegistrationService.Instance.refreshAuth(CardentialState.TR87);
+                        inviteTr87Call(true);
+                    }
+                }
+                else if (tr87Call == null && (state == CallState.PausedByRemote || state == CallState.StreamsRunning))
+                {
+                    tr87Call = lcall;
+                    this.firetr87Established();
+
+                }
+                else if (state == CallState.Released)
+                {
+
+                    tr87Call = null;
+                    this.firetr87Released();
+                }
+            }
+            else
+            {
+                this.updateMycalls(lcall, state);
+
+                foreach (var i in myCalls)
+                    addLog("alias: " + i.alias + ", is current: " + i.isCurrentCall + ", ispending incoming: " + i.isPendingIncoming);
+
+
+                if (state == CallState.Error)
+                {
+                    addLog(lcall.ErrorInfo.Phrase);
+                    stopVibrate();
+                }
+
+                if (state == CallState.IncomingReceived)
+                {
+                    if (LinphoneCore.CallsNb == 1)
+                    {
+                        SharedData.Instance.pendingDestroy = false;
+                        if (MyFileSystem.Instance.loadSettings().isRingVibrate)
+                            startVibrate();
+#if WINDOWS_UWP
+                        AlertHelper.Instance.ShowUwpIncomingToast("incoming call from " + myCalls[0].name + " " + myCalls[0].alias);
+#elif ANDROID
+                        var y = (global::Android.Telephony.TelephonyManager)Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity.GetSystemService("phone");
+                        if (y.CallState == global::Android.Telephony.CallState.Offhook)
+                        {
+                            addLog("Decline call since cellular call is offhook");
+                            lcall.Decline(Reason.Busy);
+                        }
+                        else
+                        {
+                            MyAudioManager.Instance.setCommunicationMode(AudioMode.RINGTONE);
+                        }
+                        if (SharedData.Instance.isAndroidIncomingAnswered)
+                            lcall.Accept();
+
+#elif __IOS__
+                        addLog($"launch action: {SharedData.Instance.launchAction}");
+                        if(SharedData.Instance.launchAction!=LaunchAction.INCOMING_CALL)
+                            ProviderDelegate.Instance.ReportIncomingCall("" + myCalls[0].name + " " + myCalls[0].alias, false);
+                        else if(myCalls[0].uuid==null)
+                        {
+                            myCalls[0].uuid=ProviderDelegate.Instance.getIncomingCallUUID();
+                            addLog($"setting incoming call uuid: {myCalls[0].uuid}");
+                        }
+                        if (isIOSAnswerWasPressed)
+                        {
+                            isIOSAnswerWasPressed = false;
+                            answerCall(false);
+                        }
+#endif
+                    }
+                    else
+                    {
+
+                        if (!myCalls[0].remoteAddress.Equals(lcall.RemoteAddressAsString))
+                        {
+                            addLog("Decline call since pending incoming call!");
+                            myCalls[0].isPendingIncoming = true;
+                            lcall.Decline(Reason.Busy);
+                        }
+                        else
+                        {
+#if __IOS__
+                           //ProviderDelegate.Instance.ReportIncomingCall("" + myCalls[0].name + " " + myCalls[0].alias, false);
+                             ProviderDelegate.Instance.reportOutGoingCall("" + myCalls[0].name + " " + myCalls[0].alias);
+                           
+#endif
+#if ANDROID
+                            if (myCalls.Count > 1 && myCalls[1] != null && myCalls[1].isVideo)
+                                incomingCallVideoHandler(true, myCalls[0].name);
+#endif
+                        }
+                    }
+                }
+
+                if (state == CallState.OutgoingProgress)
+                {
+#if ANDROID
+                    if (LinphoneCore.CallsNb == 1)
+                    {
+                        MyAudioManager.Instance.setCommunicationMode(AudioMode.VOIP);
+                        var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as callUtilHandler;
+                        x.screenStatusHandler(true);
+                    }
+#endif
+#if __IOS__
+                        ProviderDelegate.Instance.reportOutGoingCall("" + myCalls[0].name + " " + myCalls[0].alias);
+#endif
+                }
+
+                if (state == CallState.Released)
+                {
+                    stopVibrate();
+                    if (callsListener != null)
+                        callsListener.onCallReleased();
+
+#if WINDOWS_UWP
+                    AlertHelper.Instance.removeUWPToastNotification();
+#elif __IOS__
+                        if (myCalls != null && myCalls.Count > 1 &&
+                            myCalls[0].state == CallState.IncomingReceived)
+                        {
+                            if(myCalls[0].isPendingIncoming)
+                                terminateCall();
+                            else
+                                _shouldUpdateIOSCall=true;
+                        }
+                        var call = LinphoneCore.CurrentCall;
+                        if (call != null &&
+                            call.State == CallState.StreamsRunning &&
+                            call.RemoteAddressAsString.IndexOf("XFER") > -1)
+                        {
+                            updateCall(call, "call was transfer");
+                        }
+#elif ANDROID
+                    if (LinphoneCore.CallsNb == 0)
+                    {
+                        var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as callUtilHandler;
+                        x.screenStatusHandler(false);
+                        x.inACallServiceHandler(false);
+                    }
+                    else if (myCalls.Count > 0 && myCalls[0] != null && myCalls[0].isVideo)
+                        incomingCallVideoHandler(false, null);
+#endif
+
+                }
+                if (state == CallState.UpdatedByRemote)
+                {
+                    //lcall.Params.VideoEnabled = !lcall.Params.VideoEnabled;
+                    Console.WriteLine("omer444:UpdatedByRemote: params: " + lcall.Params.VideoEnabled + " reomtparams: " + lcall.RemoteParams.VideoEnabled);
+
+                    for (int i = 0; i < myCalls.Count; i++)
+                    {
+                        Console.WriteLine("omer444:UpdatedByRemote: isSelfPendingVideo: " + myCalls[i].isSelfPendingVideo);
+                        if (myCalls[i].remoteAddress.Equals(lcall.RemoteAddressAsString) && myCalls[i].isSelfPendingVideo)
+                        {
+                            lcall.Params.VideoEnabled = true;
+                            LinphoneCore.AcceptCallUpdate(lcall, lcall.Params);
+                            break;
+                        }
+                    }
+
+
+                }
+
+                if (state == CallState.Connected)
+                {
+#if __IOS__
+                    ProviderDelegate.Instance.reportCallConnected(myCalls[0].uuid);
+#endif
+                }
+                if (state == CallState.StreamsRunning)
+                {
+                    stopVibrate();
+
+#if WINDOWS_UWP
+                    AlertHelper.Instance.removeUWPToastNotification();
+#endif
+                    if (LinphoneCore.CallsNb == 1)
+                        MyAudioManager.Instance.setCommunicationMode(AudioMode.VOIP);
+
+                    addLog("lcall.RemoteParams.VideoEnabled: " + lcall.RemoteParams.VideoEnabled + " lcall.Params.VideoEnabled: " + lcall.Params.VideoEnabled);
+                    if (lcall.RemoteParams.VideoEnabled && lcall.Params.VideoEnabled)
+                    {
+                        videoHandler(lcall, true);
+                    }
+                    else
+                    {
+                        videoHandler(lcall, false);
+                    }
+#if __IOS__
+                        //MyAudioManager am = MyAudioManager.Instance;
+                        //am.setAudioState(MYAudioState.DEFAULT, false);
+                        if (myCalls[0].isPendingIncoming)
+                        {
+                           updateCall(lcall, "other call was pending for incoming");
+                        }else if(_shouldUpdateIOSCall){
+                            _shouldUpdateIOSCall=false;
+                             updateCall(lcall, "other call was terminated/hold before answer");
+                    }
+            
+#endif
+                    myCalls[0].isPendingIncoming = false;
+                }
+
+#if __IOS__
+                if (state == CallState.Paused)
+                {
+
+                    if (shouldResumeCall)
+                    {
+                        shouldResumeCall = false;
+                        Device.StartTimer(TimeSpan.FromMilliseconds(200), () =>
+                        {
+                            lcall.Resume();
+                            return false;
+                        });
+
+                    }
+                    else
+                    {
+                        var call = LinphoneCore.CurrentCall;
+                        if (LinphoneCore.CallsNb > 1 && call != null && call.State == CallState.StreamsRunning)
+                            if (LinphoneCore.CallsNb > 1 && call.State == CallState.StreamsRunning)
+                                updateCall(call, "other call was paused");
+                    }                  
+                }
+#endif
+
+                this.fireOnMycallsUpdated();
+
+            }
+
+        }
+
+        private void updateCall(Call call, string reason)
+        {
+            shouldResumeCall = true;
+            addLog("updating call because: " + reason);
+            Xamarin.Forms.Device.StartTimer(TimeSpan.FromMilliseconds(200), () =>
+            {
+                call.Pause();
+                return false;
+            });
+
+        }
+
+
+
+
+        private void startVibrate()
+        {
+            addLog("vibrate()");
+            var v = CrossVibrate.Current;
+            v.Vibration();
+            isVibrate = true;
+            Xamarin.Forms.Device.StartTimer(TimeSpan.FromMilliseconds(2000), () =>
+            {
+                addLog("vibrate timespan");
+                if (isVibrate)
+                    v.Vibration();
+                return isVibrate;
+            });
+        }
+
+        private bool isVibrate = false;
+
+        private void stopVibrate()
+        {
+            isVibrate = false;
+
+        }
+
+
+
+        public void setTr87Listener(Tr87stateListener tr87StateListener)
+        {
+            this.tr87StateListener = tr87StateListener;
+        }
+
+        private void firetr87Established()
+        {
+            if (this.tr87StateListener != null)
+            {
+                addLog("firetr87Established");
+                this.tr87StateListener.onTr87Invited();
+            }
+        }
+
+        private void firetr87Released()
+        {
+            if (this.tr87StateListener != null)
+            {
+                addLog("firetr87Released");
+                this.tr87StateListener.onTr87Ended();
+            }
+        }
+
+        private void fireTr87InviteFailed()
+        {
+            if (this.tr87StateListener != null)
+            {
+                addLog("firetr87InviteFailed");
+                this.tr87StateListener.onTr87InviteFailed();
+            }
+        }
+
+        public void inviteTr87Call(bool isRetry = false)
+        {
+            addLog("inviteTr87Call()");
+            if (!isRetry)
+                tr87CallRetryCounter = 0;
+            LoginInfo l = MyFileSystem.Instance.loadLoginCardential(CardentialState.TR87);
+            var addr = LinphoneCore.InterpretUrl("1234@" + l.sipAdresses[l.favoriteSipAdressIndex].ip + ":" + l.sipAdresses[l.favoriteSipAdressIndex].port);
+            CallParams cp = LinphoneCore.CreateCallParams(null);
+            cp.AddCustomHeader("Content-Disposition", "signal;handling=required");
+            cp.AddCustomHeader("TR87-Mode", "true");
+            //cp.AddCustomHeader("User-Agent", "Tadiran ATouch PC/1.0.201 (belle-sip/1.6.3)");
+            cp.AddCustomHeader("User-Agent", SharedData.Instance.USER_AGENT);
+            LinphoneCore.InviteAddressWithParams(addr, cp);
+        }
+
+        public bool isCallsNb()
+        {
+            return LinphoneCore.CallsNb > 0;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private void fireOnMycallsUpdated()
+        {
+            if (this.callsListener != null)
+            {
+                this.callsListener.onListUpdated(myCalls);
+            }
+
+            if (componentCallsListener1 != null)
+                componentCallsListener1.onListUpdated(myCalls);
+
+            if (componentCallsListener2 != null)
+                componentCallsListener2.onListUpdated(myCalls);
+
+        }
+
+
+        private void callViewInitiaterHandler()
+        {
+            addLog("callViewInitiaterHandler: " + callViewInitiater);
+
+            if (LinphoneCore.CallsNb > 0)
+            {
+                LinphoneCore.StartDtmfStream();
+                if (callViewInitiater != null)
+                    callViewInitiater.onInitiateCallViewAsync();
+            }
+            else
+            {
+                LinphoneCore.StopDtmfStream();
+                if (callViewInitiater != null)
+                    callViewInitiater.onDestroyCallView();
+                else
+                {
+#if ANDROID
+                    addLog("do destroy since incoming call session ended!");
+                    Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity.FinishAndRemoveTask();
+#endif
+                }
+                if (this.UWPVideoListener != null)
+                    this.UWPVideoListener.onVideoStatusChangedAsync(false);
+            }
+        }
+
+        private void doSetRegularCallAsCurrent()
+        {
+            addLog("doSetRegularCallAsCurrent()");
+            Call call = LinphoneCore.CurrentCall;
+            if (call != null)
+            {
+                for (int i = 0; i < myCalls.Count; i++)
+                {
+                    if (myCalls[i].remoteAddress.Equals(call.RemoteAddressAsString))
+                    {
+
+                        if (!myCalls[i].isCurrentCall)
+                        {
+                            myCalls[i].isCurrentCall = true;
+                            for (int k = i + 1; k < myCalls.Count; k++)
+                            {
+                                myCalls[k].isCurrentCall = false;
+                            }
+                            onCurrentCallChanged();
+
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        addLog("doSetRegularCallAsCurrent3");
+                        myCalls[i].isCurrentCall = false;
+                    }
+                }
+            }
+            else
+            {
+                if (myCalls.Count == 0)
+                {
+                    onCurrentCallChanged();
+                }
+                else
+                {
+                    if (!myCalls[0].isCurrentCall)
+                    {
+                        foreach (var t in myCalls)
+                        {
+                            t.isCurrentCall = false;
+                        }
+                        myCalls[0].isCurrentCall = true;
+                        onCurrentCallChanged();
+                    }
+
+                }
+
+            }
+        }
+
+        private void setCurrentCall(CallState state, bool isPendingIncomingCall)
+        {
+            addLog("setCurrentCall()");
+            if (state == CallState.IncomingReceived && !isPendingIncomingCall)
+            {
+                foreach (var t in myCalls)
+                {
+                    t.isCurrentCall = t.state == CallState.IncomingReceived && !t.isPendingIncoming;
+                }
+                onCurrentCallChanged();
+            }
+            else if (state == CallState.Released && isPendingIncomingCall)
+            {
+                foreach (var t in myCalls)
+                {
+                    t.isCurrentCall = t.state == CallState.IncomingReceived;
+                }
+                onCurrentCallChanged();
+
+            }
+            else
+            {
+                doSetRegularCallAsCurrent();
+            }
+
+        }
+
+        private void setCurrentCallOnTop()
+        {
+            myCalls.Sort(delegate (MyCall x, MyCall y)
+           {
+               int a = x.isCurrentCall ? -1 : 1;
+               return a;
+           });
+        }
+
+        private void onCurrentCallChanged()
+        {
+            addLog("onCurrentCallChanged()");
+            setCurrentCallOnTop();
+            muteHandler();
+            this.callViewInitiaterHandler();
+            if (callsListener != null)
+            {
+                callsListener.onCurrentCallChanged(myCalls);
+            }
+
+        }
+
+        private void muteHandler()
+        {
+            addLog("muteHandler()");
+            try
+            {
+                if (myCalls.Count > 0 && myCalls[0] != null)
+                {
+                    LinphoneCore.MicEnabled = myCalls[0].isMute ? false : true;
+
+                    if (myAudioListener != null)
+                        myAudioListener.onMuteChanged(myCalls[0].isMute);
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private void updateMycalls(Call call, CallState state)
+        {
+            int relevantIndex = -1;
+            int progressCallCounter = 0;
+
+            for (int i = 0; i < myCalls.Count; i++)
+            {
+                if (myCalls[i].remoteAddress.Equals(call.RemoteAddressAsString))
+                    relevantIndex = i;
+                if (myCalls[i].state == CallState.IncomingReceived ||
+                    myCalls[i].state == CallState.OutgoingInit ||
+                    myCalls[i].state == CallState.OutgoingProgress ||
+                    myCalls[i].state == CallState.OutgoingRinging)
+                    progressCallCounter++;
+            }
+
+            if (relevantIndex > -1)
+            {
+
+                if (state == CallState.End || state == CallState.Released || state == CallState.Error)
+                {
+#if __IOS__
+                    addLog($"remove {myCalls[relevantIndex].remoteAddress}");
+                    ProviderDelegate.Instance.reportEndCall(myCalls[relevantIndex].uuid);
+#endif
+                    myCalls.RemoveAt(relevantIndex);
+                }
+                else
+                {
+                    myCalls[relevantIndex].state = state;
+
+                    if (state == CallState.StreamsRunning)
+                    {
+                        // myCalls[relevantIndex].isHeld = false;
+                        if (myCalls[relevantIndex].connectedTime == -1)
+                            myCalls[relevantIndex].connectedTime = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
+                    }
+                }
+            }
+            else
+            {
+                if (state != CallState.End && state != CallState.Released)
+                {
+                    var isPendingVideo = false;
+                    if (call.RemoteParams != null && call.RemoteParams.VideoEnabled)
+                        isPendingVideo = true;
+                    char[] a = { '@', ':' };
+
+                    var aliasPart = call.RemoteAddressAsString.Split(a);
+                    var alias = aliasPart[1];
+                    string[] namesPart = { "", "" };
+                    addLog($"display name is: {call.RemoteAddress.DisplayName}");
+                    if (call.RemoteAddress.DisplayName != null)
+                        namesPart = call.RemoteAddress.DisplayName.Split('/');
+
+                    if (namesPart.Length > 1)
+                    {
+                        MyCall newCall = new MyCall(namesPart[0], System.Net.WebUtility.UrlDecode(namesPart[1]), alias, call.RemoteAddressAsString, state);
+                        newCall.isRemotePendingVideo = isPendingVideo;
+                        myCalls.Add(newCall);
+                    }
+                    else
+                    {
+                        var userName = alias;
+                        var name = System.Net.WebUtility.UrlDecode(namesPart[0]);
+                        //var name = namesPart[0];
+                        var c = ContactService.Instance.getContactByAlias(alias);
+                        if (c != null)
+                        {
+                            userName = c.userName;
+                            name = c.displayName;
+                        }
+
+                        MyCall newCall = new MyCall(userName, name, alias, call.RemoteAddressAsString, state);
+                        newCall.isRemotePendingVideo = isPendingVideo;
+                        addLog("incomingcallcounter: " + progressCallCounter + ", state: " + call.State);
+                        if (progressCallCounter > 0 && call.State == CallState.IncomingReceived)
+                            newCall.isPendingIncoming = true;
+
+                        myCalls.Add(newCall);
+                    }
+
+                }
+            }
+            setCurrentCall(state, progressCallCounter > 0 && call.State == CallState.IncomingReceived);
+
+        }
+
+        public async Task callAsync(string address, string userName, bool isVideo, string displayName = "")
+        {
+            addLog($"callAsync to: {address}, displayName:{displayName}");
+            if (address == null || address.Length == 0)
+                return;
+
+            if (callViewInitiater != null)
+            {
+                await callViewInitiater.onInitiateCallViewAsync();
+            }
+            new Task(() =>
+            {
+                Thread.Sleep(500);
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    var addr = LinphoneCore.InterpretUrl(address);
+                    if (addr == null)
+                    {
+                        return;
+                    }
+                    addr.DisplayName = userName + "/" + displayName;
+                    CallParams cp = LinphoneCore.CreateCallParams(null);
+                    cp.VideoEnabled = isVideo;
+                    string remoteAddress = "";
+                    for (int i = 0; i < myCalls.Count; i++)
+                    {
+                        if (myCalls[i].alias.Equals(address))
+                        {
+                            if (remoteAddress.Equals(myCalls[i].remoteAddress))
+                                return;
+                        }
+                    }
+                    addLog("calling() to address:" + address + ", isVideo:" + isVideo + ", displayName:" + displayName);
+                    if (LinphoneCore.CallsNb > 0 && LinphoneCore.CurrentCall == null)
+                    {
+                        addLog("_shouldUpdateIOSCall because current call is paused");
+                        _shouldUpdateIOSCall = true;
+                    }
+                    LinphoneCore.InviteAddressWithParams(addr, cp);
+                });
+            }).Start();
+
+
+        }
+
+        public MyCall getMyCallByCallId(string callId)
+        {
+            var result = myCalls.Find(delegate (MyCall c)
+            {
+                return c.callid.Equals(callId);
+            });
+
+            return result;
+        }
+
+        public void answerCallByCallId(string callId)
+        {
+            for (int i = 0; i < myCalls.Count; i++)
+            {
+                if (myCalls[i] != null && myCalls[i].callid.Equals(callId))
+                {
+                    Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[i].remoteAddress);
+                    if (call != null)
+                    {
+                        addLog("answerCallByCallId " + myCalls[i].callid);
+                        CallParams CallParams = LinphoneCore.CreateCallParams(call);
+                        LinphoneCore.AcceptCallWithParams(call, CallParams);
+                    }
+                    return;
+                }
+            }
+        }
+
+        public void answerCall(bool isVideo)
+        {
+            addLog("answerCall() isVideo:" + isVideo);
+
+            if (myCalls.Count > 0 && myCalls[0] != null && myCalls[0].state == CallState.IncomingReceived)
+            {
+                Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[0].remoteAddress);
+                if (call != null)
+                {
+
+                    CallParams CallParams = LinphoneCore.CreateCallParams(call);
+                    CallParams.VideoEnabled = isVideo;
+                    LinphoneCore.VideoDisplayEnabled = isVideo;
+                    LinphoneCore.VideoCaptureEnabled = isVideo;
+                    LinphoneCore.AcceptCallWithParams(call, CallParams);
+                }
+            }
+        }
+#if __IOS__
+        public void answerCallByUUid(Foundation.NSUuid uuid, bool isVideo)
+        {
+       for (int i = 0; i < myCalls.Count; i++)
+            {
+                if (myCalls[i] != null) 
+                {
+                    if(myCalls[i].uuid==null)
+                        myCalls[i].uuid = uuid;
+
+                    
+                    if (myCalls[i].uuid.Equals(uuid))
+                    {
+                        Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[i].remoteAddress);
+                        if (call != null)
+                        {
+                            Console.WriteLine("omer928:answerCallByUUid() uuid: " + myCalls[i].uuid);
+                            CallParams CallParams = LinphoneCore.CreateCallParams(call);
+                            CallParams.VideoEnabled = isVideo;
+                            LinphoneCore.AcceptCallWithParams(call, CallParams);
+                        }
+                        return;
+                    }
+                }
+                   
+            }
+            isIOSAnswerWasPressed = true;
+       addLog("answer Was Pressed before registration");
+        }
+#endif
+
+        public void CreateConference()
+        {
+            try
+            {
+                if (myCalls.Count > 1 &&
+               myCalls[0] != null &&
+               myCalls[1] != null)
+                {
+                    myCalls[0].isInConference = true;
+                    AeonixInfoService.Instance.setConference(myCalls[1].callid, myCalls[0].callid);
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        public void terminateCallByCallID(string callId)
+        {
+            addLog("terminateCallByCallID()");
+            try
+            {
+                for (int i = 0; i < myCalls.Count; i++)
+                {
+                    if (myCalls[i] != null &&
+                      myCalls[i].callid != null &&
+                       myCalls[i].callid.Equals(callId))
+                    {
+                        Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[i].remoteAddress);
+                        if (call != null)
+                            LinphoneCore.TerminateCall(call);
+
+                        return;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog("err: " + e);
+            }
+        }
+
+        public void setCallAddressUserName(string userName)
+        {
+            addLog("setCallAddressUserName()");
+            try
+            {
+                if (myCalls.Count > 0)
+                {
+                    Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[0].remoteAddress);
+                    if (call != null)
+                    {
+                        call.RemoteAddress.Username = userName;
+                        myCalls[0].remoteAddress = call.RemoteAddressAsString;
+                        addLog($"new CallAddress is {myCalls[0].remoteAddress}");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        public void terminateCall()
+        {
+            addLog("terminateCall()");
+            try
+            {
+                if (myCalls.Count > 0)
+                {
+                    Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[0].remoteAddress);
+                    if (call != null)
+                        LinphoneCore.TerminateCall(call);
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+#if __IOS__
+        public void terminateCallByUUid(Foundation.NSUuid uuid)
+        {
+                addLog("terminateCallByUUid(), uuid is: " + uuid);
+        try{
+                for (int i = 0 ; i < myCalls.Count;i++){
+                    if(myCalls[i]!= null)
+                      {
+                        if (myCalls[i].uuid == null || myCalls[i].uuid.Equals(uuid))
+                        {
+                            Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[i].remoteAddress);
+                            if (call != null)
+                            {
+                                addLog("doterminateCallByUUid() uuid: " + myCalls[i].uuid);
+                                LinphoneCore.TerminateCall(call);
+                            }
+                            return;
+                        }
+                    }
+                }
+               
+
+            }
+          catch(Exception e){
+                addLog("err: " + e);
+          }
+           }
+#endif
+
+
+#if __IOS__
+        public void toggleHoldByUUid(Foundation.NSUuid uuid)
+        {
+            try
+            {
+                for (int i = 0; i < myCalls.Count; i++)
+                {
+                    if (myCalls[i] != null && myCalls[i].uuid.Equals(uuid))
+                    {
+                        Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[i].remoteAddress);
+                        if (call != null)
+                        {
+                            if (call.State == CallState.Paused)
+                            {
+                                call.Resume();
+                            }
+                            else if (call.State == CallState.StreamsRunning || call.State == CallState.PausedByRemote)
+                            {
+                                call.Pause();
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog("resume failed:" + e);
+            }
+        }
+#endif
+
+
+#if __IOS__
+        public void toggleMuteByUUid(Foundation.NSUuid uuid)
+        {
+            try
+            {
+                for (int i = 0; i < myCalls.Count; i++)
+                {
+                    if (myCalls[i] != null && myCalls[i].uuid.Equals(uuid))
+                    {
+                        
+                            LinphoneCore.MicEnabled = !LinphoneCore.MicEnabled;
+                            myCalls[i].isMute = !LinphoneCore.MicEnabled;
+
+                            if (myAudioListener != null)
+                            {
+                                myAudioListener.onMuteChanged(myCalls[i].isMute);
+                            }
+                     
+                        return;
+                    }
+                }
+            }  catch (Exception e)
+            {
+                addLog("failed:" + e);
+            }
+
+        }
+#endif
+
+        //public void pauseAllCallsButCurrent()
+        //{
+        //    addLog("omer40: ", "pauseAllCallsButCurrent()");
+        //    foreach (var c in myCalls)
+        //    {
+        //        if (!c.isCurrentCall)
+        //        {
+        //            Call call = LinphoneCore.GetCallByRemoteAddress(c.remoteAddress);
+        //            if (call != null && (call.State != CallState.Paused && call.State != CallState.Pausing))
+        //            {
+        //                addLog("omer40: ", "pausing " + c.alias);
+        //                LinphoneCore.PauseCall(call);
+        //            }
+
+        //        }
+        //    }
+
+        //}
+
+        public void HoldByCallId(string callId)
+        {
+            try
+            {
+                for (int i = 0; i < myCalls.Count; i++)
+                {
+                    if (myCalls[i] != null && myCalls[i].callid.Equals(callId))
+                    {
+                        Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[i].remoteAddress);
+                        if (call != null)
+                            call.Pause();
+
+                        return;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog("HoldByCallId failed: " + e);
+            }
+        }
+
+        public void RetrieveByCallId(string callId)
+        {
+            try
+            {
+                for (int i = 0; i < myCalls.Count; i++)
+                {
+                    if (myCalls[i] != null && myCalls[i].callid.Equals(callId))
+                    {
+                        Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[i].remoteAddress);
+                        if (call != null)
+                            call.Resume();
+
+                        return;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog("HoldByCallId failed: " + e);
+            }
+        }
+
+
+        public void toggleHold()
+        {
+
+            if (myCalls != null && myCalls.Count > 0 && myCalls[0] != null)
+            {
+                try
+                {
+                    addLog("toggleHold()");
+                    Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[0].remoteAddress);
+                    if (call != null)
+                    {
+
+                        if (call.State == CallState.Paused)
+                        {
+                            call.Resume();
+                        }
+                        else if (call.State == CallState.StreamsRunning || call.State == CallState.PausedByRemote)
+                        {
+                            call.Params.AudioDirection = MediaDirection.SendRecv;
+                            call.Pause();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    addLog("resume failed:" + e);
+                }
+            }
+        }
+
+        public void SendDtmf(string dtmf)
+        {
+            addLog("SendDtmf() dtmf:" + dtmf);
+            if (myCalls != null && myCalls.Count > 0 && myCalls[0] != null)
+            {
+                Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[0].remoteAddress);
+                sbyte charDtmf = (sbyte)dtmf.ToCharArray()[0];
+                call.SendDtmf(charDtmf);
+                LinphoneCore.PlayDtmf(charDtmf, 500);
+            }
+        }
+
+
+        public void SendDtmfByCallId(string dtmf, string callId)
+        {
+            addLog("SendDtmfByCallId() dtmf:" + dtmf);
+            try
+            {
+                for (int i = 0; i < myCalls.Count; i++)
+                {
+                    if (myCalls[i] != null && myCalls[i].callid.Equals(callId))
+                    {
+                        Call call = LinphoneCore.GetCallByRemoteAddress(myCalls[i].remoteAddress);
+                        if (call != null)
+                        {
+                            addLog("DoSendDtmfByCallId() dtmf:" + dtmf);
+                            call.SendDtmfs(dtmf);
+                        }
+
+                        return;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog("SendDtmfByCallId failed: " + e);
+            }
+
+        }
+
+        public void addAllToConference()
+        {
+            addLog("addAllToConference()");
+            Conference con = LinphoneCore.Conference;
+
+            if (con == null)
+            {
+                ConferenceParams c = LinphoneCore.CreateConferenceParams();
+                Conference conference = LinphoneCore.CreateConferenceWithParams(c);
+            }
+
+            LinphoneCore.AddAllToConference();
+            foreach (MyCall mc in myCalls)
+            {
+                mc.isInConference = true;
+            }
+
+        }
+
+        public void renewConference()
+        {
+            addLog("renewConference()");
+            ConferenceParams c = LinphoneCore.CreateConferenceParams();
+            Conference conference = LinphoneCore.CreateConferenceWithParams(c);
+
+            foreach (MyCall mc in myCalls)
+            {
+                if (mc.isInConference)
+                {
+                    LinphoneCore.AddToConference(LinphoneCore.GetCallByRemoteAddress(mc.remoteAddress));
+                }
+            }
+
+        }
+
+        public void terminateConference()
+        {
+            addLog("terminateConference()");
+            LinphoneCore.TerminateConference();
+            foreach (MyCall mc in myCalls)
+            {
+                mc.isInConference = false;
+            }
+        }
+
+        public void enterConference()
+        {
+            addLog("enterConference()");
+            LinphoneCore.EnterConference();
+
+        }
+
+        public void switchCurrentCall()
+        {
+            addLog("switchCurrentCall()");
+            try
+            {
+                var remoteAddress = myCalls.Find(c => !c.isCurrentCall).remoteAddress;
+
+                if (remoteAddress != null)
+                {
+                    Call call = LinphoneCore.GetCallByRemoteAddress(remoteAddress);
+                    if (call != null)
+                    {
+                        LinphoneCore.ResumeCall(call);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog("switch failed: " + e);
+            }
+        }
+
+        public void switchCurrentCallByCallid(string callid)
+        {
+            addLog("switchCurrentCall()");
+            try
+            {
+
+                var remoteAddress = myCalls.Find(c => c.callid == callid).remoteAddress;
+
+                if (remoteAddress != null)
+                {
+                    Call call = LinphoneCore.GetCallByRemoteAddress(remoteAddress);
+                    if (call != null)
+                    {
+                        LinphoneCore.ResumeCall(call);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog("switch failed: " + e);
+            }
+        }
+
+        public void transfer(MyCall desiredCall)
+        {
+            try
+            {
+                addLog("transfer()");
+                Call call = LinphoneCore.GetCallByRemoteAddress(desiredCall.remoteAddress);
+                if (call != null)
+                {
+                    addLog($"transfer call {LinphoneCore.CurrentCall.RemoteAddressAsString} to {call.RemoteAddressAsString}");
+                    if (LinphoneCore.CurrentCall.State == CallState.StreamsRunning)
+                        LinphoneCore.TransferCallToAnother(LinphoneCore.CurrentCall, call);
+                    else
+                        LinphoneCore.TransferCallToAnother(call, LinphoneCore.CurrentCall);
+                }
+            }
+            catch (Exception e)
+            {
+                addLog("transfer failed: " + e);
+            }
+
+        }
+
+        public void incomingCallVideoHandler(bool shouldAddIncomingCallComponent, string title)
+        {
+#if ANDROID
+            addLog($"incomingCallVideoHandler(), shouldAddIncomingCallComponent:{shouldAddIncomingCallComponent}");
+            var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as VideoListener;
+            if (shouldAddIncomingCallComponent)
+                x.addIncomingCallComponent(title);
+            else
+                x.removeIncomingCallComponent();
+#endif
+        }
+
+        public void videoHandler(Call call, bool isvideo)
+        {
+#if ANDROID
+            addLog($"videoHandler() isvideo:{isvideo}");
+            var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as VideoListener;
+            if (isvideo)
+                x.setVideo(call);
+            else
+                x.removeVideo();
+#endif
+            var result = myCalls.Find(delegate (MyCall c)
+            {
+                return c.remoteAddress.Equals(call.RemoteAddressAsString);
+            });
+            if (result != null)
+            {
+                result.isVideo = isvideo;
+                if (isvideo)
+                    result.isSelfPendingVideo = false;
+
+                if (this.uIVideoListener != null)
+                    this.uIVideoListener.onVideoStatusChangedAsync(isvideo);
+                if (this.UWPVideoListener != null)
+                    this.UWPVideoListener.onVideoStatusChangedAsync(isvideo);
+            }
+        }
+
+        public void OnVideoClicked()
+        {
+            addLog("OnVideoClicked()");
+            Call call = LinphoneCore.CurrentCall;
+            if (call != null && call.State == CallState.StreamsRunning)
+            {
+                //LinphoneCore.VideoAdaptiveJittcompEnabled = true;
+                call.Params.VideoEnabled = !call.Params.VideoEnabled;
+                Console.WriteLine("omer444:OnVideoClicked: params: " + call.Params.VideoEnabled + " reomtparams: " + call.RemoteParams.VideoEnabled);
+                LinphoneCore.UpdateCall(call, call.Params);
+            }
+
+        }
+#if __IOS__
+        public void setCallkitUuid(Foundation.NSUuid uuid)
+        {
+            addLog("setCallkitUuid: " + uuid);
+            for (int i=0; i < myCalls.Count;i++){
+                if (myCalls[i].uuid == null)
+                    myCalls[i].uuid = uuid;
+
+                addLog("the uuid of "+ myCalls[i].userName+ " is: " + myCalls[i].uuid);
+            }
+        }
+#endif
+        public void setCallsListener(CallsListener callsListener)
+        {
+            this.callsListener = callsListener;
+        }
+
+        public void onDelivered(string callId, string calledDeviceIdentifier, string alertedDeviceIdentifier, string originalCalledIdentifier)
+        {
+            onCallIdUpdated(callId, calledDeviceIdentifier, alertedDeviceIdentifier, originalCalledIdentifier);
+            callsListener.onDelivered(myCalls);
+        }
+
+        public void onEstablished(string callId, string calledDeviceIdentifier, string alertedDeviceIdentifier)
+        {
+            onCallIdUpdated(callId, calledDeviceIdentifier, alertedDeviceIdentifier, null);
+            if (isVMPressed)
+            {
+                isVMPressed = false;
+                myCalls[0].alias = "";
+                var am = MyAudioManager.Instance;
+                if (am.myAudioState != MYAudioState.BT)
+                    am.setAudioState(MYAudioState.SPEAKER, false);
+            }
+            callsListener.onEstablished(myCalls);
+        }
+
+        private void onCallIdUpdated(string callId, string calledDeviceIdentifier, string alertedDeviceIdentifier, string originalCalledIdentifier)
+        {
+            var myContact = ContactService.Instance.myContact;
+
+            if (myCalls != null && myCalls.Count > 0)
+            {
+                var desiredCall = myCalls.Find(c => c.callid == null || c.callid == "" || c.callid == callId);
+                if (desiredCall != null)
+                {
+                    desiredCall.callid = callId;
+                    desiredCall.isHeld = false;
+                    var deviceID = calledDeviceIdentifier;
+                    if (extractUserNameFromDeviceID(calledDeviceIdentifier).Equals(myContact.userName))
+                        deviceID = alertedDeviceIdentifier;
+
+                    updateMyCallParamsFromDeviceId(desiredCall, deviceID, originalCalledIdentifier);
+                    addLog($"onCallIdUpdated, callId: {callId}, name: {desiredCall.name}");
+                }
+            }
+        }
+
+        private string extractUserNameFromDeviceID(string deviceId)
+        {
+            char[] splitChars = { '>', '/' };
+            var a = deviceId.Split('>');
+            if (a != null && a.Length > 1 && a[1] != null)
+            {
+                var b = a[1].Split('/');
+                return b[0];
+            }
+            return "";
+        }
+
+        private void updateMyCallParamsFromDeviceId(MyCall call, string deviceId, string originalCalledIdentifier)
+        {
+            addLog("updateCallFromDeviceId(): " + deviceId);
+            char[] splitChars1 = { '<', '>' };
+            char splitChar2 = '/';
+            var a = deviceId.Split(splitChars1);
+            try
+            {
+                var b = a[1].Split(splitChar2);
+                call.alias = b[0];
+                var names = a[2].Split(splitChar2);
+                call.userName = names[0];
+                if (names.Length > 1 && names[1] != null)
+                    call.name = System.Net.WebUtility.UrlDecode(names[1]);
+
+                if (!String.IsNullOrEmpty(originalCalledIdentifier))
+                {
+                    //this is ULA
+                    names = originalCalledIdentifier.Split(splitChar2);
+                    if (names != null && names.Length > 1 && names[1] != null)
+                    {
+                        call.name += $" calling {System.Net.WebUtility.UrlDecode(names[1])}";
+                        call.alias = "";
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog($"updateCallFromDeviceId failed: {e.ToString()}");
+            }
+        }
+
+        public void onTransferEvent(myTransfer myTransfer)
+        {
+            addLog("onTransferEvent()");
+            var myContact = ContactService.Instance.myContact;
+            var deviceID = myTransfer.deviceId1;
+            if (extractUserNameFromDeviceID(myTransfer.deviceId1).Equals(myContact.userName))
+                deviceID = myTransfer.deviceId2;
+
+            var relevantCall = myCalls.Find(delegate (MyCall c)
+            {
+                return c.callid.Equals(myTransfer.oldCallId1);
+            });
+            if (relevantCall == null)
+            {
+                relevantCall = myCalls.Find(delegate (MyCall c)
+                 {
+                     return c.callid.Equals(myTransfer.oldCallId2);
+                 });
+                if (relevantCall == null)
+                {
+                    // no call was found
+                    if (myCalls.Count > 0 && myCalls[0] != null)
+                    {
+                        relevantCall = myCalls[0];
+                    }
+
+                }
+            }
+            relevantCall.callid = myTransfer.newCallId;
+            updateMyCallParamsFromDeviceId(relevantCall, deviceID, null);
+            addLog($"onTransferEvent, new callId: {relevantCall.callid}, name: {relevantCall.name}");
+            fireOnMycallsUpdated();
+            if (this.callsListener != null)
+                this.callsListener.onTransfered(myCalls);
+
+        }
+
+        public void onHeld(string callId)
+        {
+            addLog("onHeld()");
+            MyCall call = getMyCallByCallId(callId);
+            if (call != null)
+            {
+                call.isHeld = true;
+                fireOnMycallsUpdated();
+            }
+        }
+
+        public void onMuteToggle()
+        {
+            if (myCalls != null && myCalls.Count > 0 && myCalls[0] != null)
+            {
+                LinphoneCore.MicEnabled = !LinphoneCore.MicEnabled;
+                myCalls[0].isMute = !LinphoneCore.MicEnabled;
+
+                if (myAudioListener != null)
+                {
+                    myAudioListener.onMuteChanged(myCalls[0].isMute);
+                }
+            }
+        }
+
+        public void onRetrieve(string callId)
+        {
+            addLog("onRetrieve()");
+            MyCall call = getMyCallByCallId(callId);
+            if (call != null)
+            {
+                call.isHeld = false;
+                fireOnMycallsUpdated();
+            }
+        }
+
+        public void onConferenceEstablished(string conferenceCallId, List<string> oldCallIds, List<string> participate)
+        {
+            try
+            {
+                addLog("onConferenceEstablished(), there are " + participate.Count + "conferenceParticipates ");
+                var call = myCalls[0];
+                call.isInConference = true;
+                call.callid = conferenceCallId;
+                call.conferenceParticipates = participate;
+                setCallAddressUserName($"conference_{conferenceCallId}");
+                if (myConferenceCallListener != null)
+                    myConferenceCallListener.onConferenceEstablished(conferenceCallId, oldCallIds, participate);
+
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+
+        }
+
+        public void onParticipateDroped(string callId, string alias)
+        {
+            try
+            {
+                addLog($"onParticipateDroped, alias is {alias}, callId is {callId}");
+                var result = myCalls.Find(delegate (MyCall c)
+                {
+                    return c.isInConference && c.callid == callId;
+                });
+                if (result != null && result.conferenceParticipates != null)
+                {
+                    addLog($"remove {alias} from participate list");
+                    result.conferenceParticipates.Remove(alias);
+                }
+                if (myConferenceCallListener != null)
+                    myConferenceCallListener.onParticipateDroped(callId, alias);
+
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+
+        }
+    }
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+            x:Class="LinphoneXamarin.components.Favorites"
+            xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers"
+            x:Name="FavView"
+             Title="Favorites"
+             FlowDirection="{StaticResource FlowDirection}">
+
+    <StackLayout x:Name="abslayout" VerticalOptions="Fill" HorizontalOptions="FillAndExpand" >
+        <control:TopBarComponent  VerticalOptions="StartAndExpand" Margin="5"></control:TopBarComponent>
+        <control:SpeedDialComponent  HeightRequest="180" HorizontalOptions="FillAndExpand" ></control:SpeedDialComponent>
+
+        <Frame BackgroundColor="White" Padding="7"  CornerRadius="10">
+            <StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Favorites" HorizontalOptions="FillAndExpand" FontSize="Medium" TextColor="Black" FontAttributes="Bold"></Label>
+                    <control:CallListView ></control:CallListView>
+                </StackLayout>
+                <ListView  IsPullToRefreshEnabled="True" 
+        RefreshCommand="{x:Binding RefreshCommand}"
+        IsRefreshing="{x:Binding IsRefreshing}"
+        HasUnevenRows="True"
+        SeparatorVisibility="None"
+     x:Name="favorites" 
+          HeightRequest="{x:Binding Path=Height, Source={x:Reference abslayout}}"
+          WidthRequest="{x:Binding Path=Width, Source={x:Reference abslayout}}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <control:ContactCell  contactType="{x:Binding type}" 
+                                          MessageCommand="{x:Binding Source={x:Reference favorites} , Path=BindingContext.MessageCommand}" 
+                                          ContactInfoCommand="{x:Binding Source={x:Reference favorites} , Path=BindingContext.ContactinfoCommand}"
+                                          CallCommand="{x:Binding Source={x:Reference favorites} , Path=BindingContext.CallCommand}"
+                                          image="{x:Binding image}"  isFav="{x:Binding isFav}" userName="{x:Binding userName}"
+                                          displayName="{x:Binding displayName}" primaryAlias="{x:Binding primaryAlias}" 
+                                          presence="{x:Binding presenceStatus}" />
+
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+
+                </ListView>
+            </StackLayout>
+        </Frame>
+
+    </StackLayout>
+</ContentPage>

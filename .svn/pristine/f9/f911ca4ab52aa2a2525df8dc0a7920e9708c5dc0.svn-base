@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewCell xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.userControllers.MessageViewCell"
+           xmlns:Helpers="clr-namespace:LinphoneXamarin.Util"
+          xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers">
+    <ViewCell.View>
+        <StackLayout Margin="5,2,5,2"  Padding="5,2,5,2" Orientation="Vertical">
+            <Frame x:Name="message_layout" Padding="5" CornerRadius="10"  control:LongPressedEffect.Command="{x:Binding}">
+                <Frame.Effects>
+                    <control:LongPressedEffect />
+                </Frame.Effects>
+                <StackLayout x:Name="stack" Orientation="Horizontal">
+
+                    <Label x:Name="lbl" Margin="1" TextColor="Black" VerticalOptions="Start" LineBreakMode="WordWrap" FontSize="Medium" Text="{x:Binding messageText}"/>
+
+                    <Label  TextColor="DimGray" FontSize="Micro" HorizontalOptions="EndAndExpand" MinimumWidthRequest="40"  VerticalOptions="End" Text="{x:Binding formattedTime}"/>
+
+                    <Label x:Name="checker" IsVisible="{x:Binding isMine}" Margin="1" TextColor="{x:Binding isRedMessage, Converter={Helpers:MessageCheckConverter}}"  FontSize="12" Text="&#xf560;" VerticalOptions="End">
+                        <Label.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="Font Awesome 5 Free"  />
+                        </Label.FontFamily>
+                    </Label>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ViewCell.View>
+</ViewCell>

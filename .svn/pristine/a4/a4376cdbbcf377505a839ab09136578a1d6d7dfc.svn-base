@@ -1,0 +1,33 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.Util
+{
+
+    public class CallLogCounterConverter : IValueConverter, IMarkupExtension
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var count = ((int)value);
+            if (count == 1)
+                return "";
+            else
+                return $"({count})";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+            //throw new NotImplementedException();
+        }
+
+        public object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+    }
+}

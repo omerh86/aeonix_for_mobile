@@ -1,0 +1,444 @@
+using System;
+using System.Collections.Generic;
+using Android.Runtime;
+using Java.Interop;
+
+namespace Org.Linphone.Mediastream.Video.Display {
+
+	// Metadata.xml XPath class reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView']"
+	[global::Android.Runtime.Register ("org/linphone/mediastream/video/display/GL2JNIView", DoNotGenerateAcw=true)]
+	public partial class GL2JNIView : global::Android.Opengl.GLSurfaceView {
+
+		// Metadata.xml XPath class reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']"
+		[global::Android.Runtime.Register ("org/linphone/mediastream/video/display/GL2JNIView$ConfigChooser", DoNotGenerateAcw=true)]
+		public partial class ConfigChooser : global::Java.Lang.Object, global::Android.Opengl.GLSurfaceView.IEGLConfigChooser {
+
+
+
+			// Metadata.xml XPath field reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']/field[@name='mAlphaSize']"
+			[Register ("mAlphaSize")]
+			protected int MAlphaSize {
+				get {
+					const string __id = "mAlphaSize.I";
+
+					var __v = _members.InstanceFields.GetInt32Value (__id, this);
+					return __v;
+				}
+				set {
+					const string __id = "mAlphaSize.I";
+
+					try {
+						_members.InstanceFields.SetValue (__id, this, value);
+					} finally {
+					}
+				}
+			}
+
+
+			// Metadata.xml XPath field reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']/field[@name='mBlueSize']"
+			[Register ("mBlueSize")]
+			protected int MBlueSize {
+				get {
+					const string __id = "mBlueSize.I";
+
+					var __v = _members.InstanceFields.GetInt32Value (__id, this);
+					return __v;
+				}
+				set {
+					const string __id = "mBlueSize.I";
+
+					try {
+						_members.InstanceFields.SetValue (__id, this, value);
+					} finally {
+					}
+				}
+			}
+
+
+			// Metadata.xml XPath field reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']/field[@name='mDepthSize']"
+			[Register ("mDepthSize")]
+			protected int MDepthSize {
+				get {
+					const string __id = "mDepthSize.I";
+
+					var __v = _members.InstanceFields.GetInt32Value (__id, this);
+					return __v;
+				}
+				set {
+					const string __id = "mDepthSize.I";
+
+					try {
+						_members.InstanceFields.SetValue (__id, this, value);
+					} finally {
+					}
+				}
+			}
+
+
+			// Metadata.xml XPath field reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']/field[@name='mGreenSize']"
+			[Register ("mGreenSize")]
+			protected int MGreenSize {
+				get {
+					const string __id = "mGreenSize.I";
+
+					var __v = _members.InstanceFields.GetInt32Value (__id, this);
+					return __v;
+				}
+				set {
+					const string __id = "mGreenSize.I";
+
+					try {
+						_members.InstanceFields.SetValue (__id, this, value);
+					} finally {
+					}
+				}
+			}
+
+
+			// Metadata.xml XPath field reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']/field[@name='mRedSize']"
+			[Register ("mRedSize")]
+			protected int MRedSize {
+				get {
+					const string __id = "mRedSize.I";
+
+					var __v = _members.InstanceFields.GetInt32Value (__id, this);
+					return __v;
+				}
+				set {
+					const string __id = "mRedSize.I";
+
+					try {
+						_members.InstanceFields.SetValue (__id, this, value);
+					} finally {
+					}
+				}
+			}
+
+
+			// Metadata.xml XPath field reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']/field[@name='mStencilSize']"
+			[Register ("mStencilSize")]
+			protected int MStencilSize {
+				get {
+					const string __id = "mStencilSize.I";
+
+					var __v = _members.InstanceFields.GetInt32Value (__id, this);
+					return __v;
+				}
+				set {
+					const string __id = "mStencilSize.I";
+
+					try {
+						_members.InstanceFields.SetValue (__id, this, value);
+					} finally {
+					}
+				}
+			}
+			internal    new     static  readonly    JniPeerMembers  _members    = new XAPeerMembers ("org/linphone/mediastream/video/display/GL2JNIView$ConfigChooser", typeof (ConfigChooser));
+			internal static new IntPtr class_ref {
+				get {
+					return _members.JniPeerType.PeerReference.Handle;
+				}
+			}
+
+			public override global::Java.Interop.JniPeerMembers JniPeerMembers {
+				get { return _members; }
+			}
+
+			protected override IntPtr ThresholdClass {
+				get { return _members.JniPeerType.PeerReference.Handle; }
+			}
+
+			protected override global::System.Type ThresholdType {
+				get { return _members.ManagedPeerType; }
+			}
+
+			protected ConfigChooser (IntPtr javaReference, JniHandleOwnership transfer) : base (javaReference, transfer) {}
+
+			// Metadata.xml XPath constructor reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']/constructor[@name='GL2JNIView.ConfigChooser' and count(parameter)=6 and parameter[1][@type='int'] and parameter[2][@type='int'] and parameter[3][@type='int'] and parameter[4][@type='int'] and parameter[5][@type='int'] and parameter[6][@type='int']]"
+			[Register (".ctor", "(IIIIII)V", "")]
+			public unsafe ConfigChooser (int p0, int p1, int p2, int p3, int p4, int p5)
+				: base (IntPtr.Zero, JniHandleOwnership.DoNotTransfer)
+			{
+				const string __id = "(IIIIII)V";
+
+				if (((global::Java.Lang.Object) this).Handle != IntPtr.Zero)
+					return;
+
+				try {
+					JniArgumentValue* __args = stackalloc JniArgumentValue [6];
+					__args [0] = new JniArgumentValue (p0);
+					__args [1] = new JniArgumentValue (p1);
+					__args [2] = new JniArgumentValue (p2);
+					__args [3] = new JniArgumentValue (p3);
+					__args [4] = new JniArgumentValue (p4);
+					__args [5] = new JniArgumentValue (p5);
+					var __r = _members.InstanceMethods.StartCreateInstance (__id, ((object) this).GetType (), __args);
+					SetHandle (__r.Handle, JniHandleOwnership.TransferLocalRef);
+					_members.InstanceMethods.FinishCreateInstance (__id, this, __args);
+				} finally {
+				}
+			}
+
+			static Delegate cb_chooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_;
+#pragma warning disable 0169
+			static Delegate GetChooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Handler ()
+			{
+				if (cb_chooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_ == null)
+					cb_chooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_ = JNINativeWrapper.CreateDelegate ((Func<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr>) n_ChooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_);
+				return cb_chooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_;
+			}
+
+			static IntPtr n_ChooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_ (IntPtr jnienv, IntPtr native__this, IntPtr native_p0, IntPtr native_p1)
+			{
+				global::Org.Linphone.Mediastream.Video.Display.GL2JNIView.ConfigChooser __this = global::Java.Lang.Object.GetObject<global::Org.Linphone.Mediastream.Video.Display.GL2JNIView.ConfigChooser> (jnienv, native__this, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.IEGL10 p0 = (global::Javax.Microedition.Khronos.Egl.IEGL10)global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.IEGL10> (native_p0, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.EGLDisplay p1 = global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.EGLDisplay> (native_p1, JniHandleOwnership.DoNotTransfer);
+				IntPtr __ret = JNIEnv.ToLocalJniHandle (__this.ChooseConfig (p0, p1));
+				return __ret;
+			}
+#pragma warning restore 0169
+
+			// Metadata.xml XPath method reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']/method[@name='chooseConfig' and count(parameter)=2 and parameter[1][@type='javax.microedition.khronos.egl.EGL10'] and parameter[2][@type='javax.microedition.khronos.egl.EGLDisplay']]"
+			[Register ("chooseConfig", "(Ljavax/microedition/khronos/egl/EGL10;Ljavax/microedition/khronos/egl/EGLDisplay;)Ljavax/microedition/khronos/egl/EGLConfig;", "GetChooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Handler")]
+			public virtual unsafe global::Javax.Microedition.Khronos.Egl.EGLConfig ChooseConfig (global::Javax.Microedition.Khronos.Egl.IEGL10 p0, global::Javax.Microedition.Khronos.Egl.EGLDisplay p1)
+			{
+				const string __id = "chooseConfig.(Ljavax/microedition/khronos/egl/EGL10;Ljavax/microedition/khronos/egl/EGLDisplay;)Ljavax/microedition/khronos/egl/EGLConfig;";
+				try {
+					JniArgumentValue* __args = stackalloc JniArgumentValue [2];
+					__args [0] = new JniArgumentValue ((p0 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p0).Handle);
+					__args [1] = new JniArgumentValue ((p1 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p1).Handle);
+					var __rm = _members.InstanceMethods.InvokeVirtualObjectMethod (__id, this, __args);
+					return global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.EGLConfig> (__rm.Handle, JniHandleOwnership.TransferLocalRef);
+				} finally {
+				}
+			}
+
+			static Delegate cb_chooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_arrayLjavax_microedition_khronos_egl_EGLConfig_;
+#pragma warning disable 0169
+			static Delegate GetChooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_arrayLjavax_microedition_khronos_egl_EGLConfig_Handler ()
+			{
+				if (cb_chooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_arrayLjavax_microedition_khronos_egl_EGLConfig_ == null)
+					cb_chooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_arrayLjavax_microedition_khronos_egl_EGLConfig_ = JNINativeWrapper.CreateDelegate ((Func<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr>) n_ChooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_arrayLjavax_microedition_khronos_egl_EGLConfig_);
+				return cb_chooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_arrayLjavax_microedition_khronos_egl_EGLConfig_;
+			}
+
+			static IntPtr n_ChooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_arrayLjavax_microedition_khronos_egl_EGLConfig_ (IntPtr jnienv, IntPtr native__this, IntPtr native_p0, IntPtr native_p1, IntPtr native_p2)
+			{
+				global::Org.Linphone.Mediastream.Video.Display.GL2JNIView.ConfigChooser __this = global::Java.Lang.Object.GetObject<global::Org.Linphone.Mediastream.Video.Display.GL2JNIView.ConfigChooser> (jnienv, native__this, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.IEGL10 p0 = (global::Javax.Microedition.Khronos.Egl.IEGL10)global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.IEGL10> (native_p0, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.EGLDisplay p1 = global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.EGLDisplay> (native_p1, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.EGLConfig[] p2 = (global::Javax.Microedition.Khronos.Egl.EGLConfig[]) JNIEnv.GetArray (native_p2, JniHandleOwnership.DoNotTransfer, typeof (global::Javax.Microedition.Khronos.Egl.EGLConfig));
+				IntPtr __ret = JNIEnv.ToLocalJniHandle (__this.ChooseConfig (p0, p1, p2));
+				if (p2 != null)
+					JNIEnv.CopyArray (p2, native_p2);
+				return __ret;
+			}
+#pragma warning restore 0169
+
+			// Metadata.xml XPath method reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ConfigChooser']/method[@name='chooseConfig' and count(parameter)=3 and parameter[1][@type='javax.microedition.khronos.egl.EGL10'] and parameter[2][@type='javax.microedition.khronos.egl.EGLDisplay'] and parameter[3][@type='javax.microedition.khronos.egl.EGLConfig[]']]"
+			[Register ("chooseConfig", "(Ljavax/microedition/khronos/egl/EGL10;Ljavax/microedition/khronos/egl/EGLDisplay;[Ljavax/microedition/khronos/egl/EGLConfig;)Ljavax/microedition/khronos/egl/EGLConfig;", "GetChooseConfig_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_arrayLjavax_microedition_khronos_egl_EGLConfig_Handler")]
+			public virtual unsafe global::Javax.Microedition.Khronos.Egl.EGLConfig ChooseConfig (global::Javax.Microedition.Khronos.Egl.IEGL10 p0, global::Javax.Microedition.Khronos.Egl.EGLDisplay p1, global::Javax.Microedition.Khronos.Egl.EGLConfig[] p2)
+			{
+				const string __id = "chooseConfig.(Ljavax/microedition/khronos/egl/EGL10;Ljavax/microedition/khronos/egl/EGLDisplay;[Ljavax/microedition/khronos/egl/EGLConfig;)Ljavax/microedition/khronos/egl/EGLConfig;";
+				IntPtr native_p2 = JNIEnv.NewArray (p2);
+				try {
+					JniArgumentValue* __args = stackalloc JniArgumentValue [3];
+					__args [0] = new JniArgumentValue ((p0 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p0).Handle);
+					__args [1] = new JniArgumentValue ((p1 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p1).Handle);
+					__args [2] = new JniArgumentValue (native_p2);
+					var __rm = _members.InstanceMethods.InvokeVirtualObjectMethod (__id, this, __args);
+					return global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.EGLConfig> (__rm.Handle, JniHandleOwnership.TransferLocalRef);
+				} finally {
+					if (p2 != null) {
+						JNIEnv.CopyArray (native_p2, p2);
+						JNIEnv.DeleteLocalRef (native_p2);
+					}
+				}
+			}
+
+		}
+
+		// Metadata.xml XPath class reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ContextFactory']"
+		[global::Android.Runtime.Register ("org/linphone/mediastream/video/display/GL2JNIView$ContextFactory", DoNotGenerateAcw=true)]
+		public partial class ContextFactory : global::Java.Lang.Object, global::Android.Opengl.GLSurfaceView.IEGLContextFactory {
+
+			internal    new     static  readonly    JniPeerMembers  _members    = new XAPeerMembers ("org/linphone/mediastream/video/display/GL2JNIView$ContextFactory", typeof (ContextFactory));
+			internal static new IntPtr class_ref {
+				get {
+					return _members.JniPeerType.PeerReference.Handle;
+				}
+			}
+
+			public override global::Java.Interop.JniPeerMembers JniPeerMembers {
+				get { return _members; }
+			}
+
+			protected override IntPtr ThresholdClass {
+				get { return _members.JniPeerType.PeerReference.Handle; }
+			}
+
+			protected override global::System.Type ThresholdType {
+				get { return _members.ManagedPeerType; }
+			}
+
+			protected ContextFactory (IntPtr javaReference, JniHandleOwnership transfer) : base (javaReference, transfer) {}
+
+			static Delegate cb_createContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLConfig_;
+#pragma warning disable 0169
+			static Delegate GetCreateContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLConfig_Handler ()
+			{
+				if (cb_createContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLConfig_ == null)
+					cb_createContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLConfig_ = JNINativeWrapper.CreateDelegate ((Func<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr, IntPtr>) n_CreateContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLConfig_);
+				return cb_createContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLConfig_;
+			}
+
+			static IntPtr n_CreateContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLConfig_ (IntPtr jnienv, IntPtr native__this, IntPtr native_p0, IntPtr native_p1, IntPtr native_p2)
+			{
+				global::Org.Linphone.Mediastream.Video.Display.GL2JNIView.ContextFactory __this = global::Java.Lang.Object.GetObject<global::Org.Linphone.Mediastream.Video.Display.GL2JNIView.ContextFactory> (jnienv, native__this, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.IEGL10 p0 = (global::Javax.Microedition.Khronos.Egl.IEGL10)global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.IEGL10> (native_p0, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.EGLDisplay p1 = global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.EGLDisplay> (native_p1, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.EGLConfig p2 = global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.EGLConfig> (native_p2, JniHandleOwnership.DoNotTransfer);
+				IntPtr __ret = JNIEnv.ToLocalJniHandle (__this.CreateContext (p0, p1, p2));
+				return __ret;
+			}
+#pragma warning restore 0169
+
+			// Metadata.xml XPath method reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ContextFactory']/method[@name='createContext' and count(parameter)=3 and parameter[1][@type='javax.microedition.khronos.egl.EGL10'] and parameter[2][@type='javax.microedition.khronos.egl.EGLDisplay'] and parameter[3][@type='javax.microedition.khronos.egl.EGLConfig']]"
+			[Register ("createContext", "(Ljavax/microedition/khronos/egl/EGL10;Ljavax/microedition/khronos/egl/EGLDisplay;Ljavax/microedition/khronos/egl/EGLConfig;)Ljavax/microedition/khronos/egl/EGLContext;", "GetCreateContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLConfig_Handler")]
+			public virtual unsafe global::Javax.Microedition.Khronos.Egl.EGLContext CreateContext (global::Javax.Microedition.Khronos.Egl.IEGL10 p0, global::Javax.Microedition.Khronos.Egl.EGLDisplay p1, global::Javax.Microedition.Khronos.Egl.EGLConfig p2)
+			{
+				const string __id = "createContext.(Ljavax/microedition/khronos/egl/EGL10;Ljavax/microedition/khronos/egl/EGLDisplay;Ljavax/microedition/khronos/egl/EGLConfig;)Ljavax/microedition/khronos/egl/EGLContext;";
+				try {
+					JniArgumentValue* __args = stackalloc JniArgumentValue [3];
+					__args [0] = new JniArgumentValue ((p0 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p0).Handle);
+					__args [1] = new JniArgumentValue ((p1 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p1).Handle);
+					__args [2] = new JniArgumentValue ((p2 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p2).Handle);
+					var __rm = _members.InstanceMethods.InvokeVirtualObjectMethod (__id, this, __args);
+					return global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.EGLContext> (__rm.Handle, JniHandleOwnership.TransferLocalRef);
+				} finally {
+				}
+			}
+
+			static Delegate cb_destroyContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLContext_;
+#pragma warning disable 0169
+			static Delegate GetDestroyContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLContext_Handler ()
+			{
+				if (cb_destroyContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLContext_ == null)
+					cb_destroyContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLContext_ = JNINativeWrapper.CreateDelegate ((Action<IntPtr, IntPtr, IntPtr, IntPtr, IntPtr>) n_DestroyContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLContext_);
+				return cb_destroyContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLContext_;
+			}
+
+			static void n_DestroyContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLContext_ (IntPtr jnienv, IntPtr native__this, IntPtr native_p0, IntPtr native_p1, IntPtr native_p2)
+			{
+				global::Org.Linphone.Mediastream.Video.Display.GL2JNIView.ContextFactory __this = global::Java.Lang.Object.GetObject<global::Org.Linphone.Mediastream.Video.Display.GL2JNIView.ContextFactory> (jnienv, native__this, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.IEGL10 p0 = (global::Javax.Microedition.Khronos.Egl.IEGL10)global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.IEGL10> (native_p0, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.EGLDisplay p1 = global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.EGLDisplay> (native_p1, JniHandleOwnership.DoNotTransfer);
+				global::Javax.Microedition.Khronos.Egl.EGLContext p2 = global::Java.Lang.Object.GetObject<global::Javax.Microedition.Khronos.Egl.EGLContext> (native_p2, JniHandleOwnership.DoNotTransfer);
+				__this.DestroyContext (p0, p1, p2);
+			}
+#pragma warning restore 0169
+
+			// Metadata.xml XPath method reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView.ContextFactory']/method[@name='destroyContext' and count(parameter)=3 and parameter[1][@type='javax.microedition.khronos.egl.EGL10'] and parameter[2][@type='javax.microedition.khronos.egl.EGLDisplay'] and parameter[3][@type='javax.microedition.khronos.egl.EGLContext']]"
+			[Register ("destroyContext", "(Ljavax/microedition/khronos/egl/EGL10;Ljavax/microedition/khronos/egl/EGLDisplay;Ljavax/microedition/khronos/egl/EGLContext;)V", "GetDestroyContext_Ljavax_microedition_khronos_egl_EGL10_Ljavax_microedition_khronos_egl_EGLDisplay_Ljavax_microedition_khronos_egl_EGLContext_Handler")]
+			public virtual unsafe void DestroyContext (global::Javax.Microedition.Khronos.Egl.IEGL10 p0, global::Javax.Microedition.Khronos.Egl.EGLDisplay p1, global::Javax.Microedition.Khronos.Egl.EGLContext p2)
+			{
+				const string __id = "destroyContext.(Ljavax/microedition/khronos/egl/EGL10;Ljavax/microedition/khronos/egl/EGLDisplay;Ljavax/microedition/khronos/egl/EGLContext;)V";
+				try {
+					JniArgumentValue* __args = stackalloc JniArgumentValue [3];
+					__args [0] = new JniArgumentValue ((p0 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p0).Handle);
+					__args [1] = new JniArgumentValue ((p1 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p1).Handle);
+					__args [2] = new JniArgumentValue ((p2 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p2).Handle);
+					_members.InstanceMethods.InvokeVirtualVoidMethod (__id, this, __args);
+				} finally {
+				}
+			}
+
+		}
+
+		internal    new     static  readonly    JniPeerMembers  _members    = new XAPeerMembers ("org/linphone/mediastream/video/display/GL2JNIView", typeof (GL2JNIView));
+		internal static new IntPtr class_ref {
+			get {
+				return _members.JniPeerType.PeerReference.Handle;
+			}
+		}
+
+		public override global::Java.Interop.JniPeerMembers JniPeerMembers {
+			get { return _members; }
+		}
+
+		protected override IntPtr ThresholdClass {
+			get { return _members.JniPeerType.PeerReference.Handle; }
+		}
+
+		protected override global::System.Type ThresholdType {
+			get { return _members.ManagedPeerType; }
+		}
+
+		protected GL2JNIView (IntPtr javaReference, JniHandleOwnership transfer) : base (javaReference, transfer) {}
+
+		// Metadata.xml XPath constructor reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView']/constructor[@name='GL2JNIView' and count(parameter)=4 and parameter[1][@type='android.content.Context'] and parameter[2][@type='boolean'] and parameter[3][@type='int'] and parameter[4][@type='int']]"
+		[Register (".ctor", "(Landroid/content/Context;ZII)V", "")]
+		public unsafe GL2JNIView (global::Android.Content.Context p0, bool p1, int p2, int p3)
+			: base (IntPtr.Zero, JniHandleOwnership.DoNotTransfer)
+		{
+			const string __id = "(Landroid/content/Context;ZII)V";
+
+			if (((global::Java.Lang.Object) this).Handle != IntPtr.Zero)
+				return;
+
+			try {
+				JniArgumentValue* __args = stackalloc JniArgumentValue [4];
+				__args [0] = new JniArgumentValue ((p0 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p0).Handle);
+				__args [1] = new JniArgumentValue (p1);
+				__args [2] = new JniArgumentValue (p2);
+				__args [3] = new JniArgumentValue (p3);
+				var __r = _members.InstanceMethods.StartCreateInstance (__id, ((object) this).GetType (), __args);
+				SetHandle (__r.Handle, JniHandleOwnership.TransferLocalRef);
+				_members.InstanceMethods.FinishCreateInstance (__id, this, __args);
+			} finally {
+			}
+		}
+
+		// Metadata.xml XPath constructor reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView']/constructor[@name='GL2JNIView' and count(parameter)=2 and parameter[1][@type='android.content.Context'] and parameter[2][@type='android.util.AttributeSet']]"
+		[Register (".ctor", "(Landroid/content/Context;Landroid/util/AttributeSet;)V", "")]
+		public unsafe GL2JNIView (global::Android.Content.Context p0, global::Android.Util.IAttributeSet p1)
+			: base (IntPtr.Zero, JniHandleOwnership.DoNotTransfer)
+		{
+			const string __id = "(Landroid/content/Context;Landroid/util/AttributeSet;)V";
+
+			if (((global::Java.Lang.Object) this).Handle != IntPtr.Zero)
+				return;
+
+			try {
+				JniArgumentValue* __args = stackalloc JniArgumentValue [2];
+				__args [0] = new JniArgumentValue ((p0 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p0).Handle);
+				__args [1] = new JniArgumentValue ((p1 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p1).Handle);
+				var __r = _members.InstanceMethods.StartCreateInstance (__id, ((object) this).GetType (), __args);
+				SetHandle (__r.Handle, JniHandleOwnership.TransferLocalRef);
+				_members.InstanceMethods.FinishCreateInstance (__id, this, __args);
+			} finally {
+			}
+		}
+
+		// Metadata.xml XPath constructor reference: path="/api/package[@name='org.linphone.mediastream.video.display']/class[@name='GL2JNIView']/constructor[@name='GL2JNIView' and count(parameter)=1 and parameter[1][@type='android.content.Context']]"
+		[Register (".ctor", "(Landroid/content/Context;)V", "")]
+		public unsafe GL2JNIView (global::Android.Content.Context p0)
+			: base (IntPtr.Zero, JniHandleOwnership.DoNotTransfer)
+		{
+			const string __id = "(Landroid/content/Context;)V";
+
+			if (((global::Java.Lang.Object) this).Handle != IntPtr.Zero)
+				return;
+
+			try {
+				JniArgumentValue* __args = stackalloc JniArgumentValue [1];
+				__args [0] = new JniArgumentValue ((p0 == null) ? IntPtr.Zero : ((global::Java.Lang.Object) p0).Handle);
+				var __r = _members.InstanceMethods.StartCreateInstance (__id, ((object) this).GetType (), __args);
+				SetHandle (__r.Handle, JniHandleOwnership.TransferLocalRef);
+				_members.InstanceMethods.FinishCreateInstance (__id, this, __args);
+			} finally {
+			}
+		}
+
+	}
+}

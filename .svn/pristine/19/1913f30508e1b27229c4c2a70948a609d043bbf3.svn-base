@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+            x:Class="LinphoneXamarin.components.speedDialEditorPage"
+             xmlns:Helpers="clr-namespace:LinphoneXamarin.Util"
+              Title="{StaticResource quick_actions}"
+             FlowDirection="{StaticResource FlowDirection}">
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Frame BackgroundColor="White" VerticalOptions="Start" CornerRadius="15" Margin="15">
+                <StackLayout VerticalOptions="Start">
+                    <Label Text="{StaticResource type}" TextColor="Black" FontSize="Large" FontAttributes="Bold"/>
+                    <Picker x:Name="typePicker" WidthRequest="150" FontSize="Small" SelectedIndexChanged="onTypeSelected" ItemDisplayBinding="{Binding Converter={Helpers:SpeedDialTextConverter}}" />
+
+                    <StackLayout x:Name="subTypeLayout" IsVisible="False">
+                        <Label  FontSize="Large" TextColor="Black" FontAttributes="Bold" Text="{StaticResource subType}"/>
+                        <Picker x:Name="typePickerAcc"  WidthRequest="150" FontSize="Small" ItemDisplayBinding="{Binding Converter={Helpers:SpeedDialTextConverter}}" SelectedIndexChanged="onTypeSelectedAcc" />
+                    </StackLayout>
+
+                    <StackLayout x:Name="numberLayout" IsVisible="False">
+                        <Label x:Name="numberLbl" TextColor="Black" FontSize="Large" FontAttributes="Bold"/>
+                        <Entry  Keyboard="Telephone" Text="{Binding Number}"></Entry>
+                    </StackLayout>
+
+                    <Label Text="{StaticResource label}" TextColor="Black" FontSize="Large" FontAttributes="Bold"/>
+                    <Entry x:Name="lbl"  Text="{Binding Label}"></Entry>
+                </StackLayout>
+            </Frame>
+            <Grid Margin="20">
+                <Button Text="{StaticResource cancel}" TextColor="#0091D3" WidthRequest="100" CornerRadius="25"  Grid.Row="0" FontSize="Large" Grid.Column="2" HorizontalOptions="End" Clicked="onCancelClicked" BorderWidth="1" BackgroundColor="Transparent"  BorderColor="#0091D3"/>
+                <Button x:Name="deleteBtn" IsVisible="False" CornerRadius="25" WidthRequest="100"  Text="{StaticResource delete}" FontSize="Large" TextColor="Red" Clicked="onDeleteClicked"  Grid.Row="0" Grid.Column="1"  HorizontalOptions="Center"  BorderWidth="1" BackgroundColor="Transparent" BorderColor="Red"/>
+                <Button Text="{StaticResource save}" CornerRadius="25" WidthRequest="100"  TextColor="White" FontSize="Large" Grid.Row="0" Grid.Column="0" HorizontalOptions="Start" Clicked="onSaveClicked" >
+                    <Button.Background>
+                        <LinearGradientBrush  EndPoint="0,1">
+                            <GradientStop Color="#BAE9FF" Offset="0.1" />
+                            <GradientStop Color="#0091D3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
+            </Grid>
+
+            <Label x:Name="ErrLbl" Margin="20" TextColor="Red" IsVisible="False" />
+        </StackLayout>
+
+    </ContentPage.Content>
+</ContentPage>

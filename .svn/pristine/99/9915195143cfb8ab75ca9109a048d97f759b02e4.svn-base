@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.About"
+            Title="{StaticResource about}">
+    <ContentPage.Content>
+        <StackLayout x:Name="stack_layout" Margin="10">
+            <Image Source="logofortoolbar.png" HeightRequest="60" WidthRequest="60" VerticalOptions="Center"></Image>
+            <Label Text="aeonix" HorizontalOptions="Center" TextColor="#07185A" FontAttributes="Bold" VerticalTextAlignment="End" Margin="0" VerticalOptions="End" FontSize="40" />
+            <Label Text="touch" HorizontalOptions="Center" TextColor="#0096D6" VerticalTextAlignment="Start" VerticalOptions="Start" Margin="0,-25,0,0" FontAttributes="Bold" FontSize="40" />
+            <Label  FontSize="Medium" Text="© 2021 Tadiran Telecom" FontAttributes="Bold" TextColor="Black" Margin="0,20,0,0"/>
+            <Label x:Name="versionlbl" FontSize="Small" FontAttributes="Italic"/>
+            <Label x:Name="AeonixVersionlbl" FontSize="Small" FontAttributes="Italic"/>
+            <Label FontSize="Small"  x:Name="aboutTxt"/>
+            
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

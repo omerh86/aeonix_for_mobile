@@ -1,0 +1,208 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Acr.UserDialogs;
+using Linphone;
+using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using Xamarin.Essentials;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class navBar : FlyoutPage, CallViewInitiater, IAlertListener
+    {
+
+        public navBar()
+        {
+            InitializeComponent();
+            MasterPage.ListView.ItemSelected += ListView_ItemSelected;
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            addLog("OnAppearing navbar page");
+            CallService.Instance.callViewInitiater = this;
+            AeonixInfoService.Instance.alertListener = this;
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            addLog("OnDisappearing navbar page");
+            CallService.Instance.callViewInitiater = null;
+        }
+
+
+        public async Task onInitiateCallViewAsync()
+        {
+            addLog("onInitiateCallView");
+
+            if (!SharedData.Instance.isCallView)
+            {
+                addLog("goToCallView");
+                var page = (Page)new MainPage();
+                SharedData.Instance.isCallView = true;
+                await Detail.Navigation.PushAsync(page, false);
+                MyAudioManager.Instance.setAudioState(MYAudioState.BT, false);
+
+#if __IOS__
+                AppDelegate.screenHandler(true);  
+#elif WINDOWS_UWP
+                Windows.UI.Xaml.Window.Current.Content.KeyDown += Window_KeyDown;
+#endif
+
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void onDestroyCallView()
+        {
+            addLog("onDestroyCallView: current page:" + Detail.Navigation.NavigationStack[Detail.Navigation.NavigationStack.Count - 1].ClassId);
+            SharedData.Instance.isCallView = false;
+
+            if (Detail.Navigation.NavigationStack[Detail.Navigation.NavigationStack.Count - 1].ClassId != null && Detail.Navigation.NavigationStack[Detail.Navigation.NavigationStack.Count - 1].ClassId.Equals("inACallPage"))
+            {
+#if WINDOWS_UWP
+                var shareData = SharedData.Instance;
+                if (shareData.isUWPForground)
+                {
+                    addLog("removing call view from foreground");
+                    Device.StartTimer(TimeSpan.FromMilliseconds(500), () =>
+                                        {
+                                            Detail.Navigation.PopToRootAsync(false);
+                                            return false;
+                                        });
+                }
+                else
+                {
+                    addLog("removing call view from background");
+                    try
+                    {
+                        Detail.Navigation.PopAsync(false);
+                    }
+                    catch (Exception e)
+                    {
+                        addLog(e.ToString());
+                    }
+                }
+#else
+                if (((App)App.Current).isForeground)
+                {
+                    addLog("removing call view from foreground");
+                    Detail.Navigation.PopToRootAsync(false);
+                }
+                else
+                {
+                    addLog("removing call view from background");
+                    Detail.Navigation.PopAsync(false);
+                }
+#endif
+            }
+
+            AeonixInfoService.Instance.getCallLogs();
+            MyAudioManager myAudioManager = MyAudioManager.Instance;
+            myAudioManager.setAudioState(MYAudioState.DEFAULT, false);
+            myAudioManager.setCommunicationMode(AudioMode.DEFAULT);
+
+#if __IOS__
+            Console.WriteLine("omer928:destroyApp() "+ SharedData.Instance.isVoipSession);
+            AppDelegate.screenHandler(false);
+            if(SharedData.Instance.isVoipSession){
+            Console.WriteLine("omer928:destroyApp()");
+                AppDelegate.destroyApp();
+            }
+
+#elif WINDOWS_UWP
+            try
+            {
+                Windows.UI.Xaml.Window.Current.Content.KeyDown -= Window_KeyDown;
+            }
+            catch (Exception e)
+            {
+                addLog("test:" + e.ToString());
+            }
+#endif
+        }
+
+#if WINDOWS_UWP
+        private void Window_KeyDown(object sender, Windows.UI.Xaml.Input.KeyRoutedEventArgs e)
+        {
+            addLog("you pressed: " + e.Key);
+            var settings = MyFileSystem.Instance.loadSettings();
+            addLog("answerkey: " + settings.answerKey);
+            Windows.UI.Xaml.Window.Current.Activate();
+            if (settings.answerKey != null && settings.answerKey.ToLower().Equals(e.Key.ToString().ToLower()))
+            {
+                CallService.Instance.answerCall(false);
+            }
+            if (settings.endKey != null && settings.endKey.ToLower().Equals(e.Key.ToString().ToLower()))
+            {
+                CallService.Instance.terminateCall();
+            }
+        }
+
+#endif
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "Navbar_Page");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        private void ListView_ItemSelected(object sender, SelectedItemChangedEventArgs e)
+        {
+            var item = e.SelectedItem as navBarMenuItem;
+            if (item == null)
+                return;
+
+
+            var page = (Page)Activator.CreateInstance(item.TargetType);
+            page.Title = item.Title;
+
+            Detail.Navigation.PushAsync(page);
+
+            IsPresented = false;
+
+            MasterPage.ListView.SelectedItem = null;
+        }
+
+        CancellationTokenSource cancelToken;
+
+        public async Task DisplayCollabAlert(string title, string message, bool isYesNo, string link)
+        {
+            if (isYesNo)
+            {
+                cancelToken = new CancellationTokenSource();
+                MyAudioManager.Instance.playFile("notification_sound.mp3");
+                bool answer = await UserDialogs.Instance.ConfirmAsync(title, message, (string)Application.Current.Resources["yes"], (string)Application.Current.Resources["no"], cancelToken.Token);
+                //bool answer = await DisplayAlert(title, message, (string)Application.Current.Resources["yes"], (string)Application.Current.Resources["no"]);
+                if (answer)
+                {
+                    AeonixInfoService.Instance.sendCollaborationOfferStatus("ACCEPTED");
+                    //go to link
+                    Browser.OpenAsync(new Uri(link), BrowserLaunchMode.SystemPreferred);
+                }
+                else
+                {
+                    AeonixInfoService.Instance.sendCollaborationOfferStatus("REJECTED");
+                }
+            }
+            else
+            {
+                if (cancelToken != null)
+                    cancelToken.Cancel();
+
+                //await DisplayAlert(title, message, "OK");
+            }
+
+        }
+    }
+}

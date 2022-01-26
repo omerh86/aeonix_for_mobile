@@ -1,0 +1,8 @@
+[assembly:global::Android.Runtime.NamespaceMapping (Java = "org.linphone.core.tutorials", Managed="Org.Linphone.Core.Tutorials")]
+[assembly:global::Android.Runtime.NamespaceMapping (Java = "org.linphone.core.util", Managed="Org.Linphone.Core.Util")]
+[assembly:global::Android.Runtime.NamespaceMapping (Java = "org.linphone.mediastream", Managed="Org.Linphone.Mediastream")]
+[assembly:global::Android.Runtime.NamespaceMapping (Java = "org.linphone.mediastream.video", Managed="Org.Linphone.Mediastream.Video")]
+[assembly:global::Android.Runtime.NamespaceMapping (Java = "org.linphone.mediastream.video.capture", Managed="Org.Linphone.Mediastream.Video.Capture")]
+[assembly:global::Android.Runtime.NamespaceMapping (Java = "org.linphone.mediastream.video.capture.hwconf", Managed="Org.Linphone.Mediastream.Video.Capture.Hwconf")]
+[assembly:global::Android.Runtime.NamespaceMapping (Java = "org.linphone.mediastream.video.display", Managed="Org.Linphone.Mediastream.Video.Display")]
+[assembly:global::Android.Runtime.NamespaceMapping (Java = "org.linphone.tools", Managed="Org.Linphone.Tools")]

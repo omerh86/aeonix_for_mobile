@@ -1,0 +1,68 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+
+namespace LinphoneXamarin.EsfUtil
+{
+    class EsfCommandHandler
+    {
+        private ESFCommandObj eSFCommandObj;
+        public EsfCommandHandler(ESFCommandObj eSFCommandObj)
+        {
+            this.eSFCommandObj = eSFCommandObj;
+        }
+
+        public void doAction()
+        {
+            var cs = CallService.Instance;
+            switch (eSFCommandObj.request)
+            {
+                case "Answer":
+                    cs.answerCallByCallId(eSFCommandObj.callId);
+                    break;
+                case "Makecall":
+                case "ConsultationCall":
+                    cs.callAsync(eSFCommandObj.to, "", false);
+                    break;
+                case "AlternateCall":
+                    cs.switchCurrentCall();
+                    break;
+                case "Clear":
+                    cs.terminateCallByCallID(eSFCommandObj.callId);
+                    break;
+                case "ConferenceCall":
+                    cs.CreateConference();
+                    break;
+                case "DialDigits":
+                    cs.SendDtmfByCallId(eSFCommandObj.digits, eSFCommandObj.callId);
+                    break;
+                case "Hold":
+                    cs.HoldByCallId(eSFCommandObj.callId);
+                    break;
+                case "MicStatus":
+
+                    break;
+                case "Mute":
+                    cs.onMuteToggle();
+                    break;
+                case "Retrieve":
+                    cs.RetrieveByCallId(eSFCommandObj.callId);
+                    break;
+            }
+        }
+        //private ESFCommandRequest getESFCommandRequestFromString(string request)
+        //{
+        //    switch (request)
+        //    {
+        //        case "":
+        //            return ESFCommandRequest.Answer;
+
+        //        default:
+        //            return ESFCommandRequest.None;
+        //    }
+        //}
+    }
+}

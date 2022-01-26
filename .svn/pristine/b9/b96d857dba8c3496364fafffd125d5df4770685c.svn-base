@@ -1,0 +1,45 @@
+﻿using LinphoneXamarin.Entities;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.Util
+{
+
+    public class FeatureButtonStatusColorConverter : IValueConverter, IMarkupExtension
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var result = value;
+            switch ((FeatureButtonStatus)value)
+            {
+                case FeatureButtonStatus.None:
+                    return Color.Transparent;
+                case FeatureButtonStatus.Inactive:
+                    return Color.Transparent;
+                case FeatureButtonStatus.Idle:
+                    return Color.LightGreen;
+                case FeatureButtonStatus.Busy:
+                    return Color.Red;
+                default:
+                    return Color.Red;
+
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+            //throw new NotImplementedException();
+        }
+
+        public object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+    }
+}

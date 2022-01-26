@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.ContactTabbedPage"
+           xmlns:pages="clr-namespace:LinphoneXamarin.components"
+            BarBackgroundColor="Transparent"
+            FlowDirection="{StaticResource FlowDirection}" BarTextColor="#00688f" >
+    <!--BarTextColor="#00688f"-->
+    <pages:Favorites  Title="{StaticResource favorites}"  />
+    <pages:Recent  Title="{StaticResource recent}"  />
+    <pages:Groups  Title="{StaticResource groups}" />
+
+</TabbedPage>

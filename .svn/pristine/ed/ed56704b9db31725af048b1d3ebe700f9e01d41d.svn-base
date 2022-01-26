@@ -1,0 +1,477 @@
+﻿using System;
+using LinphoneXamarin.Entities;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Linphone;
+using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
+using System.Text.RegularExpressions;
+using LinphoneXamarin.Util;
+using System.Linq;
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class ContactService
+    {
+        public Contact myContact { set; get; }
+        public Contact VoicMail { set; get; }
+
+        public List<Contact> allContacts = new List<Contact>();
+        public List<Contact> shouldUpdateExternalList { set; get; }
+        public List<string> shouldDeleteExternalList { set; get; }
+        public FavListener favListener { set; get; }
+        public ISDKContactListener sDKContactListener { set; get; }
+        private static ContactService instance = null;
+        private static readonly object padlock = new object();
+
+        ContactService() { }
+
+        public static ContactService Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new ContactService();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public void getPhoneBookContacts()
+        {
+            if (Xamarin.Essentials.VersionTracking.IsFirstLaunchForCurrentVersion)
+            {
+                allContacts = new List<Contact>();
+            }
+            Task.Run(() => DoGetPhoneBookContact());
+        }
+
+
+        public void resetMyContact()
+        {
+            var fs = MyFileSystem.Instance;
+            var bc = fs.loadMyContact();
+            if (bc != null)
+                myContact = new Contact(bc);
+            else
+                myContact = new Contact("", "", "", "", new List<string>(), new List<MySendRequestHelper.ExtNumber>(), 0, ContactType.Aeonix, Presence.ONLINE);
+
+            var cardentials = fs.loadLoginCardential(CardentialState.Aeonix);
+            if (cardentials != null)
+                myContact.userName = cardentials.userName;
+
+            addLog("resetMyContact(), myContact username is: " + myContact.userName);
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "contacts_service");
+            Console.WriteLine("omer:77 " + message);
+#if WINDOWS_UWP
+            System.Diagnostics.Debug.Write("omer:77 " + message);
+#endif
+        }
+
+
+        public void clearServerUsers()
+        {
+            allContacts = new List<Contact>();
+            getPhoneBookContacts();
+        }
+
+        public void clearPhoneBookUsers()
+        {
+            var count = allContacts.RemoveAll(delegate (Contact c)
+               {
+                   return c.type == ContactType.PhoneBook;
+               });
+            addLog($"remove {count} phoneBook contacts");
+        }
+
+        public Contact updateContact(Contact contact, bool considerFav = false)
+        {
+            if (contact == null || contact.userName == null)
+                return null;
+
+            Contact result = allContacts.Find(delegate (Contact c)
+            {
+                return c.userName.Equals(contact.userName);
+            });
+
+            if (result != null)
+            {
+                if (contact.presenceStatus != Presence.NONE && contact.presenceStatus != Presence.BUSY)
+                    result.presenceStatus = contact.presenceStatus;
+
+                if (considerFav)
+                {
+                    result.isFav = contact.isFav;
+                }
+                result.allAliases = contact.allAliases;
+                result.allExternalAliases = contact.allExternalAliases;
+                result.displayName = contact.displayName;
+                result.firstName = contact.firstName;
+                result.email = contact.email;
+                result.primaryAlias = contact.primaryAlias;
+                result.description = contact.description;
+                result.department = contact.department;
+                result.company = contact.company;
+                result.homeAddress = contact.homeAddress;
+                result.phonebook = contact.phonebook;
+                result.imageSignature = contact.imageSignature;
+                result.type = contact.type;
+            }
+            else
+            {
+                result = contact;
+                allContacts.Add(contact);
+            }
+
+            return result;
+        }
+
+        public void setMyVoiceMailGroup()
+        {
+            try
+            {
+                VoicMail = null;
+                var vmId = MyFileSystem.Instance.loadVMID();
+                if (vmId != null)
+                {
+                    addLog($"setMyVoiceMailGroup(), vm id is: {vmId}");
+                    VoicMail = allContacts.Find(i => i.type == ContactType.Group && i.displayName.Equals("VOICE_MAIL") && i.description != null && i.description.ToLower().Equals(vmId.ToLower()));
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+
+
+        }
+
+        public void setContactRefId(string userName, string RefId)
+        {
+            Contact result = allContacts.Find(i => i.userName.Equals(userName));
+            if (result != null)
+            {
+                result.monitorCrossRefID = RefId;
+            }
+        }
+
+
+        public void updateContactPresenceByRefId(string RefId, Presence presence)
+        {
+
+            Contact contact = allContacts.Find(i => i.monitorCrossRefID.Equals(RefId));
+            if (contact != null)
+            {
+                contact.presenceStatus = presence;
+            }
+
+        }
+
+        public void updateContactPresenceByUserId(string userName, Presence presence)
+        {
+
+            if (userName.Equals(myContact.userName))
+            {
+                if (presence != Presence.BUSY)
+                    myContact.presenceStatus = presence;
+            }
+            else
+            {
+                Contact result = allContacts.Find(i => i.userName.Equals(userName));
+                if (result != null)
+                {
+                    result.presenceStatus = presence;
+                }
+            }
+        }
+
+        public Contact getContactByUserName(String userName)
+        {
+            Contact result = allContacts.Find(i => i.userName.Equals(userName));
+            return result;
+        }
+
+
+        public Contact getContactByAlias(string alias)
+        {
+            if (alias != null && alias.StartsWith("9"))
+                alias = alias.Substring(1, alias.Length - 1);
+            addLog("getContactByAlias() " + alias);
+            for (int i = 0; i < allContacts.Count; i++)
+            {
+                switch (allContacts[i].type)
+                {
+                    case ContactType.Aeonix:
+                    case ContactType.Group:
+                        if (allContacts[i].allAliases != null)
+                        {
+                            for (int t = 0; t < allContacts[i].allAliases.Count; t++)
+                            {
+                                if (allContacts[i].allAliases[t].Equals(alias))
+                                    return allContacts[i];
+                            }
+                        }
+                        break;
+                    case ContactType.PhoneBook:
+
+                        for (int t = 0; t < allContacts[i].allExternalAliases.Count; t++)
+                        {
+                            if (allContacts[i].allExternalAliases[t] != null && allContacts[i].allExternalAliases[t].phoneNumber != null)
+                            {
+                                if (alias.Equals(allContacts[i].allExternalAliases[t].phoneNumber))
+                                    return allContacts[i];
+                            }
+
+                        }
+
+                        break;
+                    case ContactType.External:
+                        for (int t = 0; t < allContacts[i].allExternalAliases.Count; t++)
+                        {
+                            if (allContacts[i].allExternalAliases[t] != null && allContacts[i].allExternalAliases[t].phoneNumber != null)
+                            {
+                                if (alias.Equals(allContacts[i].allExternalAliases[t].phoneNumber))
+                                    return allContacts[i];
+                            }
+                        }
+                        break;
+                }
+            }
+
+            return null;
+        }
+
+        private string FetchDigitsOnlyFromPhoneNumber(string formattedNumber)
+        {
+            string actualNumber;
+            actualNumber = formattedNumber;
+            actualNumber = actualNumber.Replace("(", string.Empty);
+            actualNumber = actualNumber.Replace(")", string.Empty);
+            actualNumber = actualNumber.Replace("-", string.Empty);
+            actualNumber = actualNumber.Replace(" ", string.Empty); //Blank
+            actualNumber = actualNumber.Replace(".", string.Empty);
+            //addLog("formattedNumber: " + formattedNumber + ", actualNumber: " + actualNumber);
+            return actualNumber;
+        }
+
+        public Contact getGroupByAlias(string alias)
+        {
+            Contact result = allContacts.Find(i => i.type == ContactType.Group && i.primaryAlias.Equals(alias));
+            return result;
+        }
+
+        public Task<List<Contact>> getGroupsAsync() => Task.Run(() => getAllGroups());
+
+        private List<Contact> getAllGroups()
+        {
+            var result = allContacts.FindAll(i => i.type == ContactType.Group);
+#if WINDOWS_UWP
+            result.Add(new Contact("", "", "", "", new List<string>(), new List<MySendRequestHelper.ExtNumber>(), 0, ContactType.None, Presence.ONLINE));
+#endif
+            return result;
+        }
+
+        public bool toggleContactFavStatus(string userName, bool isGroup)
+        {
+            addLog("toggleContactFavStatus()");
+            Contact relevantContact = allContacts.Find(i => i.userName.Equals(userName));
+            if (relevantContact != null)
+            {
+                relevantContact.isFav = !relevantContact.isFav;
+                if (relevantContact.isFav)
+                {
+                    AeonixInfoService.Instance.addFav(userName, isGroup, relevantContact.type == ContactType.Aeonix);
+                }
+                else
+                {
+                    AeonixInfoService.Instance.removeFav(userName, isGroup, relevantContact.type == ContactType.Aeonix);
+                }
+                fireFavListChanged();
+                return relevantContact.isFav;
+            }
+            return false;
+        }
+
+        private void fireFavListChanged()
+        {
+            if (favListener != null)
+            {
+                favListener.onFavListChanged();
+            }
+        }
+
+        public List<Contact> getContactByPartialName(string name, bool includePhoneBook)
+        {
+
+            List<Contact> contacts = allContacts.FindAll(delegate (Contact c)
+        {
+            string s = $"{c.displayName},{c.userName},{c.firstName},";
+            if (c.allAliases != null)
+            {
+                foreach (var i in c.allAliases)
+                {
+                    s += $"{i},";
+                }
+            }
+            if (c.allExternalAliases != null)
+            {
+                foreach (var k in c.allExternalAliases)
+                {
+                    s += $"{k.phoneNumber},";
+                }
+            }
+            var relevantType = includePhoneBook ? ContactType.Aeonix | ContactType.PhoneBook | ContactType.Group : ContactType.Aeonix | ContactType.Group;
+            return s.ToLower().IndexOf(name.ToLower()) > -1 && (c.type & relevantType) != 0;
+        });
+
+            if (contacts == null)
+                contacts = new List<Contact>();
+
+            return contacts;
+
+        }
+
+        public Task<List<Contact>> getAllFavAsync() => Task.Run(() => getAllFav());
+
+        private List<Contact> getAllFav()
+        {
+            var result = allContacts.FindAll(i => i.isFav);
+#if WINDOWS_UWP
+            result.Add(new Contact("", "", "", "", new List<string>(), new List<MySendRequestHelper.ExtNumber>(), 0, ContactType.None, Presence.ONLINE));
+#endif
+            addLog($"getAllFav(), count: {result.Count}");
+            return result;
+        }
+
+        public void clearAllFav()
+        {
+            foreach (var i in allContacts)
+            {
+                if (i.type != ContactType.PhoneBook)
+                    i.isFav = false;
+            }
+        }
+
+        public List<Contact> getAllAeonixContacts()
+        {
+            return allContacts.FindAll(i => i.type == ContactType.Aeonix);
+        }
+
+        public List<Contact> getAllPhoneBookContacts()
+        {
+            return allContacts.FindAll(i => i.type == ContactType.PhoneBook);
+        }
+
+        public void loadContact()
+        {
+            var baseContacts = MyFileSystem.Instance.loadContacts();
+            if (baseContacts != null)
+            {
+                List<Contact> contacts = new List<Contact>();
+                foreach (var i in baseContacts)
+                {
+                    contacts.Add(new Contact(i));
+                }
+                allContacts = contacts;
+            }
+        }
+
+        private void getUpdatedPhoneBookContacts(List<Contact> sdklist, Dictionary<string, string> cacheList)
+        {
+            addLog($"getUpdatedPhoneBookContacts(), sdklist count: {sdklist.Count}, cachelist count: {cacheList.Count}");
+            shouldUpdateExternalList = new List<Contact>();
+
+            string val; ;
+            foreach (var i in sdklist)
+            {
+                if (!cacheList.TryGetValue(i.userName, out val))
+                {
+                    addLog($"added: old: {val}, new: {i.ToString()}");
+                    shouldUpdateExternalList.Add(i);
+                }
+                else if (!val.Equals(i.ToString()))
+                {
+                    addLog($"modified: old: {val}, new: {i.ToString()}");
+                    shouldUpdateExternalList.Add(i);
+                    cacheList.Remove(i.userName);
+                }
+                else
+                    cacheList.Remove(i.userName);
+
+
+            }
+            shouldDeleteExternalList = cacheList.Keys.ToList();
+            addLog($"shouldUpdateList:" + shouldUpdateExternalList.Count);
+            addLog($"shouldRemoveList:" + shouldDeleteExternalList.Count);
+        }
+
+        private async Task DoGetPhoneBookContact()
+        {
+            try
+            {
+                addLog("DoGetPhoneBookContact()");
+                var sdkContacts = await Xamarin.Essentials.Contacts.GetAllAsync();
+                sdkContacts = sdkContacts.ToList();
+                addLog($"sdkContacts received from IO, count is: {sdkContacts.Count()}");
+                clearPhoneBookUsers();
+                var pbcontacts = new List<Contact>();
+                foreach (var contact in sdkContacts)
+                {
+                    var extAliases = new List<MySendRequestHelper.ExtNumber>();
+                    foreach (var num in contact.Phones)
+                    {
+                        if (num != null)
+                            extAliases.Add(new MySendRequestHelper.ExtNumber("EXTERNAL", FetchDigitsOnlyFromPhoneNumber(num.PhoneNumber)));
+                    }
+                    if (extAliases.Count > 0)
+                    {
+                        var c = new Contact($"{contact.Id.Replace(':', '_')}", contact.DisplayName, contact.GivenName, extAliases[0].phoneNumber, new List<string>(), extAliases, 0, ContactType.PhoneBook);
+                        c.lastName = contact.FamilyName;
+                        if (contact.Emails != null && contact.Emails.Count > 0)
+                            c.email = contact.Emails[0].EmailAddress;
+                        //  c.isFav = contact.isFavorite;
+                        pbcontacts.Add(c);
+                        allContacts.Add(c);
+                    }
+                }
+                var settings = MyFileSystem.Instance.loadSettings();
+                if (settings != null && settings.IsSyncContacts)
+                {
+                    var sd = SharedData.Instance;
+                    var cacheContacts = MyFileSystem.Instance.loadExternalContacts();
+                    MyFileSystem.Instance.saveExternalContacts(pbcontacts.ToDictionary(x => x.userName, x => x.ToString()));
+                    if (cacheContacts == null)
+                    {
+                        //add all external contacts
+                        addLog("cacheContacts is empty, should add all external contacts");
+                        sd.shouldUploadAllcontacts = true;
+                    }
+                    else if (!sd.shouldUploadAllcontacts)
+                    {
+                        getUpdatedPhoneBookContacts(pbcontacts, cacheContacts);
+                        if (shouldUpdateExternalList.Count > 100)
+                        {
+                            addLog($"to many contacts updated, its better to upload all once again for safty ");
+                            sd.shouldUploadAllcontacts = true;
+                        }
+                    }
+                }
+                if (sDKContactListener != null)
+                    sDKContactListener.onSDKContactArrived();
+
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+    }
+}

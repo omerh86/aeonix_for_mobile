@@ -1,0 +1,171 @@
+using System;
+using System.Collections.Generic;
+using Linphone;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using Xamarin.Forms;
+using System.ComponentModel;
+using Xamarin.Forms.Xaml;
+#if ANDROID
+using Xamarin.Forms.PlatformConfiguration.AndroidSpecific;
+#endif
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class Tabs : Xamarin.Forms.TabbedPage, IMissedCounterListener
+    {
+
+        public Action<object, TabEventArgs> UpdateIcons { get; internal set; }
+        private bool isFeatureButtons;
+
+        public Tabs()
+        {
+            InitializeComponent();
+            NavigationPage.SetHasNavigationBar(this, false);
+#if ANDROID
+            this.On<Xamarin.Forms.PlatformConfiguration.Android>().SetIsSwipePagingEnabled(false);
+            this.On<Xamarin.Forms.PlatformConfiguration.Android>().EnableSmoothScroll();
+            this.On<Xamarin.Forms.PlatformConfiguration.Android>().SetToolbarPlacement(ToolbarPlacement.Bottom);
+
+#endif
+            var credentials = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+            if (credentials != null && credentials.aeonixVersion != null)
+            {
+                if (credentials.aeonixVersion != null)
+                    featureButtonTabHandler(credentials.aeonixVersion);
+                else
+                    featureButtonTabHandler("4.0");
+            }
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            MessagesService.Instance.missedCounterListener = this;
+            CallLogService.Instance.missedCounterListener = this;
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+        }
+
+        public void onMessageCounterchanged(int counter)
+        {
+            addLog($"onMessageCounterchanged() {counter}");
+            Xamarin.Essentials.MainThread.BeginInvokeOnMainThread(() =>
+            {
+
+#if ANDROID
+                UpdateIcons?.Invoke(this, new TabEventArgs(2, counter));
+#endif
+#if WINDOWS_UWP
+                if (counter > 0)
+                    Plugin.Badge.Abstractions.TabBadge.SetBadgeText(chatPage, counter.ToString());
+                else
+                    Plugin.Badge.Abstractions.TabBadge.SetBadgeText(chatPage, "");
+#endif
+
+#if __IOS__
+            UpdateIcons?.Invoke(this, new TabEventArgs(3, counter));
+#endif
+            });
+        }
+
+        public void onCallCounterchanged(int counter)
+        {
+            addLog($"onCallCounterchanged, counter: {counter}");
+            Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+            {
+#if ANDROID
+                UpdateIcons?.Invoke(this, new TabEventArgs(1, counter));
+#endif
+#if WINDOWS_UWP
+                if (counter > 0)
+                    Plugin.Badge.Abstractions.TabBadge.SetBadgeText(recentPage, counter.ToString());
+                else
+                    Plugin.Badge.Abstractions.TabBadge.SetBadgeText(recentPage, "");
+#endif
+
+#if __IOS__
+            UpdateIcons?.Invoke(this, new TabEventArgs(2, counter));
+#endif
+            });
+        }
+
+        public void onVMCounterChanged(int counter)
+        {
+            if (!isFeatureButtons)
+            {
+                addLog("onVMCounterChanged: " + counter);
+                Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+                {
+#if ANDROID
+                    UpdateIcons?.Invoke(this, new TabEventArgs(3, counter));
+#elif WINDOWS_UWP
+                    //if (counter > 0)
+                    //    Plugin.Badge.Abstractions.TabBadge.SetBadgeText(vmPage, counter.ToString());
+                    //else
+                    //    Plugin.Badge.Abstractions.TabBadge.SetBadgeText(vmPage, "");
+#elif __IOS__
+                                        UpdateIcons?.Invoke(this, new TabEventArgs(4, counter));
+                                        if (counter > 0)
+                                            vm.Title = (string)Application.Current.Resources["vm"] + " (" + counter.ToString() + ")";
+                                        else
+                                            vm.Title = (string)Application.Current.Resources["vm"];
+
+#endif
+                });
+            }
+
+
+        }
+
+
+        private void addLog(string s)
+        {
+            Console.WriteLine($"omer56: {s}");
+            MyFileSystem.Instance.writeDebug(s, "TabsPage");
+        }
+
+        public void featureButtonTabHandler(string version)
+        {
+            addLog("featureButtonTabHandler: " + version);
+            try
+            {
+                var s = version.Substring(0, 3);
+                double d = Double.Parse(s);
+                if (d > 6.0)
+                {
+                    isFeatureButtons = true;
+                    DialSpeedService.Instance.isFeatureGridAvailable = true;
+                }
+                else
+                {
+                    isFeatureButtons = false;
+                    DialSpeedService.Instance.isFeatureGridAvailable = false;
+                }
+
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        public class TabEventArgs : EventArgs
+        {
+            public int childindex { get; set; }
+            public int counter { get; set; }
+
+            public TabEventArgs(int childindex, int counter)
+            {
+                this.childindex = childindex;
+                this.counter = counter;
+            }
+        }
+
+    }
+}

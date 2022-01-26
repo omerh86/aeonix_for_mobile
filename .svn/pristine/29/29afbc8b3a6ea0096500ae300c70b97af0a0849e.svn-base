@@ -1,0 +1,91 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace LinphoneXamarin.Util
+{
+    class TimeHelper
+    {
+
+        public string timeFormat { set; get; }
+        public string dateFormat { set; get; }
+        private static TimeHelper instance = null;
+        private static readonly object padlock = new object();
+        private readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        TimeHelper() { }
+
+        public static TimeHelper Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new TimeHelper();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public DateTime FromUnixTime(long unixTime)
+        {
+            try
+            {
+                var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                var x = epoch.AddMilliseconds(unixTime);
+                return x;
+            }
+            catch (Exception e)
+            {
+                return epoch;
+            }
+        }
+
+        public DateTime FromUnixTimeSeconds(long unixTime)
+        {
+            try
+            {
+                var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                var x = epoch.AddSeconds(unixTime);
+                return x;
+            }
+            catch (Exception e)
+            {
+                return epoch;
+            }
+        }
+
+        public long ToUnixTime(DateTime date)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return Convert.ToInt64((date - epoch).TotalMilliseconds);
+        }
+
+        public bool isSameDay(DateTime timeA, DateTime timeB)
+        {
+            if (timeA.DayOfYear == timeB.DayOfYear)
+                return true;
+            return false;
+        }
+
+        public string timeFromSec(string sec)
+        {
+            try
+            {
+                double secAsDouble = Convert.ToDouble(sec);
+                TimeSpan time = TimeSpan.FromSeconds(secAsDouble);
+                return time.ToString(@"hh\:mm\:ss");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("omer092: " + e);
+                return sec;
+            }
+
+        }
+
+    }
+}

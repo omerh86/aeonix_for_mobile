@@ -1,0 +1,434 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Xamarin.Essentials;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class VoiceMailPage : ContentPage, IVMMessagesListener
+    {
+
+        List<MyVmMessage> VMMessagesCollection;
+        public List<string> filterList { set; get; }
+        private MyVmMessage playingMessage;
+        private bool isTimerRunning;
+        private bool isUpdateOnCommandResponse;
+        private bool isSupportVoicemailSSO;
+        private bool canSendVoicemailViaEmail;
+
+        public VoiceMailPage()
+        {
+            InitializeComponent();
+            var sd = SharedData.Instance;
+            isSupportVoicemailSSO = sd.isSupportVoicemailSSO;
+            canSendVoicemailViaEmail = sd.canSendVoicemailViaEmail;
+            addLog($"isSupportVoicemailSSO: {isSupportVoicemailSSO}, canSendVoicemailViaEmail: {canSendVoicemailViaEmail}");
+            filterList = new List<string>() { (string)Application.Current.Resources["new"], (string)Application.Current.Resources["saved"], (string)Application.Current.Resources["deleted"] };
+            filterPicker.ItemsSource = filterList;
+            filterPicker.SelectedIndex = 0;
+            this.BindingContext = this;
+            isUpdateOnCommandResponse = true;
+            var settings = MyFileSystem.Instance.loadSettings();
+            if (!isSupportVoicemailSSO)
+            {
+                try
+                {
+                    if (settings.voiceMailPassword == null || settings.voiceMailPassword == "")
+                        DisplayAlert("", (string)Application.Current.Resources["vmalert"], (string)Application.Current.Resources["ok"]);
+                }
+                catch (Exception e)
+                {
+                    addLog(e.ToString());
+                }
+            }
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            var am = MyAudioManager.Instance;
+            am.setAudioState(MYAudioState.SPEAKER, false);
+            am.addPlaybackEndedListener(this);
+            isTimerRunning = false;
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            stopAudioVMMessage();
+            var am = MyAudioManager.Instance;
+            am.setAudioState(MYAudioState.DEFAULT, false);
+            am.removePlaybackEndedListener(this);
+        }
+
+        private void onCallPressed(object sender, EventArgs e)
+        {
+            try
+            {
+                Entities.Contact vm = ContactService.Instance.VoicMail;
+                var cs = CallService.Instance;
+                if (!isSupportVoicemailSSO)
+                    cs.isVMPressed = true;
+
+                cs.callAsync(vm.primaryAlias, vm.userName, false, vm.displayName);
+            }
+            catch (Exception err)
+            {
+                addLog(err.ToString());
+            }
+        }
+
+        public void onVmMessageListChanged(List<MyVmMessage> VmMessages)
+        {
+            if (VmMessages != null)
+            {
+                addLog($"onVmMessageListChanged() vm messages count is: {VmMessages.Count}");
+                VMMessagesCollection = VmMessages;
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    vmMessageList.ItemsSource = VmMessages;
+                });
+                if (VmMessages.Count == 0)
+                    setInfoLabel("No Messages", -1, false);
+                else
+                    setInfoLabel("", -1, false);
+            }
+        }
+
+        private void onDeletePressed(object sender, EventArgs e)
+        {
+            MyVmMessage BindingContext = ((Button)sender).BindingContext as MyVmMessage;
+            addLog($"onDeletePressed(): message id is {BindingContext.messageID}");
+            MyFileSystem.Instance.deleteAudioVmMessage(BindingContext.messageID);
+            var vmMessage = VMMessagesCollection.Find(i => i.messageID == BindingContext.messageID);
+            if (vmMessage != null)
+            {
+                setInfoLabel((string)Application.Current.Resources["loading"], -1, false);
+                AeonixInfoService.Instance.sendVmMessageCommand(vmMessage.messageID, "DELETE");
+            }
+        }
+
+        private void onAudioPressed(object sender, EventArgs e)
+        {
+            MyVmMessage BindingContext = ((Button)sender).BindingContext as MyVmMessage;
+            addLog($"onAudioPressed(): message id is {BindingContext.messageID}");
+            if (isSupportVoicemailSSO)
+            {
+                var cs = CallService.Instance;
+                cs.isVMPressed = true;
+                cs.callAsync($"{ContactService.Instance.VoicMail.primaryAlias}#{BindingContext.messageID}", BindingContext.messageID, false, BindingContext.messageName);
+            }
+            else
+            {
+                var vmMessage = VMMessagesCollection.Find(i => i.messageID == BindingContext.messageID);
+                if (vmMessage != null)
+                {
+                    if (vmMessage.isPlaying)
+                    {
+                        stopAudioVMMessage();
+                        return;
+                    }
+                    var s = MyFileSystem.Instance.loadAudioVmMessage(BindingContext.messageID);
+                    if (s != null)
+                    {
+                        playAudioVMMessage(BindingContext.messageID, s);
+                    }
+                    else
+                    {
+                        setInfoLabel((string)Application.Current.Resources["loading"], -1, false);
+                        vmMessage.isloading = true;
+                        AeonixInfoService.Instance.getVmAudioMessage(vmMessage.messageID, vmMessage.messageName);
+                    }
+                }
+            }
+        }
+
+        private void onSavePressed(object sender, EventArgs e)
+        {
+            setInfoLabel((string)Application.Current.Resources["loading"], -1, false);
+            MyVmMessage BindingContext = ((Button)sender).BindingContext as MyVmMessage;
+
+            addLog($"onSavePressed(): message id is {BindingContext.messageID}");
+            var vmMessage = VMMessagesCollection.Find(i => i.messageID == BindingContext.messageID);
+            if (vmMessage != null)
+                AeonixInfoService.Instance.sendVmMessageCommand(vmMessage.messageID, "SAVE");
+
+        }
+
+        private void onRestorePressed(object sender, EventArgs e)
+        {
+            setInfoLabel((string)Application.Current.Resources["loading"], -1, false);
+            MyVmMessage BindingContext = ((Button)sender).BindingContext as MyVmMessage;
+
+            addLog($"onRestorePressed(): message id is {BindingContext.messageID}");
+            var vmMessage = VMMessagesCollection.Find(i => i.messageID == BindingContext.messageID);
+            if (vmMessage != null)
+                AeonixInfoService.Instance.sendVmMessageCommand(vmMessage.messageID, "RESTORE");
+
+        }
+
+        private void onSendMailPressed(object sender, EventArgs e)
+        {
+
+            MyVmMessage BindingContext = ((Button)sender).BindingContext as MyVmMessage;
+            addLog($"onSendMailPressed(): message id is {BindingContext.messageID}");
+            var vmMessage = VMMessagesCollection.Find(i => i.messageID == BindingContext.messageID);
+            if (vmMessage != null)
+            {
+                if (isSupportVoicemailSSO)
+                {
+                    isUpdateOnCommandResponse = false;
+                    setInfoLabel("Sending Mail", -1, false);
+                    AeonixInfoService.Instance.sendVmMessageCommand(vmMessage.messageID, "SEND_TO_EMAIL");
+                }
+                else
+                {
+                    if (vmMessage.isPlaying && vmMessage.isloading)
+                    {
+                        return;
+                    }
+                    var s = MyFileSystem.Instance.loadAudioVmMessage(BindingContext.messageID);
+                    if (s != null)
+                    {
+
+                        sendMail(vmMessage.messageID, "", $"Description:\nFrom: {vmMessage.from}\nTime: {TimeHelper.Instance.FromUnixTimeSeconds(vmMessage.dateTime).ToString()}\nDuration: {vmMessage.durationSec} seconds\nMessage ID: {vmMessage.messageID}\nMessage Name: {vmMessage.messageName}");
+                    }
+                    else
+                    {
+                        setInfoLabel((string)Application.Current.Resources["loading"], -1, false);
+                        vmMessage.isloading = true;
+                        vmMessage.pendingSend = true;
+                        AeonixInfoService.Instance.getVmAudioMessage(vmMessage.messageID, vmMessage.messageName);
+                    }
+                }
+            }
+        }
+
+        private void sendMail(string messageID, string title, string body)
+        {
+            var message = new EmailMessage
+            {
+                To = new List<string>() { "" },
+                Subject = title,
+                Body = body,
+                BodyFormat = EmailBodyFormat.PlainText,
+                Attachments = new List<EmailAttachment>() { new EmailAttachment(MyFileSystem.Instance.getAudioVmMessageFilePath(messageID)) },
+            };
+
+            Email.ComposeAsync(message);
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "VoiceMailPage");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        public void onCommandResponed(int resultcode)
+        {
+            addLog($"onCommandResponed, result code: {resultcode}");
+            if (isUpdateOnCommandResponse)
+                AeonixInfoService.Instance.getVmMessageList(this, getFilterAsString(filterPicker.SelectedIndex));
+            else
+            {
+                if (isSupportVoicemailSSO)
+                    setInfoLabel("Message Sent Successfully", 4, false);
+
+                isUpdateOnCommandResponse = true;
+            }
+        }
+
+
+        private void playAudioVMMessage(string messageID, Stream audioContent)
+        {
+            foreach (var i in VMMessagesCollection)
+            {
+                i.progress = 0;
+                if (i.messageID.Equals(messageID))
+                {
+                    i.isPlaying = true;
+                    playingMessage = i;
+                }
+                else
+                    i.isPlaying = false;
+
+
+            }
+            // Stream stream = new MemoryStream(Convert.FromBase64String(audioContent));
+            var am = MyAudioManager.Instance;
+            //am.setAudioState(MYAudioState.SPEAKER, true);
+            am.playVMAudioMessage(audioContent);
+            if (!isTimerRunning)
+            {
+                isTimerRunning = true;
+                Device.StartTimer(TimeSpan.FromSeconds(0.2), () =>
+                {
+                    if (playingMessage.isPlaying)
+                    {
+                        playingMessage.progress += (float)1 / (playingMessage.durationSec * 5);
+
+                        addLog($"playingMessage progress is {playingMessage.progress}");
+                        return true;
+                    }
+                    else
+                    {
+                        playingMessage.progress = 0;
+                        isTimerRunning = false;
+                        return false;
+                    }
+                });
+            }
+        }
+
+        private void stopAudioVMMessage()
+        {
+            foreach (var i in VMMessagesCollection)
+            {
+                i.isPlaying = false;
+                i.progress = 0;
+            }
+
+            var am = MyAudioManager.Instance;
+            am.stopVMAudioMessage();
+        }
+
+        public void onVMAudioMessageResponed(int errCode, string messageID, string audioContent)
+        {
+            addLog($"onVMAudioMessageResponed()");
+
+            switch (errCode)
+            {
+                case 0:
+                    setInfoLabel("", -1, false);
+                    var vmMessage = VMMessagesCollection.Find(i => i.messageID == messageID);
+                    if (vmMessage != null)
+                    {
+                        MyFileSystem.Instance.saveAudioVmMessage(vmMessage.messageID, audioContent);
+                        vmMessage.isloading = false;
+                        if (vmMessage.pendingSend)
+                        {
+                            vmMessage.pendingSend = false;
+                            sendMail(messageID, "", $"Description:\nFrom: {vmMessage.from}\nTime: {new DateTime(vmMessage.dateTime).ToString()}\nMessage ID: {vmMessage.messageID}\nMessage Name: {vmMessage.messageName}");
+                        }
+                        else
+                        {
+                            vmMessage.isPlaying = true;
+                            playAudioVMMessage(vmMessage.messageID, MyFileSystem.Instance.loadAudioVmMessage(messageID));
+                            if (!vmMessage.heard)
+                            {
+                                vmMessage.heard = true;
+                                isUpdateOnCommandResponse = false;
+                                AeonixInfoService.Instance.sendVmMessageCommand(messageID, "MARK_HEARD");
+
+                            }
+                        }
+                    }
+                    return;
+                case -200:
+                    setInfoLabel("User has no mailbox", 5, true);
+                    break;
+                case -201:
+                    setInfoLabel("Cannot connect to voicemail", 5, true);
+                    break;
+                case -202:
+                    setInfoLabel("Illegal userID", 5, true);
+                    break;
+                case -203:
+                    setInfoLabel("No such message", 5, true);
+                    break;
+                case -204:
+                    setInfoLabel("The message has no audio attached", 5, true);
+                    break;
+                case -205:
+                    setInfoLabel("Internal Error", 5, true);
+                    break;
+                case -206:
+                    setInfoLabel("Internal Error", 5, true);
+                    break;
+
+            }
+            foreach (var i in VMMessagesCollection)
+                i.isloading = false;
+
+        }
+
+
+        public void onBusy(int errCode)
+        {
+            addLog($"onBusy(): {errCode}");
+            setInfoLabel("Busy downloading other data, please retry soon ", 8, true);
+            switch (errCode)
+            {
+                case 2:
+                    foreach (var i in VMMessagesCollection)
+                        i.isloading = false;
+
+                    break;
+            }
+        }
+
+        private void setInfoLabel(string info, int timeout, bool isErr)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                errLbl.Text = info;
+                errLbl.TextColor = isErr ? Color.Red : Color.Black;
+                if (timeout > 0)
+                {
+                    Device.StartTimer(TimeSpan.FromSeconds(timeout), () =>
+                     {
+                         errLbl.Text = "";
+                         return false;
+                     });
+                }
+            });
+
+        }
+
+        public void PlaybackEndedListener(object sender, EventArgs e)
+        {
+            addLog($"PlaybackEndedListener()");
+            if (VMMessagesCollection != null)
+            {
+                foreach (var i in VMMessagesCollection)
+                {
+                    i.isPlaying = false;
+                    i.progress = 0;
+                }
+            }
+        }
+
+        private void onFilterSelected(object sender, EventArgs e)
+        {
+            var picker = sender as Picker;
+            string filter = getFilterAsString(picker.SelectedIndex);
+            addLog($"filter: {filter}");
+            setInfoLabel((string)Application.Current.Resources["loading"], -1, false);
+            AeonixInfoService.Instance.getVmMessageList(this, filter);
+        }
+
+        private string getFilterAsString(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return "NEW";
+                case 1:
+                    return "SAVED";
+                case 2:
+                    return "DELETED";
+                default:
+                    return "";
+            }
+        }
+    }
+}

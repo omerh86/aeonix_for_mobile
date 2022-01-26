@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.userControllers.FavotireComponent"
+             xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers"
+              FlowDirection="{StaticResource FlowDirection}">
+    <ContentView.Content>
+
+        <Frame BackgroundColor="White" Padding="7" VerticalOptions="FillAndExpand"  CornerRadius="15">
+            <StackLayout  VerticalOptions="FillAndExpand">
+                <Label Text="{StaticResource favorites}" HorizontalOptions="FillAndExpand" FontSize="Title" TextColor="Black" FontAttributes="Bold"></Label>
+                <ListView  VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" IsPullToRefreshEnabled="True" 
+        RefreshCommand="{x:Binding RefreshCommand}"
+        IsRefreshing="{x:Binding IsRefreshing}"
+        HasUnevenRows="True"
+        SeparatorVisibility="None"
+     x:Name="favList" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <control:ContactCell  contactType="{x:Binding type}" 
+                                          MessageCommand="{x:Binding Source={x:Reference favList} , Path=BindingContext.MessageCommand}" 
+                                          ContactInfoCommand="{x:Binding Source={x:Reference favList} , Path=BindingContext.ContactinfoCommand}"
+                                          CallCommand="{x:Binding Source={x:Reference favList} , Path=BindingContext.CallCommand}"
+                                          image="{x:Binding image}"  isFav="{x:Binding isFav}" userName="{x:Binding userName}"
+                                          displayName="{x:Binding displayName}" primaryAlias="{x:Binding primaryAlias}" 
+                                          presence="{x:Binding presenceStatus}"
+                                          hasImage="{x:Binding hasImage}"/>
+
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+
+                </ListView>
+                <StackLayout x:Name="AddfavoritContainer" IsVisible="False" Margin="10" VerticalOptions="FillAndExpand">
+                    <Image Source="addfav.png" HeightRequest="150" WidthRequest="150" Margin="10"/>
+                    <Label Text="Start Adding to Favorites" TextColor="Black" HorizontalOptions="Center" FontAttributes="Bold" FontSize="Large" Margin="10"/>
+                    <Button Clicked="onAddFavClicked" Text="Add To Favorite" TextColor="White" HorizontalOptions="Center" WidthRequest="150" CornerRadius="25" Margin="5" >
+                        <Button.Background>
+                            <LinearGradientBrush  EndPoint="0,1">
+                                <GradientStop Color="#BAE9FF" Offset="0.1" />
+                                <GradientStop Color="#0091D3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+
+    </ContentView.Content>
+</ContentView>

@@ -1,0 +1,75 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class MyPresenceComponent : ContentView
+    {
+        public static readonly BindableProperty SelectedCommandProperty =
+BindableProperty.Create("SelectedCommand", typeof(ICommand), typeof(MyPresenceComponent), null);
+
+        public ICommand SelectedCommand
+        {
+            get { return (ICommand)GetValue(SelectedCommandProperty); }
+            set { SetValue(SelectedCommandProperty, value); }
+        }
+        public static void Execute(ICommand command, object val)
+        {
+            if (command == null) return;
+            if (command.CanExecute(null))
+            {
+                command.Execute(val);
+            }
+        }
+        public MyPresenceComponent()
+        {
+            InitializeComponent();
+            AvaliableLbl.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => OnAvaliableTapped()),
+            });
+            dndLbl.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => OnDNDTapped()),
+            });
+            busyLbl.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => OnMeetingTapped()),
+            });
+        }
+
+        public void OnAvaliableTapped()
+        {
+            doPresenceLblTapped(Presence.ONLINE);
+        }
+
+        public void OnDNDTapped()
+        {
+            doPresenceLblTapped(Presence.DND);
+        }
+
+        public void OnMeetingTapped()
+        {
+            doPresenceLblTapped(Presence.MEETING);
+        }
+
+        private void doPresenceLblTapped(Presence p)
+        {
+            Entities.Contact contatct = ContactService.Instance.myContact;
+            var before = contatct.presenceStatus;
+            contatct.presenceStatus = p;
+            AeonixInfoService.Instance.SetPresenceStatusRequest(ContactService.Instance.myContact.presenceStatus, before);
+            Execute(SelectedCommand,null);
+        }
+
+    }
+}

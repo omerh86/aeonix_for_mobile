@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ProjectView>ShowAllFiles</ProjectView>
+    <AppxPackageIsForStore>False</AppxPackageIsForStore>
+    <AppxShowAllApps>False</AppxShowAllApps>
+    <AppxBuildConfigurationSelection>x86</AppxBuildConfigurationSelection>
+    <PackageOptionalProjectsInIdeBuilds>False</PackageOptionalProjectsInIdeBuilds>
+    <SplashScreenSource>C:\Users\a180104\Documents\splash1240x600.png</SplashScreenSource>
+    <AppIconSource>C:\Xamarin - Copy\UWP\Assets\StoreLogo.scale-400.png</AppIconSource>
+    <BadgeLogoSource>C:\Xamarin - Copy\UWP\Assets\BadgeLogo.scale-400.png</BadgeLogoSource>
+    <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
+    <MediumTileSource>C:\Users\a180104\Documents\logo.png</MediumTileSource>
+    <SmallTileSource>C:\Users\a180104\Documents\logo.png</SmallTileSource>
+    <WideTileSource>C:\Users\a180104\Documents\logo.png</WideTileSource>
+    <LargeTileSource>C:\Users\a180104\Documents\logo.png</LargeTileSource>
+    <PackageLogoSource>C:\Users\a180104\Documents\logo.png</PackageLogoSource>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <DeviceId>30F105C9-681E-420b-A277-7C086EAD8A4E</DeviceId>
+    <UseEmulator>true</UseEmulator>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DebugEngines>
+    </DebugEngines>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <BackgroundTaskDebugEngines>
+    </BackgroundTaskDebugEngines>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="LinphoneXamarin.components.userControllers.SpeedDialComponent">
+    <ContentView.Content>
+        <Frame  Margin="5" BackgroundColor="White" Padding="7" CornerRadius="10" FlowDirection="LeftToRight">
+
+            <Grid 
+                    x:Name="speedDialComponent"
+                     AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All"
+                ColumnSpacing="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="addActionBtn" IsVisible="false" CornerRadius="25" TextColor="White" Padding="2,2,2,2" Text="{StaticResource add_actions}"  Clicked="onAddQuickActions">
+                    <Button.Background>
+                        <LinearGradientBrush  EndPoint="0,1">
+                            <GradientStop Color="#BAE9FF" Offset="0.1" />
+                            <GradientStop Color="#0091D3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
+                <ImageButton x:Name="addActionBtn2" IsVisible="false" BackgroundColor="Transparent"  Source="settingsarrow.png"  Clicked="onAddQuickActions" Padding="20" HeightRequest="20" WidthRequest="20"/>
+            </Grid>
+        </Frame>
+
+
+    </ContentView.Content>
+</ContentView>

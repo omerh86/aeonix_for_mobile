@@ -1,0 +1,156 @@
+﻿using System;
+using LinphoneXamarin.Entities;
+using System.Collections.Generic;
+using LinphoneXamarin.Util;
+
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class ImgService : MyImageListener
+    {
+
+        private static ImgService instance = null;
+        private static readonly object padlock = new object();
+        private ImgDBRepository imgDBRepository;
+
+        private string currentUserId;
+        private int currentIndex;
+        private int howmanyuploads;
+        private List<Contact> aeonixContacts;
+
+        public MyContanctVM myContactListener { set; get; }
+        public MyInfoProccessListener myInfoProccessListener { set; get; }
+        public FavListener favListener { set; get; }
+        public CalllogListener calllogListener { set; get; }
+
+        ImgService()
+        {
+            imgDBRepository = ImgDBRepository.Instance;
+        }
+
+        public static ImgService Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new ImgService();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public void setDBImgItem(string userName, long imgSignature)
+        {
+            MyImgItem myImgItem = new MyImgItem()
+            {
+                userName = userName,
+                imgSignature = imgSignature
+            };
+            imgDBRepository.setItem(myImgItem);
+        }
+
+
+        public bool isUpdateImgNeeded(long imgSignature)
+        {
+            addLog("isUpdateImgNeeded, imgSignature: " + imgSignature);
+            if (imgSignature == 0)
+                return false;
+            var x = imgDBRepository.getItemByImageSignature(imgSignature);
+            return x == null;
+        }
+
+        public void updateImageproccess(bool isStart)
+        {
+            if (isStart)
+            {
+                ContactService cs = ContactService.Instance;
+                aeonixContacts = cs.getAllAeonixContacts();
+                if (aeonixContacts != null)
+                {
+                    aeonixContacts.Add(cs.myContact);
+                }
+                currentIndex = 0;
+                howmanyuploads = 0;
+            }
+            else
+            {
+                currentIndex++;
+            }
+
+            if (aeonixContacts != null && aeonixContacts.Count > currentIndex && aeonixContacts[currentIndex] != null)
+            {
+                if (isUpdateImgNeeded(aeonixContacts[currentIndex].imageSignature))
+                {
+                    howmanyuploads++;
+                    addLog("getUserImg " + howmanyuploads);
+                    getUserImg(aeonixContacts[currentIndex]);
+                }
+                else
+                {
+                    updateImageproccess(false);
+                }
+            }
+            else
+            {
+                addLog("how many uploads finally: " + howmanyuploads);
+
+                if (howmanyuploads > 0)
+                {
+                    if (myContactListener != null)
+                        myContactListener.onMyInfoChanged(true);
+
+
+                    if (favListener != null)
+                    {
+                        favListener.onFavListChanged();
+                    }
+                    if (calllogListener != null)
+                    {
+                        calllogListener.onCallLogListChanged();
+                    }
+                }
+                if (myInfoProccessListener != null)
+                    myInfoProccessListener.onImageProccessFinished();
+
+            }
+        }
+
+        public void getUserImg(Entities.Contact c)
+        {
+            this.currentUserId = c.userName;
+            AeonixInfoService.Instance.myImageListener = this;
+            AeonixInfoService.Instance.getPic(currentUserId);
+
+        }
+
+        public void onImageResponse(long imageSignature, string imageContent)
+        {
+            try
+            {
+                addLog($"onImageResponse, userId: {currentUserId}, imageSignature: {imageSignature}");
+                if (imageSignature > -1)
+                {
+                    var cs = ContactService.Instance;
+                    MyFileSystem.Instance.saveUserIdImage(currentUserId, imageContent);
+                    setDBImgItem(currentUserId, imageSignature);
+                }
+                updateImageproccess(false);
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+
+        }
+
+        private void addLog(string message)
+        {
+            Console.WriteLine("omer40: " + message);
+            MyFileSystem.Instance.writeDebug(message, "image_service");
+        }
+    }
+}

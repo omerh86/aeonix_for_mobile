@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<FlyoutPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                x:Class="LinphoneXamarin.components.navBar"
+             xmlns:pages="clr-namespace:LinphoneXamarin.components"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" 
+                   FlyoutLayoutBehavior="Default">
+
+    <FlyoutPage.Flyout>
+        <pages:navBarMaster x:Name="MasterPage"   />
+    </FlyoutPage.Flyout>
+
+    <FlyoutPage.Detail>
+        <NavigationPage BarBackgroundColor="Transparent" BarTextColor="Black" 
+                        BackgroundColor="#F8FBFC"
+                        ios:NavigationPage.PrefersLargeTitles="false"
+                        ios:Page.UseSafeArea="true">
+            <x:Arguments>
+
+                <pages:RootPage/>
+            </x:Arguments>
+        </NavigationPage>
+    </FlyoutPage.Detail>
+
+</FlyoutPage>

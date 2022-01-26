@@ -1,0 +1,1294 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Machine>OMERH-PC</Machine>
+    <WindowsUser>a180104</WindowsUser>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetOsVersion>10.0</TargetOsVersion>
+    <TargetOsDescription>Windows 10.0</TargetOsDescription>
+    <SolutionConfiguration>Release|x86</SolutionConfiguration>
+    <PackageArchitecture>x86</PackageArchitecture>
+    <PackageIdentityName>5e73ac6f-a53b-4822-87cf-154709c8a23b</PackageIdentityName>
+    <PackageIdentityPublisher>CN=a180104</PackageIdentityPublisher>
+    <IntermediateOutputPath>C:\Xamarin - Copy - Copy\UWPpackage\obj\x86\Release\</IntermediateOutputPath>
+    <RemoteDeploymentType>
+    </RemoteDeploymentType>
+    <PackageRegistrationPath>
+    </PackageRegistrationPath>
+    <RemoveNonLayoutFiles>true</RemoveNonLayoutFiles>
+    <DeployOptionalPackages>false</DeployOptionalPackages>
+    <WindowsSdkPath>
+    </WindowsSdkPath>
+    <LayoutDir>C:\Xamarin - Copy - Copy\UWPpackage\bin\x86\Release\AppX</LayoutDir>
+    <RegisteredManifestChecksum>6F7F818F654D3DE69752938FD3F5CCEFB5AB5A411252172CDB795E2DFF0F1B67</RegisteredManifestChecksum>
+    <RegisteredPackageMoniker>5e73ac6f-a53b-4822-87cf-154709c8a23b_6.1.9.0_x86__tz40az7c1phse</RegisteredPackageMoniker>
+    <RegisteredUserModeAppID>5e73ac6f-a53b-4822-87cf-154709c8a23b_tz40az7c1phse!App</RegisteredUserModeAppID>
+    <RegisteredPackageID>5e73ac6f-a53b-4822-87cf-154709c8a23b</RegisteredPackageID>
+    <RegisteredPackagePublisher>CN=a180104</RegisteredPackagePublisher>
+    <RegisteredVersion>6.1.9.0</RegisteredVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppXManifest Include="C:\Xamarin - Copy - Copy\UWPpackage\bin\x86\Release\AppxManifest.xml">
+      <PackagePath>AppxManifest.xml</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-21T14:18:42.194</Modified>
+    </AppXManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\BadgeLogo.scale-100.png">
+      <PackagePath>BadgeLogo.scale-100.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.366</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\BadgeLogo.scale-125.png">
+      <PackagePath>BadgeLogo.scale-125.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.375</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\BadgeLogo.scale-150.png">
+      <PackagePath>BadgeLogo.scale-150.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.384</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\BadgeLogo.scale-200.png">
+      <PackagePath>BadgeLogo.scale-200.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.398</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\BadgeLogo.scale-400.png">
+      <PackagePath>BadgeLogo.scale-400.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.413</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\BadgeLogo.scale-100.png">
+      <PackagePath>Images\BadgeLogo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:49:54.220</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\BadgeLogo.scale-125.png">
+      <PackagePath>Images\BadgeLogo.scale-125.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:49:54.229</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\BadgeLogo.scale-150.png">
+      <PackagePath>Images\BadgeLogo.scale-150.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:49:54.229</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\BadgeLogo.scale-200.png">
+      <PackagePath>Images\BadgeLogo.scale-200.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:49:54.244</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\BadgeLogo.scale-400.png">
+      <PackagePath>Images\BadgeLogo.scale-400.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:49:54.249</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\LargeTile.scale-100.png">
+      <PackagePath>Images\LargeTile.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:59:29.822</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\LargeTile.scale-125.png">
+      <PackagePath>Images\LargeTile.scale-125.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:59:29.842</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\LargeTile.scale-150.png">
+      <PackagePath>Images\LargeTile.scale-150.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:59:29.862</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\LargeTile.scale-200.png">
+      <PackagePath>Images\LargeTile.scale-200.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:59:29.907</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\LargeTile.scale-400.png">
+      <PackagePath>Images\LargeTile.scale-400.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:59:30.052</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\SmallTile.scale-100.png">
+      <PackagePath>Images\SmallTile.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:49.543</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\SmallTile.scale-125.png">
+      <PackagePath>Images\SmallTile.scale-125.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:49.553</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\SmallTile.scale-150.png">
+      <PackagePath>Images\SmallTile.scale-150.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:49.565</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\SmallTile.scale-200.png">
+      <PackagePath>Images\SmallTile.scale-200.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:49.578</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\SmallTile.scale-400.png">
+      <PackagePath>Images\SmallTile.scale-400.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:49.596</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\SplashScreen.scale-200.png">
+      <PackagePath>Images\SplashScreen.scale-200.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2019-12-10T12:17:35.727</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\LockScreenLogo.scale-200.png">
+      <PackagePath>Images\LockScreenLogo.scale-200.png</PackagePath>
+      <Modified>2020-03-15T10:48:36.785</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square150x150Logo.scale-100.png">
+      <PackagePath>Images\Square150x150Logo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:01:02.733</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square150x150Logo.scale-125.png">
+      <PackagePath>Images\Square150x150Logo.scale-125.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:01:02.743</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square150x150Logo.scale-150.png">
+      <PackagePath>Images\Square150x150Logo.scale-150.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:01:02.753</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square150x150Logo.scale-200.png">
+      <PackagePath>Images\Square150x150Logo.scale-200.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:01:02.773</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square150x150Logo.scale-400.png">
+      <PackagePath>Images\Square150x150Logo.scale-400.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:01:02.813</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.altform-lightunplated_targetsize-16.png">
+      <PackagePath>Images\Square44x44Logo.altform-lightunplated_targetsize-16.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.574</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.altform-lightunplated_targetsize-24.png">
+      <PackagePath>Images\Square44x44Logo.altform-lightunplated_targetsize-24.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.581</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.altform-lightunplated_targetsize-256.png">
+      <PackagePath>Images\Square44x44Logo.altform-lightunplated_targetsize-256.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.613</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.altform-lightunplated_targetsize-32.png">
+      <PackagePath>Images\Square44x44Logo.altform-lightunplated_targetsize-32.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.587</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.altform-lightunplated_targetsize-48.png">
+      <PackagePath>Images\Square44x44Logo.altform-lightunplated_targetsize-48.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.595</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.altform-unplated_targetsize-16.png">
+      <PackagePath>Images\Square44x44Logo.altform-unplated_targetsize-16.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.526</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.altform-unplated_targetsize-256.png">
+      <PackagePath>Images\Square44x44Logo.altform-unplated_targetsize-256.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.566</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.altform-unplated_targetsize-32.png">
+      <PackagePath>Images\Square44x44Logo.altform-unplated_targetsize-32.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.541</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.altform-unplated_targetsize-48.png">
+      <PackagePath>Images\Square44x44Logo.altform-unplated_targetsize-48.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.548</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.scale-100.png">
+      <PackagePath>Images\Square44x44Logo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.418</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.scale-125.png">
+      <PackagePath>Images\Square44x44Logo.scale-125.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.426</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.scale-150.png">
+      <PackagePath>Images\Square44x44Logo.scale-150.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.433</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.scale-200.png">
+      <PackagePath>Images\Square44x44Logo.scale-200.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.442</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.scale-400.png">
+      <PackagePath>Images\Square44x44Logo.scale-400.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.453</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.targetsize-16.png">
+      <PackagePath>Images\Square44x44Logo.targetsize-16.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.461</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.targetsize-24.png">
+      <PackagePath>Images\Square44x44Logo.targetsize-24.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.485</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.targetsize-24_altform-unplated.png">
+      <PackagePath>Images\Square44x44Logo.targetsize-24_altform-unplated.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.534</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.targetsize-256.png">
+      <PackagePath>Images\Square44x44Logo.targetsize-256.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.519</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.targetsize-32.png">
+      <PackagePath>Images\Square44x44Logo.targetsize-32.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.496</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Square44x44Logo.targetsize-48.png">
+      <PackagePath>Images\Square44x44Logo.targetsize-48.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T12:50:45.503</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\StoreLogo.scale-100.png">
+      <PackagePath>Images\StoreLogo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:28.016</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\StoreLogo.scale-125.png">
+      <PackagePath>Images\StoreLogo.scale-125.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:28.028</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\StoreLogo.scale-150.png">
+      <PackagePath>Images\StoreLogo.scale-150.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:28.039</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\StoreLogo.scale-200.png">
+      <PackagePath>Images\StoreLogo.scale-200.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:28.051</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\StoreLogo.scale-400.png">
+      <PackagePath>Images\StoreLogo.scale-400.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T11:04:28.067</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Wide310x150Logo.scale-100.png">
+      <PackagePath>Images\Wide310x150Logo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:00:12.652</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Wide310x150Logo.scale-125.png">
+      <PackagePath>Images\Wide310x150Logo.scale-125.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:00:12.667</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Wide310x150Logo.scale-150.png">
+      <PackagePath>Images\Wide310x150Logo.scale-150.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:00:12.682</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Wide310x150Logo.scale-200.png">
+      <PackagePath>Images\Wide310x150Logo.scale-200.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:00:12.713</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\Images\Wide310x150Logo.scale-400.png">
+      <PackagePath>Images\Wide310x150Logo.scale-400.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2020-06-18T13:00:12.787</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\SplashScreen.scale-100.png">
+      <PackagePath>SplashScreen.scale-100.png</PackagePath>
+      <Modified>2019-12-10T12:17:35.674</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\SplashScreen.scale-125.png">
+      <PackagePath>SplashScreen.scale-125.png</PackagePath>
+      <Modified>2019-12-10T12:17:35.702</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\SplashScreen.scale-150.png">
+      <PackagePath>SplashScreen.scale-150.png</PackagePath>
+      <Modified>2019-12-10T12:17:35.727</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\SplashScreen.scale-400.png">
+      <PackagePath>SplashScreen.scale-400.png</PackagePath>
+      <Modified>2019-12-10T12:17:35.727</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWPpackage\bin\x86\Release\resources.pri">
+      <PackagePath>resources.pri</PackagePath>
+      <Modified>2020-06-21T14:18:33.403</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\HotKeyWindow\obj\Release\netcoreapp3.1\Msix\HotKeyWindow.deps.json">
+      <PackagePath>HotKeyWindow\HotKeyWindow.deps.json</PackagePath>
+      <Modified>2020-06-21T12:41:37.001</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\HotKeyWindow\obj\Release\netcoreapp3.1\HotKeyWindow.exe">
+      <PackagePath>HotKeyWindow\HotKeyWindow.exe</PackagePath>
+      <Modified>2020-06-21T14:15:03.629</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\HotKeyWindow\obj\Release\netcoreapp3.1\HotKeyWindow.dll">
+      <PackagePath>HotKeyWindow\HotKeyWindow.dll</PackagePath>
+      <Modified>2020-06-21T14:15:03.551</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\HotKeyWindow\bin\Release\netcoreapp3.1\HotKeyWindow.runtimeconfig.json">
+      <PackagePath>HotKeyWindow\HotKeyWindow.runtimeconfig.json</PackagePath>
+      <Modified>2020-06-21T12:37:41.041</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\accessibility\4.6.0-preview3-27504-2\lib\netcoreapp3.0\Accessibility.dll">
+      <PackagePath>HotKeyWindow\Accessibility.dll</PackagePath>
+      <Modified>2019-03-03T15:20:30.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\microsoft.win32.systemevents\5.0.0-preview.5.20278.1\lib\netstandard2.0\Microsoft.Win32.SystemEvents.dll">
+      <PackagePath>HotKeyWindow\Microsoft.Win32.SystemEvents.dll</PackagePath>
+      <Modified>2020-05-28T04:24:56.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\newtonsoft.json\11.0.2\lib\netstandard2.0\Newtonsoft.Json.dll">
+      <PackagePath>HotKeyWindow\Newtonsoft.Json.dll</PackagePath>
+      <Modified>2018-03-24T14:44:14.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.configuration.configurationmanager\5.0.0-preview.5.20278.1\lib\netstandard2.0\System.Configuration.ConfigurationManager.dll">
+      <PackagePath>HotKeyWindow\System.Configuration.ConfigurationManager.dll</PackagePath>
+      <Modified>2020-05-28T04:26:08.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.drawing.common\5.0.0-preview.5.20278.1\lib\netstandard2.0\System.Drawing.Common.dll">
+      <PackagePath>HotKeyWindow\System.Drawing.Common.dll</PackagePath>
+      <Modified>2018-09-18T16:38:14.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.security.accesscontrol\5.0.0-preview.5.20278.1\lib\netstandard2.0\System.Security.AccessControl.dll">
+      <PackagePath>HotKeyWindow\System.Security.AccessControl.dll</PackagePath>
+      <Modified>2020-05-28T04:34:46.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.security.cryptography.protecteddata\5.0.0-preview.5.20278.1\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll">
+      <PackagePath>HotKeyWindow\System.Security.Cryptography.ProtectedData.dll</PackagePath>
+      <Modified>2020-05-28T04:36:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.security.permissions\5.0.0-preview.5.20278.1\lib\netcoreapp3.0\System.Security.Permissions.dll">
+      <PackagePath>HotKeyWindow\System.Security.Permissions.dll</PackagePath>
+      <Modified>2020-05-28T04:36:46.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.security.principal.windows\5.0.0-preview.5.20278.1\lib\netstandard2.0\System.Security.Principal.Windows.dll">
+      <PackagePath>HotKeyWindow\System.Security.Principal.Windows.dll</PackagePath>
+      <Modified>2020-05-28T04:36:52.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.windows.extensions\5.0.0-preview.5.20278.1\lib\netcoreapp3.0\System.Windows.Extensions.dll">
+      <PackagePath>HotKeyWindow\System.Windows.Extensions.dll</PackagePath>
+      <Modified>2020-05-28T04:38:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\microsoft.win32.systemevents\5.0.0-preview.5.20278.1\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll">
+      <PackagePath>HotKeyWindow\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll</PackagePath>
+      <Modified>2020-05-28T04:24:58.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.drawing.common\5.0.0-preview.5.20278.1\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll">
+      <PackagePath>HotKeyWindow\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll</PackagePath>
+      <Modified>2020-05-28T04:28:24.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.drawing.common\5.0.0-preview.5.20278.1\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll">
+      <PackagePath>HotKeyWindow\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll</PackagePath>
+      <Modified>2020-05-28T04:28:20.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.security.accesscontrol\5.0.0-preview.5.20278.1\runtimes\win\lib\netcoreapp2.0\System.Security.AccessControl.dll">
+      <PackagePath>HotKeyWindow\runtimes\win\lib\netcoreapp2.0\System.Security.AccessControl.dll</PackagePath>
+      <Modified>2020-05-28T04:34:44.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.security.cryptography.protecteddata\5.0.0-preview.5.20278.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll">
+      <PackagePath>HotKeyWindow\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll</PackagePath>
+      <Modified>2020-05-28T04:36:20.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.security.principal.windows\5.0.0-preview.5.20278.1\runtimes\unix\lib\netcoreapp2.1\System.Security.Principal.Windows.dll">
+      <PackagePath>HotKeyWindow\runtimes\unix\lib\netcoreapp2.1\System.Security.Principal.Windows.dll</PackagePath>
+      <Modified>2020-05-28T04:36:58.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.security.principal.windows\5.0.0-preview.5.20278.1\runtimes\win\lib\netcoreapp2.1\System.Security.Principal.Windows.dll">
+      <PackagePath>HotKeyWindow\runtimes\win\lib\netcoreapp2.1\System.Security.Principal.Windows.dll</PackagePath>
+      <Modified>2020-05-28T04:36:56.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\.nuget\packages\system.windows.extensions\5.0.0-preview.5.20278.1\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll">
+      <PackagePath>HotKeyWindow\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll</PackagePath>
+      <Modified>2020-05-28T04:38:22.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\a180104\Downloads\System.Windows.Forms\System.Windows.Forms.dll">
+      <PackagePath>HotKeyWindow\System.Windows.Forms.dll</PackagePath>
+      <Modified>2020-06-16T05:43:08.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_end_wrap_up.png">
+      <PackagePath>acc_end_wrap_up.png</PackagePath>
+      <Modified>2020-03-29T17:43:21.994</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_extend_wrap_up.png">
+      <PackagePath>acc_extend_wrap_up.png</PackagePath>
+      <Modified>2020-03-29T17:43:22.222</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_group_queue_info.png">
+      <PackagePath>acc_group_queue_info.png</PackagePath>
+      <Modified>2020-03-29T17:43:22.432</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_login.png">
+      <PackagePath>acc_login.png</PackagePath>
+      <Modified>2020-03-29T17:43:22.632</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_login_group.png">
+      <PackagePath>acc_login_group.png</PackagePath>
+      <Modified>2020-03-29T17:43:22.832</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_release.png">
+      <PackagePath>acc_release.png</PackagePath>
+      <Modified>2020-03-29T17:43:23.435</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_release_with_code.png">
+      <PackagePath>acc_release_with_code.png</PackagePath>
+      <Modified>2020-03-29T17:43:23.648</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_resume.png">
+      <PackagePath>acc_resume.png</PackagePath>
+      <Modified>2020-03-29T17:43:23.850</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_resume_with_code.png">
+      <PackagePath>acc_resume_with_code.png</PackagePath>
+      <Modified>2020-03-29T17:43:24.033</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\acc_wrap_up_with_code.png">
+      <PackagePath>acc_wrap_up_with_code.png</PackagePath>
+      <Modified>2020-03-29T17:43:24.237</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\answercall.png">
+      <PackagePath>answercall.png</PackagePath>
+      <Modified>2019-11-17T14:34:30.415</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\antlr3c.dll">
+      <PackagePath>antlr3c.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\BadgeLogo.scale-100.png">
+      <PackagePath>Assets\BadgeLogo.scale-100.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.366</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\BadgeLogo.scale-125.png">
+      <PackagePath>Assets\BadgeLogo.scale-125.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.375</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\BadgeLogo.scale-150.png">
+      <PackagePath>Assets\BadgeLogo.scale-150.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.384</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\BadgeLogo.scale-200.png">
+      <PackagePath>Assets\BadgeLogo.scale-200.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.398</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\BadgeLogo.scale-400.png">
+      <PackagePath>Assets\BadgeLogo.scale-400.png</PackagePath>
+      <Modified>2019-08-04T09:55:58.413</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\error.mp3">
+      <PackagePath>Assets\error.mp3</PackagePath>
+      <Modified>2019-04-28T15:30:37.269</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\fa-brands-400.ttf">
+      <PackagePath>Assets\fa-brands-400.ttf</PackagePath>
+      <Modified>2019-04-21T14:55:59.700</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\fa-regular-400.ttf">
+      <PackagePath>Assets\fa-regular-400.ttf</PackagePath>
+      <Modified>2019-04-21T14:55:59.703</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\fa-solid-900.ttf">
+      <PackagePath>Assets\fa-solid-900.ttf</PackagePath>
+      <Modified>2019-04-21T14:55:59.707</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\LargeTile.scale-100.png">
+      <PackagePath>Assets\LargeTile.scale-100.png</PackagePath>
+      <Modified>2020-06-18T11:33:20.212</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\LargeTile.scale-125.png">
+      <PackagePath>Assets\LargeTile.scale-125.png</PackagePath>
+      <Modified>2020-06-18T11:33:20.238</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\LargeTile.scale-150.png">
+      <PackagePath>Assets\LargeTile.scale-150.png</PackagePath>
+      <Modified>2020-06-18T11:33:20.267</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\LargeTile.scale-200.png">
+      <PackagePath>Assets\LargeTile.scale-200.png</PackagePath>
+      <Modified>2020-06-18T11:33:20.317</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\LargeTile.scale-400.png">
+      <PackagePath>Assets\LargeTile.scale-400.png</PackagePath>
+      <Modified>2020-06-18T11:33:20.465</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\linphonerc_default">
+      <PackagePath>Assets\linphonerc_default</PackagePath>
+      <Modified>2020-04-20T11:39:15.595</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\LockScreenLogo.scale-200.png">
+      <PackagePath>Assets\LockScreenLogo.scale-200.png</PackagePath>
+      <Modified>2019-04-18T11:44:55.752</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\message_sent.wav">
+      <PackagePath>Assets\message_sent.wav</PackagePath>
+      <Modified>2019-10-30T18:12:03.252</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\notification_sound.mp3">
+      <PackagePath>Assets\notification_sound.mp3</PackagePath>
+      <Modified>2019-04-28T15:30:17.597</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ring1.wav">
+      <PackagePath>Assets\ring1.wav</PackagePath>
+      <Modified>2019-04-22T10:27:19.763</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ring2.wav">
+      <PackagePath>Assets\ring2.wav</PackagePath>
+      <Modified>2019-04-28T15:44:08.959</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ring3.wav">
+      <PackagePath>Assets\ring3.wav</PackagePath>
+      <Modified>2019-04-28T15:44:08.962</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ring4.wav">
+      <PackagePath>Assets\ring4.wav</PackagePath>
+      <Modified>2019-04-28T15:44:08.965</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ring5.wav">
+      <PackagePath>Assets\ring5.wav</PackagePath>
+      <Modified>2019-04-28T15:44:08.969</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ring6.wav">
+      <PackagePath>Assets\ring6.wav</PackagePath>
+      <Modified>2019-04-28T15:44:08.972</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ring7.wav">
+      <PackagePath>Assets\ring7.wav</PackagePath>
+      <Modified>2019-04-28T15:44:08.974</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ring8.wav">
+      <PackagePath>Assets\ring8.wav</PackagePath>
+      <Modified>2019-04-28T15:44:08.977</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ring9.wav">
+      <PackagePath>Assets\ring9.wav</PackagePath>
+      <Modified>2019-04-28T15:44:08.980</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\ringback.wav">
+      <PackagePath>Assets\ringback.wav</PackagePath>
+      <Modified>2019-04-28T12:39:31.119</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\rootca.pem">
+      <PackagePath>Assets\rootca.pem</PackagePath>
+      <Modified>2019-04-21T13:21:37.762</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SmallTile.scale-100.png">
+      <PackagePath>Assets\SmallTile.scale-100.png</PackagePath>
+      <Modified>2019-08-04T09:55:09.859</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SmallTile.scale-125.png">
+      <PackagePath>Assets\SmallTile.scale-125.png</PackagePath>
+      <Modified>2019-08-04T09:55:09.868</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SmallTile.scale-150.png">
+      <PackagePath>Assets\SmallTile.scale-150.png</PackagePath>
+      <Modified>2019-08-04T09:55:09.877</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SmallTile.scale-200.png">
+      <PackagePath>Assets\SmallTile.scale-200.png</PackagePath>
+      <Modified>2019-08-04T09:55:09.887</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SmallTile.scale-400.png">
+      <PackagePath>Assets\SmallTile.scale-400.png</PackagePath>
+      <Modified>2019-08-04T09:55:09.903</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SplashScreen.scale-100.png">
+      <PackagePath>Assets\SplashScreen.scale-100.png</PackagePath>
+      <Modified>2020-06-18T11:07:40.157</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SplashScreen.scale-125.png">
+      <PackagePath>Assets\SplashScreen.scale-125.png</PackagePath>
+      <Modified>2020-06-18T11:07:40.196</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SplashScreen.scale-150.png">
+      <PackagePath>Assets\SplashScreen.scale-150.png</PackagePath>
+      <Modified>2020-06-18T11:07:40.250</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SplashScreen.scale-200.png">
+      <PackagePath>Assets\SplashScreen.scale-200.png</PackagePath>
+      <Modified>2020-06-18T11:07:40.325</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\SplashScreen.scale-400.png">
+      <PackagePath>Assets\SplashScreen.scale-400.png</PackagePath>
+      <Modified>2020-06-18T11:07:40.594</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square150x150Logo.scale-100.png">
+      <PackagePath>Assets\Square150x150Logo.scale-100.png</PackagePath>
+      <Modified>2019-08-04T09:54:48.291</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square150x150Logo.scale-125.png">
+      <PackagePath>Assets\Square150x150Logo.scale-125.png</PackagePath>
+      <Modified>2019-08-04T09:54:48.301</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square150x150Logo.scale-150.png">
+      <PackagePath>Assets\Square150x150Logo.scale-150.png</PackagePath>
+      <Modified>2019-08-04T09:54:48.315</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square150x150Logo.scale-200.png">
+      <PackagePath>Assets\Square150x150Logo.scale-200.png</PackagePath>
+      <Modified>2019-08-04T09:54:48.332</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square150x150Logo.scale-400.png">
+      <PackagePath>Assets\Square150x150Logo.scale-400.png</PackagePath>
+      <Modified>2019-08-04T09:54:48.373</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png">
+      <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-16.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.770</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png">
+      <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-24.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.779</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png">
+      <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-256.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.822</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png">
+      <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-32.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.789</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png">
+      <PackagePath>Assets\Square44x44Logo.altform-lightunplated_targetsize-48.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.799</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.altform-unplated_targetsize-16.png">
+      <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-16.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.711</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.altform-unplated_targetsize-256.png">
+      <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-256.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.760</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.altform-unplated_targetsize-32.png">
+      <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-32.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.727</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.altform-unplated_targetsize-48.png">
+      <PackagePath>Assets\Square44x44Logo.altform-unplated_targetsize-48.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.736</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.scale-100.png">
+      <PackagePath>Assets\Square44x44Logo.scale-100.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.601</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.scale-125.png">
+      <PackagePath>Assets\Square44x44Logo.scale-125.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.611</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.scale-150.png">
+      <PackagePath>Assets\Square44x44Logo.scale-150.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.621</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.scale-200.png">
+      <PackagePath>Assets\Square44x44Logo.scale-200.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.631</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.scale-400.png">
+      <PackagePath>Assets\Square44x44Logo.scale-400.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.646</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.targetsize-16.png">
+      <PackagePath>Assets\Square44x44Logo.targetsize-16.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.654</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.targetsize-24.png">
+      <PackagePath>Assets\Square44x44Logo.targetsize-24.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.663</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
+      <PackagePath>Assets\Square44x44Logo.targetsize-24_altform-unplated.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.719</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.targetsize-256.png">
+      <PackagePath>Assets\Square44x44Logo.targetsize-256.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.701</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.targetsize-32.png">
+      <PackagePath>Assets\Square44x44Logo.targetsize-32.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.672</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Square44x44Logo.targetsize-48.png">
+      <PackagePath>Assets\Square44x44Logo.targetsize-48.png</PackagePath>
+      <Modified>2020-06-18T11:31:19.682</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\StoreLogo.scale-100.png">
+      <PackagePath>Assets\StoreLogo.scale-100.png</PackagePath>
+      <Modified>2019-08-05T11:02:42.422</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\StoreLogo.scale-125.png">
+      <PackagePath>Assets\StoreLogo.scale-125.png</PackagePath>
+      <Modified>2019-08-05T11:02:42.430</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\StoreLogo.scale-150.png">
+      <PackagePath>Assets\StoreLogo.scale-150.png</PackagePath>
+      <Modified>2019-08-05T11:02:42.439</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\StoreLogo.scale-200.png">
+      <PackagePath>Assets\StoreLogo.scale-200.png</PackagePath>
+      <Modified>2019-08-05T11:02:42.449</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\StoreLogo.scale-400.png">
+      <PackagePath>Assets\StoreLogo.scale-400.png</PackagePath>
+      <Modified>2019-08-05T11:02:42.465</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Wide310x150Logo.scale-100.png">
+      <PackagePath>Assets\Wide310x150Logo.scale-100.png</PackagePath>
+      <Modified>2019-08-04T09:55:31.054</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Wide310x150Logo.scale-125.png">
+      <PackagePath>Assets\Wide310x150Logo.scale-125.png</PackagePath>
+      <Modified>2019-08-04T09:55:31.068</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Wide310x150Logo.scale-150.png">
+      <PackagePath>Assets\Wide310x150Logo.scale-150.png</PackagePath>
+      <Modified>2019-08-04T09:55:31.086</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Wide310x150Logo.scale-200.png">
+      <PackagePath>Assets\Wide310x150Logo.scale-200.png</PackagePath>
+      <Modified>2019-08-04T09:55:31.111</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Assets\Wide310x150Logo.scale-400.png">
+      <PackagePath>Assets\Wide310x150Logo.scale-400.png</PackagePath>
+      <Modified>2019-08-04T09:55:31.183</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\bctoolbox-tester.dll">
+      <PackagePath>bctoolbox-tester.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\bctoolbox.dll">
+      <PackagePath>bctoolbox.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\bcunit.dll">
+      <PackagePath>bcunit.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\belcard.dll">
+      <PackagePath>belcard.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\bellesip.dll">
+      <PackagePath>bellesip.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\belr.dll">
+      <PackagePath>belr.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\bug.png">
+      <PackagePath>bug.png</PackagePath>
+      <Modified>2019-08-05T10:53:09.488</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\bzrtp.dll">
+      <PackagePath>bzrtp.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\call.png">
+      <PackagePath>call.png</PackagePath>
+      <Modified>2020-01-06T14:50:23.205</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\chat.png">
+      <PackagePath>chat.png</PackagePath>
+      <Modified>2019-04-25T12:43:57.316</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\clrcompression.dll">
+      <PackagePath>clrcompression.dll</PackagePath>
+      <Modified>2020-02-27T17:15:52.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\contact.png">
+      <PackagePath>contact.png</PackagePath>
+      <Modified>2019-04-25T12:43:57.320</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\copy.png">
+      <PackagePath>copy.png</PackagePath>
+      <Modified>2020-02-20T15:59:19.875</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\delete.png">
+      <PackagePath>delete.png</PackagePath>
+      <Modified>2020-02-20T15:59:19.870</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\dialpad.png">
+      <PackagePath>dialpad.png</PackagePath>
+      <Modified>2019-04-25T12:43:57.324</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\emergency.png">
+      <PackagePath>emergency.png</PackagePath>
+      <Modified>2020-05-05T12:37:15.618</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\endcall.png">
+      <PackagePath>endcall.png</PackagePath>
+      <Modified>2020-01-06T14:48:17.080</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\e_sqlite3.dll">
+      <PackagePath>e_sqlite3.dll</PackagePath>
+      <Modified>2018-05-02T08:44:46.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\favorite.png">
+      <PackagePath>favorite.png</PackagePath>
+      <Modified>2019-04-25T12:43:43.916</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\featuresbutton.png">
+      <PackagePath>featuresbutton.png</PackagePath>
+      <Modified>2020-03-31T10:42:39.914</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\gradient.jpg">
+      <PackagePath>gradient.jpg</PackagePath>
+      <Modified>2020-01-09T13:21:17.352</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\green.png">
+      <PackagePath>green.png</PackagePath>
+      <Modified>2019-10-29T16:00:20.219</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\groups.png">
+      <PackagePath>groups.png</PackagePath>
+      <Modified>2019-04-25T12:37:30.022</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\gsm.dll">
+      <PackagePath>gsm.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\libbcg729.dll">
+      <PackagePath>libbcg729.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\libmswasapi.dll">
+      <PackagePath>libmswasapi.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\libmswebrtc.dll">
+      <PackagePath>libmswebrtc.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\libmswinrtvid.dll">
+      <PackagePath>libmswinrtvid.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\linphone.dll">
+      <PackagePath>linphone.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\mbedcrypto.dll">
+      <PackagePath>mbedcrypto.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\mbedtls.dll">
+      <PackagePath>mbedtls.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\mbedx509.dll">
+      <PackagePath>mbedx509.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\mediastreamer_base.dll">
+      <PackagePath>mediastreamer_base.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\mediastreamer_voip.dll">
+      <PackagePath>mediastreamer_voip.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Microsoft.Graphics.Canvas.dll">
+      <PackagePath>Microsoft.Graphics.Canvas.dll</PackagePath>
+      <Modified>2016-11-30T00:58:38.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\Microsoft.Graphics.Canvas.winmd">
+      <PackagePath>Microsoft.Graphics.Canvas.winmd</PackagePath>
+      <Modified>2016-11-30T00:58:38.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\MSWinRTVideo.dll">
+      <PackagePath>MSWinRTVideo.dll</PackagePath>
+      <Modified>2019-09-09T12:07:08.511</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\MSWinRTVideo.winmd">
+      <PackagePath>MSWinRTVideo.winmd</PackagePath>
+      <Modified>2019-09-09T12:07:04.003</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\ortp.dll">
+      <PackagePath>ortp.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\phonebook.png">
+      <PackagePath>phonebook.png</PackagePath>
+      <Modified>2019-04-29T15:31:40.114</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\pickup.png">
+      <PackagePath>pickup.png</PackagePath>
+      <Modified>2020-05-05T12:45:15.107</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\red.png">
+      <PackagePath>red.png</PackagePath>
+      <Modified>2019-08-01T13:38:27.709</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\rod.png">
+      <PackagePath>rod.png</PackagePath>
+      <Modified>2020-05-05T13:29:18.629</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\search.png">
+      <PackagePath>search.png</PackagePath>
+      <Modified>2019-04-22T11:24:00.741</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\speedial.png">
+      <PackagePath>speedial.png</PackagePath>
+      <Modified>2020-03-29T17:43:25.793</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\speex.dll">
+      <PackagePath>speex.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\speexdsp.dll">
+      <PackagePath>speexdsp.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\sqlite3.dll">
+      <PackagePath>sqlite3.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\srtp.dll">
+      <PackagePath>srtp.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\unknown.png">
+      <PackagePath>unknown.png</PackagePath>
+      <Modified>2019-04-29T15:31:40.111</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\user.png">
+      <PackagePath>user.png</PackagePath>
+      <Modified>2019-09-03T15:03:31.786</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\users.png">
+      <PackagePath>users.png</PackagePath>
+      <Modified>2019-04-29T15:31:39.115</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\user_dnd.png">
+      <PackagePath>user_dnd.png</PackagePath>
+      <Modified>2019-11-25T15:17:38.485</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\user_idle.png">
+      <PackagePath>user_idle.png</PackagePath>
+      <Modified>2019-11-25T15:17:38.485</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\user_in_meeting.png">
+      <PackagePath>user_in_meeting.png</PackagePath>
+      <Modified>2019-11-25T15:17:38.500</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\UWP.dll">
+      <PackagePath>UWP.dll</PackagePath>
+      <Modified>2020-06-21T14:18:29.154</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\UWP.exe">
+      <PackagePath>UWP.exe</PackagePath>
+      <Modified>2020-06-21T14:18:31.997</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\voicemail.png">
+      <PackagePath>voicemail.png</PackagePath>
+      <Modified>2019-04-25T12:43:57.327</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\voicemailspeedbtn.png">
+      <PackagePath>voicemailspeedbtn.png</PackagePath>
+      <Modified>2020-05-05T12:40:19.347</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\xml2.dll">
+      <PackagePath>xml2.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\yellow.png">
+      <PackagePath>yellow.png</PackagePath>
+      <Modified>2019-08-01T13:33:25.733</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Xamarin - Copy - Copy\UWP\bin\x86\Release\ilc\zlib.dll">
+      <PackagePath>zlib.dll</PackagePath>
+      <Modified>2017-12-01T12:05:12.000</Modified>
+    </AppxPackagedFile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\microsoft.ui.xaml\2.1.190606001\build\..\tools\AppX\x86\Release\Microsoft.UI.Xaml.2.1.appx">
+      <Name>Microsoft.UI.Xaml.2.1</Name>
+      <Version>2.11906.6001.0</Version>
+      <Architecture>x86</Architecture>
+      <FrameworkIdentity>Name = Microsoft.UI.Xaml.2.1, MinVersion = 2.11906.6001.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\microsoft.ui.xaml\2.1.190606001\build\..\tools\AppX\x86\Release\Microsoft.UI.Xaml.2.1.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-x86.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx">
+      <Name>Microsoft.NET.Native.Framework.2.2</Name>
+      <Version>2.2.27912.0</Version>
+      <Architecture>x86</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Framework.2.2, MinVersion = 2.2.27912.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-x86.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-x64.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx">
+      <Name>Microsoft.NET.Native.Framework.2.2</Name>
+      <Version>2.2.27912.0</Version>
+      <Architecture>x64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Framework.2.2, MinVersion = 2.2.27912.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-x64.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-arm64.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx">
+      <Name>Microsoft.NET.Native.Framework.2.2</Name>
+      <Version>2.2.27912.0</Version>
+      <Architecture>arm64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Framework.2.2, MinVersion = 2.2.27912.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-arm64.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-arm.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx">
+      <Name>Microsoft.NET.Native.Framework.2.2</Name>
+      <Version>2.2.27912.0</Version>
+      <Architecture>arm</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Framework.2.2, MinVersion = 2.2.27912.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-arm.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-x86.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\x86\Microsoft.NET.Native.Runtime.2.2.appx">
+      <Name>Microsoft.NET.Native.Runtime.2.2</Name>
+      <Version>2.2.28604.0</Version>
+      <Architecture>x86</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Runtime.2.2, MinVersion = 2.2.28604.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-x86.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\x86\Microsoft.NET.Native.Runtime.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-x64.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\x64\Microsoft.NET.Native.Runtime.2.2.appx">
+      <Name>Microsoft.NET.Native.Runtime.2.2</Name>
+      <Version>2.2.28604.0</Version>
+      <Architecture>x64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Runtime.2.2, MinVersion = 2.2.28604.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-x64.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\x64\Microsoft.NET.Native.Runtime.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-arm64.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\arm64\Microsoft.NET.Native.Runtime.2.2.appx">
+      <Name>Microsoft.NET.Native.Runtime.2.2</Name>
+      <Version>2.2.28604.0</Version>
+      <Architecture>arm64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Runtime.2.2, MinVersion = 2.2.28604.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-arm64.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\arm64\Microsoft.NET.Native.Runtime.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-arm.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\arm\Microsoft.NET.Native.Runtime.2.2.appx">
+      <Name>Microsoft.NET.Native.Runtime.2.2</Name>
+      <Version>2.2.28604.0</Version>
+      <Architecture>arm</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Runtime.2.2, MinVersion = 2.2.28604.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-arm.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\arm\Microsoft.NET.Native.Runtime.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>ARM</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\ARM\Microsoft.VCLibs.ARM.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>ARM64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\ARM64\Microsoft.VCLibs.ARM64.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>x64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\x64\Microsoft.VCLibs.x64.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>x86</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\x86\Microsoft.VCLibs.x86.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\microsoft.ui.xaml\2.1.190606001\build\..\tools\AppX\x86\Release\Microsoft.UI.Xaml.2.1.appx">
+      <Name>Microsoft.UI.Xaml.2.1</Name>
+      <Version>2.11906.6001.0</Version>
+      <Architecture>x86</Architecture>
+      <FrameworkIdentity>Name = Microsoft.UI.Xaml.2.1, MinVersion = 2.11906.6001.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\microsoft.ui.xaml\2.1.190606001\build\..\tools\AppX\x86\Release\Microsoft.UI.Xaml.2.1.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-x86.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx">
+      <Name>Microsoft.NET.Native.Framework.2.2</Name>
+      <Version>2.2.27912.0</Version>
+      <Architecture>x86</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Framework.2.2, MinVersion = 2.2.27912.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-x86.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-x64.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx">
+      <Name>Microsoft.NET.Native.Framework.2.2</Name>
+      <Version>2.2.27912.0</Version>
+      <Architecture>x64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Framework.2.2, MinVersion = 2.2.27912.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-x64.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-arm64.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx">
+      <Name>Microsoft.NET.Native.Framework.2.2</Name>
+      <Version>2.2.27912.0</Version>
+      <Architecture>arm64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Framework.2.2, MinVersion = 2.2.27912.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-arm64.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-arm.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx">
+      <Name>Microsoft.NET.Native.Framework.2.2</Name>
+      <Version>2.2.27912.0</Version>
+      <Architecture>arm</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Framework.2.2, MinVersion = 2.2.27912.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-arm.microsoft.net.native.sharedlibrary\2.2.7-rel-28605-00\build\..\tools\SharedLibrary\ret\Native\Microsoft.NET.Native.Framework.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-x86.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\x86\Microsoft.NET.Native.Runtime.2.2.appx">
+      <Name>Microsoft.NET.Native.Runtime.2.2</Name>
+      <Version>2.2.28604.0</Version>
+      <Architecture>x86</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Runtime.2.2, MinVersion = 2.2.28604.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-x86.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\x86\Microsoft.NET.Native.Runtime.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-x64.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\x64\Microsoft.NET.Native.Runtime.2.2.appx">
+      <Name>Microsoft.NET.Native.Runtime.2.2</Name>
+      <Version>2.2.28604.0</Version>
+      <Architecture>x64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Runtime.2.2, MinVersion = 2.2.28604.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-x64.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\x64\Microsoft.NET.Native.Runtime.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-arm64.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\arm64\Microsoft.NET.Native.Runtime.2.2.appx">
+      <Name>Microsoft.NET.Native.Runtime.2.2</Name>
+      <Version>2.2.28604.0</Version>
+      <Architecture>arm64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Runtime.2.2, MinVersion = 2.2.28604.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-arm64.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\arm64\Microsoft.NET.Native.Runtime.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Users\a180104\.nuget\packages\runtime.win10-arm.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\arm\Microsoft.NET.Native.Runtime.2.2.appx">
+      <Name>Microsoft.NET.Native.Runtime.2.2</Name>
+      <Version>2.2.28604.0</Version>
+      <Architecture>arm</Architecture>
+      <FrameworkIdentity>Name = Microsoft.NET.Native.Runtime.2.2, MinVersion = 2.2.28604.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Users\a180104\.nuget\packages\runtime.win10-arm.microsoft.net.native.compiler\2.2.8-rel-28605-00\build\..\tools\Runtime\arm\Microsoft.NET.Native.Runtime.2.2.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>ARM</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\ARM\Microsoft.VCLibs.ARM.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>ARM64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\ARM64\Microsoft.VCLibs.ARM64.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>x64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\x64\Microsoft.VCLibs.x64.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>x86</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\x86\Microsoft.VCLibs.x86.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>ARM</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\ARM\Microsoft.VCLibs.ARM.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>ARM64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\ARM64\Microsoft.VCLibs.ARM64.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>x64</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\x64\Microsoft.VCLibs.x64.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\">
+      <Name>Microsoft.VCLibs.140.00</Name>
+      <Version>14.0.27323.0</Version>
+      <Architecture>x86</Architecture>
+      <FrameworkIdentity>Name = Microsoft.VCLibs.140.00, MinVersion = 14.0.27323.0, Publisher = %27CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US%27</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.VCLibs\14.0\.\AppX\Retail\x86\Microsoft.VCLibs.x86.14.00.appx</AppxLocation>
+      <MoreInfo>
+      </MoreInfo>
+    </ResolvedSDKReference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,1393 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<api>
+  <package name="org.linphone.core.tutorials">
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="TutorialBuddyStatus" static="false" visibility="public">
+      <implements name="org.linphone.core.LinphoneCoreListener" name-generic-aware="org.linphone.core.LinphoneCoreListener"></implements>
+      <constructor deprecated="not deprecated" final="false" name="TutorialBuddyStatus" static="false" type="org.linphone.core.tutorials.TutorialBuddyStatus" visibility="public">
+        <parameter name="p0" type="org.linphone.core.tutorials.TutorialNotifier"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="TutorialBuddyStatus" static="false" type="org.linphone.core.tutorials.TutorialBuddyStatus" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="authInfoRequested" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="authenticationRequested" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneAuthInfo"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCore.AuthMethod"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="byeReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callEncryptionChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="boolean"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCall.State"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callStatsUpdated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCallStats"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="configuringStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.RemoteProvisioningState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayMessage" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayWarning" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="dtmfReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="ecCalibrationStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.EcCalibratorStatus"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="java.lang.Object"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferProgressIndication" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferRecv" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="byte[]"></parameter>
+        <parameter name="p4" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferSend" native="false" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="java.nio.ByteBuffer"></parameter>
+        <parameter name="p4" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="friendListCreated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriendList"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="friendListRemoved" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriendList"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="globalState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.GlobalState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="infoReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneInfoMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isComposingReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="launchTutorial" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <exception name="LinphoneCoreException" type="org.linphone.core.LinphoneCoreException"></exception>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="main" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="messageReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneChatMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="messageReceivedUnableToDecrypted" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneChatMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="networkReachableChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="newSubscriptionRequest" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriend"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyPresenceReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriend"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneAddress"></parameter>
+        <parameter name="p3" type="byte[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <parameter name="p3" type="org.linphone.core.LinphoneContent"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="publishStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="org.linphone.core.PublishState"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="registrationState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneProxyConfig"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCore.RegistrationState"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="show" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="stopMainLoop" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="subscriptionStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="org.linphone.core.SubscriptionState"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="transferState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCall.State"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="uploadProgressIndication" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="uploadStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.LogCollectionUploadState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="TutorialChatRoom" static="false" visibility="public">
+      <implements name="org.linphone.core.LinphoneChatMessage.StateListener" name-generic-aware="org.linphone.core.LinphoneChatMessage.StateListener"></implements>
+      <implements name="org.linphone.core.LinphoneCoreListener" name-generic-aware="org.linphone.core.LinphoneCoreListener"></implements>
+      <constructor deprecated="not deprecated" final="false" name="TutorialChatRoom" static="false" type="org.linphone.core.tutorials.TutorialChatRoom" visibility="public">
+        <parameter name="p0" type="org.linphone.core.tutorials.TutorialNotifier"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="TutorialChatRoom" static="false" type="org.linphone.core.tutorials.TutorialChatRoom" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="authInfoRequested" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="authenticationRequested" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneAuthInfo"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCore.AuthMethod"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="byeReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callEncryptionChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="boolean"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCall.State"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callStatsUpdated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCallStats"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="configuringStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.RemoteProvisioningState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayMessage" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayWarning" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="dtmfReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="ecCalibrationStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.EcCalibratorStatus"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="java.lang.Object"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferProgressIndication" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferRecv" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="byte[]"></parameter>
+        <parameter name="p4" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferSend" native="false" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="java.nio.ByteBuffer"></parameter>
+        <parameter name="p4" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="friendListCreated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriendList"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="friendListRemoved" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriendList"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="globalState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.GlobalState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="infoReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneInfoMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isComposingReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="launchTutorial" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <exception name="LinphoneCoreException" type="org.linphone.core.LinphoneCoreException"></exception>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="main" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="messageReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneChatMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="messageReceivedUnableToDecrypted" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneChatMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="networkReachableChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="newSubscriptionRequest" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriend"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyPresenceReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriend"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneAddress"></parameter>
+        <parameter name="p3" type="byte[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <parameter name="p3" type="org.linphone.core.LinphoneContent"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="onLinphoneChatMessageStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage.State"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="publishStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="org.linphone.core.PublishState"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="registrationState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneProxyConfig"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCore.RegistrationState"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="show" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="stopMainLoop" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="subscriptionStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="org.linphone.core.SubscriptionState"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="transferState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCall.State"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="uploadProgressIndication" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="uploadStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.LogCollectionUploadState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="TutorialHelloWorld" static="false" visibility="public">
+      <implements name="org.linphone.core.LinphoneCoreListener" name-generic-aware="org.linphone.core.LinphoneCoreListener"></implements>
+      <constructor deprecated="not deprecated" final="false" name="TutorialHelloWorld" static="false" type="org.linphone.core.tutorials.TutorialHelloWorld" visibility="public">
+        <parameter name="p0" type="org.linphone.core.tutorials.TutorialNotifier"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="TutorialHelloWorld" static="false" type="org.linphone.core.tutorials.TutorialHelloWorld" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="authInfoRequested" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="authenticationRequested" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneAuthInfo"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCore.AuthMethod"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="byeReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callEncryptionChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="boolean"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCall.State"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callStatsUpdated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCallStats"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="configuringStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.RemoteProvisioningState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayMessage" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayWarning" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="dtmfReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="ecCalibrationStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.EcCalibratorStatus"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="java.lang.Object"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferProgressIndication" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferRecv" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="byte[]"></parameter>
+        <parameter name="p4" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferSend" native="false" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="java.nio.ByteBuffer"></parameter>
+        <parameter name="p4" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="friendListCreated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriendList"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="friendListRemoved" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriendList"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="globalState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.GlobalState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="infoReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneInfoMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isComposingReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="launchTutorial" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <exception name="LinphoneCoreException" type="org.linphone.core.LinphoneCoreException"></exception>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="main" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="messageReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneChatMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="messageReceivedUnableToDecrypted" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneChatMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="networkReachableChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="newSubscriptionRequest" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriend"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyPresenceReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriend"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneAddress"></parameter>
+        <parameter name="p3" type="byte[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <parameter name="p3" type="org.linphone.core.LinphoneContent"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="publishStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="org.linphone.core.PublishState"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="registrationState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneProxyConfig"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCore.RegistrationState"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="show" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="stopMainLoop" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="subscriptionStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="org.linphone.core.SubscriptionState"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="textReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneAddress"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="transferState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCall.State"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="uploadProgressIndication" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="uploadStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.LogCollectionUploadState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="TutorialNotifier" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="TutorialNotifier" static="false" type="org.linphone.core.tutorials.TutorialNotifier" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notify" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="TutorialRegistration" static="false" visibility="public">
+      <implements name="org.linphone.core.LinphoneCoreListener" name-generic-aware="org.linphone.core.LinphoneCoreListener"></implements>
+      <constructor deprecated="not deprecated" final="false" name="TutorialRegistration" static="false" type="org.linphone.core.tutorials.TutorialRegistration" visibility="public">
+        <parameter name="p0" type="org.linphone.core.tutorials.TutorialNotifier"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="TutorialRegistration" static="false" type="org.linphone.core.tutorials.TutorialRegistration" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="authInfoRequested" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="authenticationRequested" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneAuthInfo"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCore.AuthMethod"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="byeReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callEncryptionChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="boolean"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCall.State"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="callStatsUpdated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCallStats"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="configuringStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.RemoteProvisioningState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayMessage" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="displayWarning" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="dtmfReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="ecCalibrationStatus" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.EcCalibratorStatus"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="java.lang.Object"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferProgressIndication" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferRecv" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="byte[]"></parameter>
+        <parameter name="p4" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="fileTransferSend" native="false" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatMessage"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneContent"></parameter>
+        <parameter name="p3" type="java.nio.ByteBuffer"></parameter>
+        <parameter name="p4" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="friendListCreated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriendList"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="friendListRemoved" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriendList"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="globalState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.GlobalState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="infoReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneInfoMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isComposingReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="launchTutorial" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+        <exception name="LinphoneCoreException" type="org.linphone.core.LinphoneCoreException"></exception>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="main" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="messageReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneChatMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="messageReceivedUnableToDecrypted" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneChatRoom"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneChatMessage"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="networkReachableChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="newSubscriptionRequest" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriend"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyPresenceReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneFriend"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneAddress"></parameter>
+        <parameter name="p3" type="byte[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="notifyReceived" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <parameter name="p3" type="org.linphone.core.LinphoneContent"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="publishStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="org.linphone.core.PublishState"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="registrationState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneProxyConfig"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCore.RegistrationState"></parameter>
+        <parameter name="p3" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="show" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="stopMainLoop" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="subscriptionStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneEvent"></parameter>
+        <parameter name="p2" type="org.linphone.core.SubscriptionState"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="transferState" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCall"></parameter>
+        <parameter name="p2" type="org.linphone.core.LinphoneCall.State"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="uploadProgressIndication" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="uploadStateChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LinphoneCore"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore.LogCollectionUploadState"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+      </method>
+    </class>
+  </package>
+  <package name="org.linphone.core.util">
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidPlatformHelper" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AndroidPlatformHelper" static="false" type="org.linphone.core.util.AndroidPlatformHelper" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+      </constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="acquireCpuLock" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="acquireMcastLock" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="acquireWifiLock" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getDnsServers" native="false" return="java.lang.String[]" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getPowerManager" native="false" return="java.lang.Object" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="releaseCpuLock" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="releaseMcastLock" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="releaseWifiLock" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+    </class>
+  </package>
+  <package name="org.linphone.core.video">
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="true" name="VideoUtil" static="false" visibility="">
+      <method abstract="false" deprecated="not deprecated" final="false" name="createList" native="false" return="java.util.List&lt;org.linphone.core.VideoSize&gt;" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.util.List&lt;android.hardware.Camera.Size&gt;"></parameter>
+      </method>
+    </class>
+  </package>
+  <package name="org.linphone.mediastream">
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AACFilter" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AACFilter" static="false" type="org.linphone.mediastream.AACFilter" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="instance" native="false" return="org.linphone.mediastream.AACFilter" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="postprocess" native="false" return="boolean" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="preprocess" native="false" return="boolean" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="boolean"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="pullFromDecoder" native="false" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="byte[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="pullFromEncoder" native="false" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="byte[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="pushToDecoder" native="false" return="boolean" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="byte[]"></parameter>
+        <parameter name="p1" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="pushToEncoder" native="false" return="boolean" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="byte[]"></parameter>
+        <parameter name="p1" type="int"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="Factory" static="false" visibility="public">
+      <method abstract="false" deprecated="not deprecated" final="false" name="enableFilterFromName" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="filterFromNameEnabled" native="false" return="boolean" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getDecoderText" native="false" return="java.lang.String" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getEncoderText" native="false" return="java.lang.String" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setDeviceInfo" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+        <parameter name="p2" type="java.lang.String"></parameter>
+        <parameter name="p3" type="int"></parameter>
+        <parameter name="p4" type="int"></parameter>
+        <parameter name="p5" type="int"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="true" name="Log" static="false" visibility="public">
+      <constructor deprecated="deprecated" final="false" name="Log" static="false" type="org.linphone.mediastream.Log" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+      </constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="d" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object..."></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="e" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object..."></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="i" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object..."></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="w" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object..."></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Exception" extends-generic-aware="java.lang.Exception" final="false" name="MediastreamException" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="MediastreamException" static="false" type="org.linphone.mediastream.MediastreamException" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <parameter name="p1" type="java.lang.Throwable"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="MediastreamException" static="false" type="org.linphone.mediastream.MediastreamException" visibility="public">
+        <parameter name="p0" type="java.lang.Throwable"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="MediastreamException" static="false" type="org.linphone.mediastream.MediastreamException" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="MediastreamException" static="false" type="org.linphone.mediastream.MediastreamException" visibility="public"></constructor>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="MediastreamerAndroidContext" static="false" visibility="public">
+      <method abstract="false" deprecated="not deprecated" final="false" name="enableFilterFromName" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+        <exception name="MediastreamException" type="org.linphone.mediastream.MediastreamException"></exception>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="filterFromNameEnabled" native="false" return="boolean" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getContext" native="false" return="android.content.Context" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setContext" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+      </method>
+      <field deprecated="not deprecated" final="true" name="DEVICE_HAS_BUILTIN_AEC" static="true" transient="false" type="int" type-generic-aware="int" value="1" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="DEVICE_HAS_BUILTIN_AEC_CRAPPY" static="true" transient="false" type="int" type-generic-aware="int" value="2" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="DEVICE_HAS_BUILTIN_OPENSLES_AEC" static="true" transient="false" type="int" type-generic-aware="int" value="8" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="DEVICE_USE_ANDROID_MIC" static="true" transient="false" type="int" type-generic-aware="int" value="4" visibility="public" volatile="false"></field>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="Version" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="Version" static="false" type="org.linphone.mediastream.Version" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="dumpCapabilities" native="false" return="void" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getCpuAbis" native="false" return="java.util.List&lt;java.lang.String&gt;" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="hasFastCpu" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="hasFastCpuWithAsmOptim" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="hasNeon" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="hasZrtp" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isHDVideoCapable" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isVideoCapable" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isXLargeScreen" native="false" return="boolean" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="android.content.Context"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="sdk" native="false" return="int" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="true" name="sdkAboveOrEqual" native="false" return="boolean" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="true" name="sdkStrictlyBelow" native="false" return="boolean" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+      </method>
+      <field deprecated="not deprecated" final="true" name="API03_CUPCAKE_15" static="true" transient="false" type="int" type-generic-aware="int" value="3" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API04_DONUT_16" static="true" transient="false" type="int" type-generic-aware="int" value="4" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API05_ECLAIR_20" static="true" transient="false" type="int" type-generic-aware="int" value="5" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API06_ECLAIR_201" static="true" transient="false" type="int" type-generic-aware="int" value="6" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API07_ECLAIR_21" static="true" transient="false" type="int" type-generic-aware="int" value="7" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API08_FROYO_22" static="true" transient="false" type="int" type-generic-aware="int" value="8" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API09_GINGERBREAD_23" static="true" transient="false" type="int" type-generic-aware="int" value="9" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API10_GINGERBREAD_MR1_233" static="true" transient="false" type="int" type-generic-aware="int" value="10" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API11_HONEYCOMB_30" static="true" transient="false" type="int" type-generic-aware="int" value="11" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API12_HONEYCOMB_MR1_31X" static="true" transient="false" type="int" type-generic-aware="int" value="12" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API13_HONEYCOMB_MR2_32" static="true" transient="false" type="int" type-generic-aware="int" value="13" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API14_ICE_CREAM_SANDWICH_40" static="true" transient="false" type="int" type-generic-aware="int" value="14" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API15_ICE_CREAM_SANDWICH_403" static="true" transient="false" type="int" type-generic-aware="int" value="15" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API16_JELLY_BEAN_41" static="true" transient="false" type="int" type-generic-aware="int" value="16" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API17_JELLY_BEAN_42" static="true" transient="false" type="int" type-generic-aware="int" value="17" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API18_JELLY_BEAN_43" static="true" transient="false" type="int" type-generic-aware="int" value="18" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API19_KITKAT_44" static="true" transient="false" type="int" type-generic-aware="int" value="19" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API21_LOLLIPOP_50" static="true" transient="false" type="int" type-generic-aware="int" value="21" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API22_LOLLIPOP_51" static="true" transient="false" type="int" type-generic-aware="int" value="22" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API23_MARSHMALLOW_60" static="true" transient="false" type="int" type-generic-aware="int" value="23" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API24_NOUGAT_70" static="true" transient="false" type="int" type-generic-aware="int" value="24" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API25_NOUGAT_71" static="true" transient="false" type="int" type-generic-aware="int" value="25" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="API26_O_80" static="true" transient="false" type="int" type-generic-aware="int" value="26" visibility="public" volatile="false"></field>
+    </class>
+  </package>
+  <package name="org.linphone.mediastream.video">
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoWindowImpl" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AndroidVideoWindowImpl" static="false" type="org.linphone.mediastream.video.AndroidVideoWindowImpl" visibility="public">
+        <parameter name="p0" type="android.view.SurfaceView"></parameter>
+        <parameter name="p1" type="android.view.SurfaceView"></parameter>
+        <parameter name="p2" type="org.linphone.mediastream.video.AndroidVideoWindowImpl.VideoWindowListener"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="AndroidVideoWindowImpl" static="false" type="org.linphone.mediastream.video.AndroidVideoWindowImpl" visibility="public">
+        <parameter name="p0" type="android.view.SurfaceView"></parameter>
+        <parameter name="p1" type="android.view.SurfaceView"></parameter>
+      </constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getBitmap" native="false" return="android.graphics.Bitmap" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getSurface" native="false" return="android.view.Surface" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="init" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="release" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="requestRender" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="rotationToAngle" native="false" return="int" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setListener" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.mediastream.video.AndroidVideoWindowImpl.VideoWindowListener"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setOpenGLESDisplay" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="long"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="update" native="false" return="void" static="false" synchronized="true" visibility="public"></method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoWindowImpl.1" static="false" visibility="">
+      <implements name="android.view.SurfaceHolder.Callback" name-generic-aware="android.view.SurfaceHolder.Callback"></implements>
+      <method abstract="false" deprecated="not deprecated" final="false" name="surfaceChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="android.view.SurfaceHolder"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="surfaceCreated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="android.view.SurfaceHolder"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="surfaceDestroyed" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="android.view.SurfaceHolder"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoWindowImpl.2" static="false" visibility="">
+      <implements name="android.view.SurfaceHolder.Callback" name-generic-aware="android.view.SurfaceHolder.Callback"></implements>
+      <method abstract="false" deprecated="not deprecated" final="false" name="surfaceChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="android.view.SurfaceHolder"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="surfaceCreated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="android.view.SurfaceHolder"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="surfaceDestroyed" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="android.view.SurfaceHolder"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoWindowImpl.Renderer" static="true" visibility="">
+      <implements name="android.opengl.GLSurfaceView.Renderer" name-generic-aware="android.opengl.GLSurfaceView.Renderer"></implements>
+      <constructor deprecated="not deprecated" final="false" name="AndroidVideoWindowImpl.Renderer" static="false" type="org.linphone.mediastream.video.AndroidVideoWindowImpl.Renderer" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="onDrawFrame" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="javax.microedition.khronos.opengles.GL10"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="onSurfaceChanged" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="javax.microedition.khronos.opengles.GL10"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="onSurfaceCreated" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="javax.microedition.khronos.opengles.GL10"></parameter>
+        <parameter name="p1" type="javax.microedition.khronos.egl.EGLConfig"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setOpenGLESDisplay" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="long"></parameter>
+      </method>
+    </class>
+    <interface abstract="true" deprecated="not deprecated" final="false" name="AndroidVideoWindowImpl.VideoWindowListener" static="true" visibility="public">
+      <method abstract="true" deprecated="not deprecated" final="false" name="onVideoPreviewSurfaceDestroyed" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.mediastream.video.AndroidVideoWindowImpl"></parameter>
+      </method>
+      <method abstract="true" deprecated="not deprecated" final="false" name="onVideoPreviewSurfaceReady" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.mediastream.video.AndroidVideoWindowImpl"></parameter>
+        <parameter name="p1" type="android.view.SurfaceView"></parameter>
+      </method>
+      <method abstract="true" deprecated="not deprecated" final="false" name="onVideoRenderingSurfaceDestroyed" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.mediastream.video.AndroidVideoWindowImpl"></parameter>
+      </method>
+      <method abstract="true" deprecated="not deprecated" final="false" name="onVideoRenderingSurfaceReady" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.mediastream.video.AndroidVideoWindowImpl"></parameter>
+        <parameter name="p1" type="android.view.SurfaceView"></parameter>
+      </method>
+    </interface>
+  </package>
+  <package name="org.linphone.mediastream.video.capture">
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoApi5JniWrapper" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AndroidVideoApi5JniWrapper" static="false" type="org.linphone.mediastream.video.capture.AndroidVideoApi5JniWrapper" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="activateAutoFocus" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="applyCameraParameters" native="false" return="void" static="true" synchronized="false" visibility="protected">
+        <parameter name="p0" type="android.hardware.Camera"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="detectCameras" native="false" return="int" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int[]"></parameter>
+        <parameter name="p1" type="int[]"></parameter>
+        <parameter name="p2" type="int[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="putImage" native="true" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="long"></parameter>
+        <parameter name="p1" type="byte[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="selectNearestResolutionAvailable" native="false" return="int[]" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="selectNearestResolutionAvailableForCamera" native="false" return="int[]" static="true" synchronized="false" visibility="protected">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setPreviewDisplaySurface" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+        <parameter name="p1" type="java.lang.Object"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="startRecording" native="false" return="java.lang.Object" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="int"></parameter>
+        <parameter name="p4" type="int"></parameter>
+        <parameter name="p5" type="long"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="stopRecording" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+      </method>
+      <field deprecated="not deprecated" final="false" name="isRecording" static="true" transient="false" type="boolean" type-generic-aware="boolean" visibility="public" volatile="false"></field>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoApi5JniWrapper.1" static="true" visibility="">
+      <implements name="android.hardware.Camera.PreviewCallback" name-generic-aware="android.hardware.Camera.PreviewCallback"></implements>
+      <method abstract="false" deprecated="not deprecated" final="false" name="onPreviewFrame" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="byte[]"></parameter>
+        <parameter name="p1" type="android.hardware.Camera"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoApi8JniWrapper" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AndroidVideoApi8JniWrapper" static="false" type="org.linphone.mediastream.video.capture.AndroidVideoApi8JniWrapper" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="detectCameras" native="false" return="int" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int[]"></parameter>
+        <parameter name="p1" type="int[]"></parameter>
+        <parameter name="p2" type="int[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="selectNearestResolutionAvailable" native="false" return="int[]" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setPreviewDisplaySurface" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+        <parameter name="p1" type="java.lang.Object"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="startRecording" native="false" return="java.lang.Object" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="int"></parameter>
+        <parameter name="p4" type="int"></parameter>
+        <parameter name="p5" type="long"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="stopRecording" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoApi8JniWrapper.1" static="true" visibility="">
+      <implements name="android.hardware.Camera.PreviewCallback" name-generic-aware="android.hardware.Camera.PreviewCallback"></implements>
+      <method abstract="false" deprecated="not deprecated" final="false" name="onPreviewFrame" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="byte[]"></parameter>
+        <parameter name="p1" type="android.hardware.Camera"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoApi9JniWrapper" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AndroidVideoApi9JniWrapper" static="false" type="org.linphone.mediastream.video.capture.AndroidVideoApi9JniWrapper" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="detectCameras" native="false" return="int" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int[]"></parameter>
+        <parameter name="p1" type="int[]"></parameter>
+        <parameter name="p2" type="int[]"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="selectNearestResolutionAvailable" native="false" return="int[]" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setPreviewDisplaySurface" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+        <parameter name="p1" type="java.lang.Object"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="startRecording" native="false" return="java.lang.Object" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="int"></parameter>
+        <parameter name="p4" type="int"></parameter>
+        <parameter name="p5" type="long"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="stopRecording" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidVideoApi9JniWrapper.1" static="true" visibility="">
+      <implements name="android.hardware.Camera.PreviewCallback" name-generic-aware="android.hardware.Camera.PreviewCallback"></implements>
+      <method abstract="false" deprecated="not deprecated" final="false" name="onPreviewFrame" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="byte[]"></parameter>
+        <parameter name="p1" type="android.hardware.Camera"></parameter>
+      </method>
+    </class>
+  </package>
+  <package name="org.linphone.mediastream.video.capture.hwconf">
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidCameraConfiguration" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AndroidCameraConfiguration" static="false" type="org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="hasFrontCamera" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="hasSeveralCameras" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="retrieveCameras" native="false" return="org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera[]" static="true" synchronized="false" visibility="public"></method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidCameraConfiguration.AndroidCamera" static="true" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AndroidCameraConfiguration.AndroidCamera" static="false" type="org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+        <parameter name="p2" type="java.util.List&lt;org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera.Size&gt;"></parameter>
+        <parameter name="p3" type="int"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="AndroidCameraConfiguration.AndroidCamera" static="false" type="org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="java.util.List&lt;android.hardware.Camera.Size&gt;"></parameter>
+      </constructor>
+      <field deprecated="not deprecated" final="false" name="frontFacing" static="false" transient="false" type="boolean" type-generic-aware="boolean" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="id" static="false" transient="false" type="int" type-generic-aware="int" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="orientation" static="false" transient="false" type="int" type-generic-aware="int" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="resolutions" static="false" transient="false" type="java.util.List" type-generic-aware="java.util.List&lt;org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera.Size&gt;" visibility="public" volatile="false"></field>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidCameraConfiguration.AndroidCamera.Size" static="true" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AndroidCameraConfiguration.AndroidCamera.Size" static="false" type="org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera.Size" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+      </constructor>
+      <field deprecated="not deprecated" final="true" name="height" static="false" transient="false" type="int" type-generic-aware="int" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="width" static="false" transient="false" type="int" type-generic-aware="int" visibility="public" volatile="false"></field>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidCameraConfigurationReader21" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="AndroidCameraConfigurationReader21" static="false" type="org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfigurationReader21" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="probeCameras" native="false" return="org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera[]" static="true" synchronized="false" visibility="public"></method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidCameraConfigurationReader5" static="false" visibility="">
+      <method abstract="false" deprecated="not deprecated" final="false" name="probeCameras" native="false" return="org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera[]" static="true" synchronized="false" visibility="public"></method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="AndroidCameraConfigurationReader9" static="false" visibility="">
+      <method abstract="false" deprecated="not deprecated" final="false" name="probeCameras" native="false" return="org.linphone.mediastream.video.capture.hwconf.AndroidCameraConfiguration.AndroidCamera[]" static="true" synchronized="false" visibility="public"></method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="true" name="Hacks" static="false" visibility="public">
+      <method abstract="false" deprecated="not deprecated" final="false" name="hasBuiltInEchoCanceller" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="hasCamera" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="true" name="hasTwoCamerasRear0Front1" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isGalaxySOrTab" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isGalaxySOrTabWithFrontCamera" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isGalaxyTab" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="needGalaxySAudioHack" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="needPausingCallForSpeakers" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="needSoftvolume" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="true" name="sleep" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="Hacks.BuiltInEchoCancellerModel" static="true" visibility="">
+      <constructor deprecated="not deprecated" final="false" name="Hacks.BuiltInEchoCancellerModel" static="false" type="org.linphone.mediastream.video.capture.hwconf.Hacks.BuiltInEchoCancellerModel" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </constructor>
+      <field deprecated="not deprecated" final="false" name="manufacturer" static="false" transient="false" type="java.lang.String" type-generic-aware="java.lang.String" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="model" static="false" transient="false" type="java.lang.String" type-generic-aware="java.lang.String" visibility="public" volatile="false"></field>
+    </class>
+  </package>
+  <package name="org.linphone.mediastream.video.display">
+    <class abstract="false" deprecated="not deprecated" extends="android.opengl.GLSurfaceView" extends-generic-aware="android.opengl.GLSurfaceView" final="false" name="GL2JNIView" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="GL2JNIView" static="false" type="org.linphone.mediastream.video.display.GL2JNIView" visibility="public">
+        <parameter name="p0" type="android.content.Context"></parameter>
+        <parameter name="p1" type="boolean"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="int"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="GL2JNIView" static="false" type="org.linphone.mediastream.video.display.GL2JNIView" visibility="public">
+        <parameter name="p0" type="android.content.Context"></parameter>
+        <parameter name="p1" type="android.util.AttributeSet"></parameter>
+      </constructor>
+      <constructor deprecated="not deprecated" final="false" name="GL2JNIView" static="false" type="org.linphone.mediastream.video.display.GL2JNIView" visibility="public">
+        <parameter name="p0" type="android.content.Context"></parameter>
+      </constructor>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="GL2JNIView.1" static="true" visibility="" />
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="GL2JNIView.ConfigChooser" static="true" visibility="">
+      <implements name="android.opengl.GLSurfaceView.EGLConfigChooser" name-generic-aware="android.opengl.GLSurfaceView.EGLConfigChooser"></implements>
+      <constructor deprecated="not deprecated" final="false" name="GL2JNIView.ConfigChooser" static="false" type="org.linphone.mediastream.video.display.GL2JNIView.ConfigChooser" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+        <parameter name="p3" type="int"></parameter>
+        <parameter name="p4" type="int"></parameter>
+        <parameter name="p5" type="int"></parameter>
+      </constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="chooseConfig" native="false" return="javax.microedition.khronos.egl.EGLConfig" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="javax.microedition.khronos.egl.EGL10"></parameter>
+        <parameter name="p1" type="javax.microedition.khronos.egl.EGLDisplay"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="chooseConfig" native="false" return="javax.microedition.khronos.egl.EGLConfig" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="javax.microedition.khronos.egl.EGL10"></parameter>
+        <parameter name="p1" type="javax.microedition.khronos.egl.EGLDisplay"></parameter>
+        <parameter name="p2" type="javax.microedition.khronos.egl.EGLConfig[]"></parameter>
+      </method>
+      <field deprecated="not deprecated" final="false" name="mAlphaSize" static="false" transient="false" type="int" type-generic-aware="int" visibility="protected" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="mBlueSize" static="false" transient="false" type="int" type-generic-aware="int" visibility="protected" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="mDepthSize" static="false" transient="false" type="int" type-generic-aware="int" visibility="protected" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="mGreenSize" static="false" transient="false" type="int" type-generic-aware="int" visibility="protected" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="mRedSize" static="false" transient="false" type="int" type-generic-aware="int" visibility="protected" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="mStencilSize" static="false" transient="false" type="int" type-generic-aware="int" visibility="protected" volatile="false"></field>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="GL2JNIView.ContextFactory" static="true" visibility="">
+      <implements name="android.opengl.GLSurfaceView.EGLContextFactory" name-generic-aware="android.opengl.GLSurfaceView.EGLContextFactory"></implements>
+      <method abstract="false" deprecated="not deprecated" final="false" name="createContext" native="false" return="javax.microedition.khronos.egl.EGLContext" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="javax.microedition.khronos.egl.EGL10"></parameter>
+        <parameter name="p1" type="javax.microedition.khronos.egl.EGLDisplay"></parameter>
+        <parameter name="p2" type="javax.microedition.khronos.egl.EGLConfig"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="destroyContext" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="javax.microedition.khronos.egl.EGL10"></parameter>
+        <parameter name="p1" type="javax.microedition.khronos.egl.EGLDisplay"></parameter>
+        <parameter name="p2" type="javax.microedition.khronos.egl.EGLContext"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="OpenGLESDisplay" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="OpenGLESDisplay" static="false" type="org.linphone.mediastream.video.display.OpenGLESDisplay" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="init" native="true" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="long"></parameter>
+        <parameter name="p1" type="int"></parameter>
+        <parameter name="p2" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="render" native="true" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="long"></parameter>
+      </method>
+    </class>
+  </package>
+  <package name="org.linphone.tools">
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="H264Helper" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="H264Helper" static="false" type="org.linphone.tools.H264Helper" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setH264Mode" native="false" return="void" static="true" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+        <parameter name="p1" type="org.linphone.core.LinphoneCore"></parameter>
+      </method>
+      <field deprecated="not deprecated" final="false" name="MODE_AUTO" static="true" transient="false" type="java.lang.String" type-generic-aware="java.lang.String" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="MODE_MEDIA_CODEC" static="true" transient="false" type="java.lang.String" type-generic-aware="java.lang.String" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="false" name="MODE_OPENH264" static="true" transient="false" type="java.lang.String" type-generic-aware="java.lang.String" visibility="public" volatile="false"></field>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="Lpc2Xml" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="Lpc2Xml" static="false" type="org.linphone.tools.Lpc2Xml" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="convertFile" native="true" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="convertString" native="true" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.StringBuffer"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="finalize" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="printLog" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setLpc" native="true" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LpConfig"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="Lpc2Xml.1" static="true" visibility="" />
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Enum" extends-generic-aware="java.lang.Enum&lt;org.linphone.tools.Lpc2Xml.LogLevel&gt;" final="true" name="Lpc2Xml.LogLevel" static="true" visibility="">
+      <field deprecated="not deprecated" final="true" name="DEBUG" static="true" transient="false" type="org.linphone.tools.Lpc2Xml.LogLevel" type-generic-aware="org.linphone.tools.Lpc2Xml.LogLevel" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="ERROR" static="true" transient="false" type="org.linphone.tools.Lpc2Xml.LogLevel" type-generic-aware="org.linphone.tools.Lpc2Xml.LogLevel" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="MESSAGE" static="true" transient="false" type="org.linphone.tools.Lpc2Xml.LogLevel" type-generic-aware="org.linphone.tools.Lpc2Xml.LogLevel" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="WARNING" static="true" transient="false" type="org.linphone.tools.Lpc2Xml.LogLevel" type-generic-aware="org.linphone.tools.Lpc2Xml.LogLevel" visibility="public" volatile="false"></field>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="OpenH264DownloadHelper" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="OpenH264DownloadHelper" static="false" type="org.linphone.tools.OpenH264DownloadHelper" visibility="public">
+        <parameter name="p0" type="android.content.Context"></parameter>
+      </constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="downloadCodec" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getFullPathLib" native="false" return="java.lang.String" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getLicenseMessage" native="false" return="java.lang.String" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getNameLib" native="false" return="java.lang.String" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getOpenH264DownloadHelperListener" native="false" return="org.linphone.core.OpenH264DownloadHelperListener" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getUserData" native="false" return="java.lang.Object" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="getUserDataSize" native="false" return="int" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isCodecFound" native="false" return="boolean" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setNameFileDownload" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setNameLib" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setOpenH264HelperListener" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.OpenH264DownloadHelperListener"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setUrlDownload" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setUserData" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="java.lang.Object"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setUserData" native="false" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.Object"></parameter>
+      </method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="OpenH264DownloadHelper.1" static="false" visibility="">
+      <implements name="java.lang.Runnable" name-generic-aware="java.lang.Runnable"></implements>
+      <method abstract="false" deprecated="not deprecated" final="false" name="run" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="Xml2Lpc" static="false" visibility="public">
+      <constructor deprecated="not deprecated" final="false" name="Xml2Lpc" static="false" type="org.linphone.tools.Xml2Lpc" visibility="public"></constructor>
+      <method abstract="false" deprecated="not deprecated" final="false" name="convert" native="true" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="org.linphone.core.LpConfig"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="finalize" native="false" return="void" static="false" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="isAvailable" native="false" return="boolean" static="true" synchronized="false" visibility="public"></method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="printLog" native="false" return="void" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="int"></parameter>
+        <parameter name="p1" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setXmlFile" native="true" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setXmlString" native="true" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setXsdFile" native="true" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="setXsdString" native="true" return="int" static="false" synchronized="false" visibility="public">
+        <parameter name="p0" type="java.lang.String"></parameter>
+      </method>
+      <method abstract="false" deprecated="not deprecated" final="false" name="validate" native="true" return="int" static="false" synchronized="false" visibility="public"></method>
+    </class>
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Object" extends-generic-aware="java.lang.Object" final="false" name="Xml2Lpc.1" static="true" visibility="" />
+    <class abstract="false" deprecated="not deprecated" extends="java.lang.Enum" extends-generic-aware="java.lang.Enum&lt;org.linphone.tools.Xml2Lpc.LogLevel&gt;" final="true" name="Xml2Lpc.LogLevel" static="true" visibility="">
+      <field deprecated="not deprecated" final="true" name="DEBUG" static="true" transient="false" type="org.linphone.tools.Xml2Lpc.LogLevel" type-generic-aware="org.linphone.tools.Xml2Lpc.LogLevel" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="ERROR" static="true" transient="false" type="org.linphone.tools.Xml2Lpc.LogLevel" type-generic-aware="org.linphone.tools.Xml2Lpc.LogLevel" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="MESSAGE" static="true" transient="false" type="org.linphone.tools.Xml2Lpc.LogLevel" type-generic-aware="org.linphone.tools.Xml2Lpc.LogLevel" visibility="public" volatile="false"></field>
+      <field deprecated="not deprecated" final="true" name="WARNING" static="true" transient="false" type="org.linphone.tools.Xml2Lpc.LogLevel" type-generic-aware="org.linphone.tools.Xml2Lpc.LogLevel" visibility="public" volatile="false"></field>
+    </class>
+  </package>
+</api>

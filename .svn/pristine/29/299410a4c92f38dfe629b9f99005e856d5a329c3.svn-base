@@ -1,0 +1,61 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class ContactTabbedPage : TabbedPage, IMissedCounterListener
+    {
+        public ContactTabbedPage()
+        {
+            InitializeComponent();
+#if WINDOWS_UWP
+            ScaleX = 1.05;
+#endif
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            Console.WriteLine("omer40: " + "on ContactTabbedPage appearing");
+            var cl = CallLogService.Instance;
+            onCallCounterchanged(cl.missedCallcounter);
+            cl.missedCounterListener2 = this;
+
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+        }
+
+        public void onCallCounterchanged(int counter)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (counter > 0)
+                    Children[1].Title = (string)Application.Current.Resources["recent"] + "(" + counter + ")";
+                else
+                    Children[1].Title = (string)Application.Current.Resources["recent"];
+            });
+        }
+
+        public void onMessageCounterchanged(int counter)
+        {
+
+        }
+
+        public void onVMCounterChanged(int counter)
+        {
+
+        }
+    }
+}

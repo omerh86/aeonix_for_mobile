@@ -1,0 +1,103 @@
+﻿using Android.Net.Wifi;
+using Linphone;
+using LinphoneXamarin.Services;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using Xamarin.Essentials;
+
+namespace LinphoneXamarin.Util
+{
+    class LocationHelper
+    {
+
+        public static async Task<EmergencyLocator> getCurrentLocationAsync()
+        {
+            var emergencyLocator = new EmergencyLocator(-1, -1, getBestWifiSignal());
+            try
+            {
+                // var request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(2));
+
+                var location = await Geolocation.GetLocationAsync();
+
+                if (location != null)
+                {
+                    emergencyLocator.lat = location.Latitude;
+                    emergencyLocator.lon = location.Longitude;
+                    Console.WriteLine($"omer45545: Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}");
+                }
+            }
+            catch (FeatureNotSupportedException fnsEx)
+            {
+                Console.WriteLine("omer45545: FeatureNotSupportedException");
+                // Handle not supported on device exception
+            }
+            catch (FeatureNotEnabledException fneEx)
+            {
+                // Handle not enabled on device exception
+                Console.WriteLine("omer45545: FeatureNotEnabledException");
+            }
+            catch (PermissionException pEx)
+            {
+                // Handle permission exception
+                Console.WriteLine("omer45545: PermissionException");
+            }
+            catch (Exception ex)
+            {
+                // Unable to get location
+                Console.WriteLine($"omer45545: Exception: {ex.ToString()}");
+            }
+            return emergencyLocator;
+        }
+
+        public static string[] getBestWifiSignal()
+        {
+            var wifiMgr = (WifiManager)Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity.GetSystemService("wifi");
+            var wifiList = wifiMgr.ScanResults;
+            string[] bssid = new string[3];
+            for (var i = 0; i < 3; i++)
+            {
+                if (wifiList.Count > i && wifiList[i] != null)
+                    bssid[i] = wifiList[i].Bssid;
+            }
+
+            return bssid;
+        }
+
+        public static void addLocationHeaders(CallParams cp, EmergencyLocator emergencyLocator)
+        {
+            try
+            {
+                var location = $"<lat={emergencyLocator.lat} lon={emergencyLocator.lon}>";
+                cp.AddCustomHeader("Geolocation", location);
+                var bssid = "";
+                foreach (var b in emergencyLocator.bssid)
+                    bssid += $"{b};";
+                cp.AddCustomHeader("WifiBsSid", bssid);
+            }
+            catch (Exception e)
+            {
+                MyFileSystem.Instance.writeDebug($"{e.ToString()}", "getBestWifiSignal");
+            }
+        }
+
+        public static bool IsEmergencyCall(string address)
+        {
+            return SharedData.Instance.emergencyNumbers.FindIndex(i => i.Equals(address)) > -1;
+        }
+
+        public struct EmergencyLocator
+        {
+            public double lat, lon;
+            public string[] bssid;
+
+            public EmergencyLocator(double lat, double lon, string[] bssid)
+            {
+                this.lat = lat;
+                this.lon = lon;
+                this.bssid = bssid;
+            }
+        }
+    }
+}

@@ -1,0 +1,1000 @@
+﻿using ICSharpCode.SharpZipLib.Zip;
+using LinphoneXamarin.Entities;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using Xamarin.Forms;
+
+using System.Runtime.CompilerServices;
+using System.Reflection;
+using LinphoneXamarin.components;
+using LinphoneXamarin.Services;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+#if ANDROID
+using Android.Content;
+using Android.Preferences;
+using System.Security.AccessControl;
+using System.Security.Principal;
+#elif __IOS__
+using Foundation;
+#endif
+namespace LinphoneXamarin.Util
+{
+    public sealed class MyFileSystem
+    {
+
+        private static MyFileSystem instance = null;
+        private static readonly object padlock = new object();
+
+        private Object fileLock = new Object();
+
+        private static long MAX_LOG_SIZE = 5000000; //max log size is 5M 
+        public readonly string LATEST_ANX_FILE_NAME = "anxTouch.log";
+        private readonly string PREVIOUS_ANX_FILE_NAME = "anxTouch_prev.log";
+        public readonly string ZIP_ANX_FILE_NAME = "anxTouch.zip";
+#if WINDOWS_UWP
+        public readonly string ANX_LOG_PATH = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\AeonixTouchLogs";
+        public readonly string ANX_LOG_PATH_COPY = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\AeonixTouchLogsCopy";
+        public readonly string ANX_ZIP_PATH = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\AeonixTouchZip";
+#else
+        public readonly string ANX_LOG_PATH = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AeonixTouchLogs");
+        public readonly string ANX_ZIP_PATH = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AeonixTouchZip");
+#endif
+
+
+        public readonly string LOGS_PATH = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        private readonly string LOGIN_CARDENTIAL_TR87 = "LoginCardentialTr87.txt";
+        private readonly string LOGIN_CARDENTIAL_AEONIX = "LoginCardentialAeonix.txt";
+
+        MyFileSystem()
+        {
+#if __IOS__
+           SetDirProtection(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), false);
+            SetDirProtection(ANX_LOG_PATH, false);
+            SetDirProtection(ANX_LOG_PATH, false);
+#endif
+            setDirectory(ANX_LOG_PATH);
+            setDirectory(ANX_ZIP_PATH);
+            handleAnxTouchLogFile();
+        }
+        public static MyFileSystem Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new MyFileSystem();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+#if __IOS__
+        public void SetDirProtection(string dir, bool completeProtection = true)
+        {
+            NSMutableDictionary dict = new NSMutableDictionary();
+            var protection = new NSString((completeProtection ? "NSFileProtectionCompleteUnlessOpen" : "NSFileProtectionNone"));
+
+            dict.Add((new NSString("NSFileProtectionKey") as NSObject), (protection as NSObject));
+            NSError error;
+            var files = NSFileManager.DefaultManager.GetDirectoryContent(dir, out error);
+            if (files != null)
+            {
+                foreach (var s in files)
+                {
+                    NSFileManager.DefaultManager.SetAttributes(dict, Path.Combine(dir, s), out error);
+                }
+            }
+            if (error != null)
+                Console.WriteLine("SetFileProtection Error: " + error.Description);
+        }
+
+#endif
+        public void writeDebug(string message, string threadName)
+        {
+            writeLog("DEBUG", threadName, message, null);
+        }
+
+        public void writeInfo(string message, string threadName)
+        {
+            writeLog("INFO", threadName, message, null);
+        }
+
+        public void writeWarning(string message, string threadName)
+        {
+            writeLog("WARN", threadName, message, null);
+        }
+
+        public void writeError(string message, string exception, string threadName)
+        {
+            writeLog("ERROR", threadName, message, exception);
+        }
+
+
+        public void writeFatal(string message, string exception, string threadName)
+        {
+            writeLog("FATAL", threadName, message, exception);
+        }
+
+        public void writeLog(string logLevel, string threadName, string message)
+        {
+            string level = "debug";
+
+            if (logLevel != null)
+                level = logLevel.ToLower();
+
+            switch (level)
+            {
+                case "fatal":
+                    writeFatal(message, null, threadName);
+                    break;
+
+                case "error":
+                case "err":
+                    writeError(message, null, threadName);
+                    break;
+
+                case "warning":
+                case "warn":
+                    writeWarning(message, threadName);
+                    break;
+
+                case "info":
+                    writeInfo(message, threadName);
+                    break;
+
+                default:
+                    writeDebug(message, threadName);
+                    break;
+            }
+        }
+
+        private void writeLog(string logLevel, string threadName, string message, string exception)
+        {
+            // Task.Run(() => doWriteLog(logLevel, threadName, message, exception));
+            doWriteLog(logLevel, threadName, message, exception);
+        }
+
+        private void doWriteLog(string logLevel, string threadName, string message, string exception)
+        {
+            try
+            {
+                //The implemetation of anxTouch.log - all the current rows are written to anxTouch, when the log is full (go to MAX_LOG_SIZE)
+                //the log will replace the anxTouch_previous.log and anxTouch.log will be clread and start written to it from the begining of the file
+                string currentFileName = Path.Combine(ANX_LOG_PATH, LATEST_ANX_FILE_NAME);
+                //In order to able view the anxTouch.log with chainsaw the line format should be 
+                //logLevel | 2018-08-16 09:39:43,067 | Thread name | Component (NDC) | class name | message
+                string str = logLevel.ToUpper() + " | " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff") + " | " + threadName + " |  |  | " + message + ((exception != null) ? exception : "");
+
+                if (File.Exists(currentFileName))
+                    File.AppendAllText(currentFileName, str + "\n\r");
+                else
+                    File.WriteAllText(currentFileName, str + "\n\r");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("omer:" + e);
+            }
+        }
+
+        public string readLog()
+        {
+            string fileName = Path.Combine(ANX_LOG_PATH, LATEST_ANX_FILE_NAME);
+
+            if (File.Exists(fileName))
+                return File.ReadAllText(fileName);
+            else
+                return null;
+
+        }
+
+        public string getInitFilePath()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "initfile");
+            if (!File.Exists(fileName))
+                return null;
+            else
+                return fileName;
+        }
+
+        public void saveInitFile(string ep)
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "initfile");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\initfile";
+#endif
+            File.WriteAllText(fileName, ep);
+        }
+
+
+        public void saveEP(string ep)
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "endPoint");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\endPoint";
+#endif
+            File.WriteAllText(fileName, ep);
+        }
+
+        public string loadEP()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "endPoint");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\endPoint";
+#endif
+            if (!File.Exists(fileName))
+                return null;
+
+            return File.ReadAllText(fileName);
+
+        }
+
+        public void saveIsCollaborateAllowed(bool isCollaborateAllowed)
+        {
+            Console.WriteLine($"saveCollaborateAllowed: {isCollaborateAllowed}");
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "isCollaborateAllowed");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\isCollaborateAllowed";
+#endif
+            File.WriteAllText(fileName, isCollaborateAllowed.ToString());
+        }
+
+        public bool loadIsCollaborateAllowed()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "isCollaborateAllowed");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\isCollaborateAllowed";
+#endif
+            if (!File.Exists(fileName))
+                return false;
+
+            var s = File.ReadAllText(fileName);
+            var result = Boolean.TryParse(s, out bool j);
+            Console.WriteLine($"loadIsCollaborateAllowed: {j}");
+            return j;
+        }
+
+        public void saveVMID(string id)
+        {
+            Console.WriteLine("omer595: saveVMID() " + id);
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VMId");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\VMId";
+#endif
+            File.WriteAllText(fileName, id);
+        }
+
+        public string loadVMID()
+        {
+            try
+            {
+                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VMId");
+#if WINDOWS_UWP
+                fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\VMId";
+#endif
+                if (!File.Exists(fileName))
+                    return null;
+                var s = File.ReadAllText(fileName);
+                return s;
+            }
+            catch (Exception e)
+            {
+                return null;
+                writeDebug(e.ToString(), "File_System");
+            }
+        }
+
+        public void saveVMCounter(int counter)
+        {
+            Console.WriteLine("omer595: saveVMCounter() " + counter);
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VMCounter");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\VMCounter";
+#endif
+            File.WriteAllText(fileName, counter.ToString());
+        }
+
+        public int loadVMCounter()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VMCounter");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\VMCounter";
+#endif
+            if (!File.Exists(fileName))
+                return 0;
+            var s = File.ReadAllText(fileName);
+            return int.Parse(s);
+
+        }
+
+        public void saveNotificationTokens(NotificationTokens tokens)
+        {
+            try
+            {
+                string s = "";
+                if (tokens != null)
+                {
+                    s = objToJson<NotificationTokens>(tokens);
+                }
+                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "notificationTokens");
+                File.WriteAllText(fileName, s);
+            }
+            catch (Exception e)
+            {
+                writeDebug(e.ToString(), "FileSystem");
+            }
+        }
+
+        public NotificationTokens loadNotificationTokens()
+        {
+            try
+            {
+                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "notificationTokens");
+                if (!File.Exists(fileName))
+                {
+                    return null;
+                }
+                string s = File.ReadAllText(fileName);
+                if (s != null && s != "")
+                {
+                    NotificationTokens result = jsonToObj<NotificationTokens>(s);
+                    return result;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                writeDebug(e.ToString(), "FileSystem");
+                return null;
+            }
+        }
+
+        public void saveSettings(MySettings settings)
+        {
+            string s = "";
+            if (settings != null)
+            {
+                s = objToJson<MySettings>(settings);
+            }
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_settings");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_settings";
+#endif
+            File.WriteAllText(fileName, s);
+
+#if ANDROID
+            ISharedPreferences prefs = PreferenceManager.GetDefaultSharedPreferences(Plugin.CurrentActivity.CrossCurrentActivity.Current.AppContext);
+            ISharedPreferencesEditor editor = prefs.Edit();
+            editor.PutString("lang", settings.lang.ToString());
+            editor.PutBoolean("isMessageSound", settings.isMessageSound);
+            editor.Apply();
+#endif
+
+        }
+
+        public MySettings loadSettings()
+        {
+            try
+            {
+                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_settings");
+
+#if WINDOWS_UWP
+                fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_settings";
+#endif
+                if (!File.Exists(fileName))
+                {
+                    return null;
+                }
+
+                string s = File.ReadAllText(fileName);
+                if (s != null && s != "")
+                {
+                    MySettings result = jsonToObj<MySettings>(s);
+                    return result;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+
+                return null;
+            }
+
+        }
+
+        public void saveCallLogs(List<BaseContact> callLogs)
+        {
+            string s = "";
+            if (callLogs != null)
+            {
+                s = objToJson<List<BaseContact>>(callLogs);
+            }
+
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_calllogs");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_calllogs";
+#endif
+            File.WriteAllText(fileName, s);
+        }
+
+        public List<BaseContact> loadCallLogs()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_calllogs");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_calllogs";
+#endif
+            if (!File.Exists(fileName))
+            {
+                return null;
+            }
+            string s = File.ReadAllText(fileName);
+            if (s != null && s != "")
+            {
+                List<BaseContact> result = jsonToObj<List<BaseContact>>(s);
+                return result;
+            }
+            return null;
+        }
+
+        public void saveSpeedials(List<SpeedDial> speedDials)
+        {
+            string s = "";
+            if (speedDials != null)
+            {
+                s = objToJson<List<SpeedDial>>(speedDials);
+            }
+
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_speedDials");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_calllogs";
+#endif
+            File.WriteAllText(fileName, s);
+        }
+
+        public List<SpeedDial> loadSpeedials()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_speedDials");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_calllogs";
+#endif
+            if (!File.Exists(fileName))
+            {
+                return null;
+            }
+            string s = File.ReadAllText(fileName);
+            if (s != null && s != "")
+            {
+                List<SpeedDial> result = jsonToObj<List<SpeedDial>>(s);
+                return result;
+            }
+            return null;
+        }
+
+        public void saveContacts(List<BaseContact> contacts)
+        {
+            string s = "";
+            string fileName = "";
+
+            if (contacts != null)
+            {
+                s = objToJson(contacts);
+            }
+
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_contacts";
+            File.WriteAllTextAsync(fileName, s);
+#else
+            fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_contacts");
+            File.WriteAllText(fileName, s);
+#endif
+        }
+
+        public List<BaseContact> loadContacts()
+        {
+            try
+            {
+                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_contacts");
+#if WINDOWS_UWP
+                fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_contacts";
+#endif
+                if (!File.Exists(fileName))
+                {
+                    return null;
+                }
+                string s = File.ReadAllText(fileName);
+                if (s != null && s != "")
+                {
+                    List<BaseContact> result = jsonToObj<List<BaseContact>>(s);
+                    return result;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                writeDebug("error: " + e, "FileSystem");
+                return null;
+            }
+
+        }
+
+        public void saveExternalContacts(Dictionary<string, string> extContacts)
+        {
+            string s = "";
+            string fileName = "";
+
+            if (extContacts != null)
+            {
+                s = objToJson(extContacts);
+            }
+
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_contacts";
+            File.WriteAllTextAsync(fileName, s);
+#else
+            fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "extenal_Contacts");
+            File.WriteAllText(fileName, s);
+#endif
+        }
+
+        public Dictionary<string, string> loadExternalContacts()
+        {
+            try
+            {
+                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "extenal_Contacts");
+#if WINDOWS_UWP
+                fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_contacts";
+#endif
+                if (!File.Exists(fileName))
+                {
+                    return null;
+                }
+                string s = File.ReadAllText(fileName);
+                if (s != null && s != "")
+                {
+                    Dictionary<string, string> result = jsonToObj<Dictionary<string, string>>(s);
+                    return result;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                writeDebug("error: " + e, "FileSystem");
+                return null;
+            }
+
+        }
+
+        public void saveMyContact(BaseContact contact)
+        {
+            try
+            {
+                string s = "";
+                if (contact != null)
+                {
+                    s = objToJson<BaseContact>(contact);
+                }
+
+                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_contact");
+#if WINDOWS_UWP
+                fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_contact";
+#endif
+                File.WriteAllText(fileName, s);
+            }
+            catch (Exception e)
+            {
+                writeDebug("error: " + e, "FileSystem");
+            }
+        }
+
+        public BaseContact loadMyContact()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "my_contact");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\my_contact";
+#endif
+            if (!File.Exists(fileName))
+            {
+                return null;
+            }
+            string s = File.ReadAllText(fileName);
+            if (s != null && s != "")
+            {
+                BaseContact result = jsonToObj<BaseContact>(s);
+                return result;
+            }
+            return null;
+        }
+
+        public void saveLoginCardential(LoginInfo loginInfo, CardentialState cardentialState)
+        {
+            string s = "";
+            if (loginInfo != null)
+            {
+                s = objToJson<LoginInfo>(loginInfo);
+            }
+
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), cardentialState == CardentialState.TR87 ? LOGIN_CARDENTIAL_TR87 : LOGIN_CARDENTIAL_AEONIX);
+#if WINDOWS_UWP
+            var x = cardentialState == CardentialState.TR87 ? LOGIN_CARDENTIAL_TR87 : LOGIN_CARDENTIAL_AEONIX;
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + x;
+#endif
+            File.WriteAllText(fileName, s);
+        }
+
+        public LoginInfo loadLoginCardential(CardentialState cardentialState)
+        {
+            try
+            {
+                string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), cardentialState == CardentialState.TR87 ? LOGIN_CARDENTIAL_TR87 : LOGIN_CARDENTIAL_AEONIX);
+#if WINDOWS_UWP
+                var x = cardentialState == CardentialState.TR87 ? LOGIN_CARDENTIAL_TR87 : LOGIN_CARDENTIAL_AEONIX;
+                fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + x;
+#endif
+
+                if (!File.Exists(fileName))
+                {
+                    return null;
+                }
+                string s = File.ReadAllText(fileName);
+                if (s != null && s != "")
+                {
+                    LoginInfo loginInfo = jsonToObj<LoginInfo>(s);
+                    return loginInfo;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                writeDebug(e.ToString(), "File_System");
+                return null;
+            }
+        }
+
+        public void deleteUserIdImage(List<string> userNames)
+        {
+            string fileName = "";
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            foreach (var i in userNames)
+            {
+#if WINDOWS_UWP
+                fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + i + ".txt";
+#else
+                fileName = Path.Combine(path, i + ".txt");
+#endif
+                if (File.Exists(fileName))
+                    File.Delete(fileName);
+
+            }
+        }
+
+        public void saveUserIdImage(string userName, string imgContent)
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string fileName = Path.Combine(path, userName + ".txt");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + userName + ".txt";
+#endif
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+            File.WriteAllText(fileName, imgContent);
+        }
+
+        public ImageSource loadUserIdImage(string userName)
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string fileName = Path.Combine(path, userName + ".txt");
+#if WINDOWS_UWP
+            fileName = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\" + userName + ".txt";
+#endif
+            if (!File.Exists(fileName))
+            {
+                return null;
+            }
+            string s = File.ReadAllText(fileName);
+            if (s != null && s != "")
+            {
+                return (ImageSource.FromStream(
+            () => new MemoryStream(Convert.FromBase64String(s))));
+            }
+            return null;
+        }
+
+        public void saveAudioVmMessage(string vmID, string vmAudioContent)
+        {
+            Console.WriteLine($"omer444: saveAudioVmMessage(): {vmID}");
+            clearRedundancyAudioVmMessages();
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string fileName = Path.Combine(path, $"VMAudio{vmID}.wav");
+#if WINDOWS_UWP
+            fileName = $"{Windows.Storage.ApplicationData.Current.LocalFolder.Path}\\VMAudio{vmID}.txt";
+#endif
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+            File.WriteAllBytes(fileName, Convert.FromBase64String(vmAudioContent));
+        }
+
+        public string getAudioVmMessageFilePath(string vmID)
+        {
+            Console.WriteLine($"omer444: saveAudioVmMessage(): {vmID}");
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            return Path.Combine(path, $"VMAudio{vmID}.wav");
+        }
+
+        private void clearRedundancyAudioVmMessages()
+        {
+            Console.WriteLine($"omer444: clearRedundancyAudioVmMessages");
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var result = Directory.GetFiles(path, "*.wav");
+            Console.WriteLine($"omer444: numbers of saves vmmessages: {result.Length}");
+            if (result.Length > 15)
+            {
+                foreach (var i in result)
+                {
+                    Console.WriteLine($"omer444: deleteAudioVmMessage(): {i}");
+                    File.Delete(i);
+                }
+                var result2 = Directory.GetFiles(path, "*.wav");
+                Console.WriteLine($"omer444: numbers of saves vmmessages: {result2.Length}");
+            }
+
+        }
+
+        public void deleteAudioVmMessage(string vmID)
+        {
+            Console.WriteLine($"omer444: deleteAudioVmMessage(): {vmID}");
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string fileName = Path.Combine(path, $"VMAudio{vmID}.wav");
+#if WINDOWS_UWP
+            fileName = $"{Windows.Storage.ApplicationData.Current.LocalFolder.Path}\\VMAudio{vmID}.txt";
+#endif
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+        }
+
+        public Stream loadAudioVmMessage(string vmID)
+        {
+            Console.WriteLine($"omer444: loadAudioVmMessage(): {vmID}");
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string fileName = Path.Combine(path, $"VMAudio{vmID}.wav");
+#if WINDOWS_UWP
+            fileName = $"{Windows.Storage.ApplicationData.Current.LocalFolder.Path}\\VMAudio{vmID}.txt";
+#endif
+            if (!File.Exists(fileName))
+            {
+                return null;
+            }
+            return new MemoryStream(File.ReadAllBytes(fileName));
+        }
+
+        private void handleAnxTouchLogFile()
+        {
+            string currentFileName = Path.Combine(ANX_LOG_PATH, LATEST_ANX_FILE_NAME);
+            if (!Directory.Exists(ANX_LOG_PATH))
+                Directory.CreateDirectory(ANX_LOG_PATH);
+
+            if (File.Exists(currentFileName))
+            {
+                if ((File.ReadAllText(currentFileName).Length) >= MAX_LOG_SIZE)
+                {
+                    string prevFileName = Path.Combine(ANX_LOG_PATH, PREVIOUS_ANX_FILE_NAME);
+                    if (File.Exists(prevFileName))
+                        File.Delete(prevFileName);
+
+                    File.Copy(currentFileName, prevFileName);
+                    File.Delete(currentFileName);
+
+                }
+            }
+
+        }
+
+        public T jsonToObj<T>(string val)
+        {
+            T loginInfo = JsonConvert.DeserializeObject<T>(val);
+            return loginInfo;
+        }
+
+        public string objToJson<T>(T obj)
+        {
+            string res = JsonConvert.SerializeObject(obj);
+            return res;
+        }
+
+        public byte[] Decompress(byte[] data)
+        {
+            using (var compressedStream = new MemoryStream(data))
+            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+            using (var resultStream = new MemoryStream())
+            {
+                zipStream.CopyTo(resultStream);
+                return resultStream.ToArray();
+            }
+        }
+
+        public byte[] compress(byte[] data)
+        {
+            using (var compressedStream = new MemoryStream())
+            using (var zipStream = new GZipStream(compressedStream, CompressionMode.Compress))
+            {
+                zipStream.Write(data, 0, data.Length);
+                zipStream.Close();
+                return compressedStream.ToArray();
+            }
+        }
+
+        //The method get the path to put the zip file and return Path+fileName.zip in Android it return /storage/emulated/0/Download/anxTouch.zip  
+        public string CompressATouchLogs()
+        {
+            try
+            {
+                //The anxTouch.zip file will include anxTouch.log & anxTouch_prev.log
+                var path = "";
+#if WINDOWS_UWP
+                Directory.CreateDirectory(ANX_ZIP_PATH);
+                DirectoryCopy(ANX_LOG_PATH, ANX_LOG_PATH_COPY, false);
+                path = ANX_ZIP_PATH;
+#endif
+
+#if __IOS__ || ANDROID
+                path = ANX_ZIP_PATH;
+#endif
+                string zipFileName = Path.Combine(path, ZIP_ANX_FILE_NAME);
+                lock (fileLock)
+                {
+#if WINDOWS_UWP
+                    compress(zipFileName, ANX_LOG_PATH_COPY, true, "");
+#else
+                    compress(zipFileName, ANX_LOG_PATH, true, "");
+#endif
+                }
+                if (File.Exists(zipFileName))
+                {
+                    //Console.WriteLine("MeravMerav - Succeeded compress files to path = " + zipFileName + "\n");
+                    return zipFileName;
+                }
+                else
+                {
+                    Console.WriteLine("Failed to compress files to path = " + zipFileName);
+                    writeInfo("inside Compress(...) method - failed to create " + zipFileName, "File_System");
+                    return null;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                writeDebug(e.ToString(), "File_System");
+                return null;
+            }
+        }
+
+        public void compress(string zipFileName, string sourceDirectory, bool recurse, string fileFilter)
+        {
+            try
+            {
+                FastZip fz = new FastZip();
+                fz.CreateZip(zipFileName, sourceDirectory, recurse, fileFilter);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                writeDebug(e.ToString(), "File_System");
+            }
+        }
+
+        public void setDirectory(string directoryName)
+        {
+#if WINDOWS_UWP
+            var localRoot = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
+            DirectoryInfo d = new DirectoryInfo(directoryName);
+            if (!d.Exists)
+                d.Create();
+#else
+            if (!(Directory.Exists(directoryName)))
+                Directory.CreateDirectory(directoryName);
+#endif
+
+        }
+
+        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            // If the destination directory doesn't exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, true);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location.
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
+            }
+        }
+
+        public ResourceDictionary getResourceDictionary(Language lang)
+        {
+            var fileName = "";
+            switch (lang)
+            {
+                case Language.HEBREW:
+                    fileName = "Resources.he.txt";
+                    break;
+                case Language.ENGLISH:
+                    fileName = "Resources.en.txt";
+                    break;
+                case Language.SPANISH:
+                    fileName = "Resources.sp.txt";
+                    break;
+                case Language.PORTUGUESE:
+                    fileName = "Resources.pt.txt";
+                    break;
+                case Language.CHINESE:
+                    fileName = "Resources.ch.txt";
+                    break;
+            }
+
+            var resourcePrefix = "LinphoneXamarin.UWP.";
+
+#if __IOS__
+ resourcePrefix = "LinphoneXamarin.";
+#endif
+#if ANDROID
+            resourcePrefix = "LinphoneXamarin.Android.";
+#endif
+#if WINDOWS_UWP
+            resourcePrefix = "UWP.";
+#endif
+
+            // note that the prefix includes the trailing period '.' that is required
+            var assembly = IntrospectionExtensions.GetTypeInfo(typeof(contactDetail)).Assembly;
+            var x = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            Stream stream = assembly.GetManifestResourceStream
+                (resourcePrefix + fileName);
+            string text = "";
+            using (var reader = new System.IO.StreamReader(stream))
+            {
+                text = reader.ReadToEnd();
+
+            }
+            Console.WriteLine("omer456: getResourceDictionary() " + text);
+            return jsonToObj<ResourceDictionary>(text);
+        }
+    }
+
+}
+

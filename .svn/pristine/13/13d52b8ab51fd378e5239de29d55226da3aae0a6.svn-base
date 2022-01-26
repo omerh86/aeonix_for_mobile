@@ -1,0 +1,252 @@
+﻿
+#if WINDOWS_UWP
+using System;
+using System.Xml.Linq;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+
+using Microsoft.Toolkit.Uwp.Notifications;
+using Plugin.Toasts;
+using Windows.Data.Xml.Dom;
+using Windows.UI.Notifications;
+using Xamarin.Essentials;
+using Xamarin.Forms;
+
+
+namespace LinphoneXamarin.Util
+{
+    class AlertHelper
+    {
+        private static AlertHelper instance = null;
+        private static readonly object padlock = new object();
+
+        private ToastNotification toast;
+        ToastNotifier ToastNotifier;
+
+        AlertHelper()
+        {
+            ToastNotifier = ToastNotificationManager.CreateToastNotifier();
+        }
+        public static AlertHelper Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new AlertHelper();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public void updateCallLogBadge(int num)
+        {
+            if (num > 0)
+                doUpdateBadge(num.ToString(), true);
+            else
+                updatePresenceBadge();
+        }
+
+        public void updateMessageBadge()
+        {
+            if (!SharedData.Instance.isUWPForground)
+                doUpdateBadge("newMessage", false);
+        }
+
+        public void updateSuspandedBadge(bool isSuspended)
+        {
+            addLog("updateSuspandedBadge,isSuspended: " + isSuspended);
+            if (isSuspended)
+                doUpdateBadge("attention", false);
+            else
+                clearBadge();
+        }
+
+        public void updateInACallBadge(bool isInACall)
+        {
+            addLog("updateCallBadge, is in a call: " + isInACall);
+            if (isInACall)
+                doUpdateBadge("playing", false);
+            else
+                updatePresenceBadge();
+        }
+
+        public void updatePresenceBadge()
+        {
+            addLog("updatePresenceBadge()");
+            string badgeGlyphValue = "available";
+            var c = ContactService.Instance;
+            if (c.myContact != null)
+            {
+                Presence p = c.myContact.presenceStatus;
+                switch (p)
+                {
+                    case Presence.MEETING:
+                    case Presence.BUSY:
+                        badgeGlyphValue = "away";
+                        break;
+                    case Presence.DND:
+                        badgeGlyphValue = "busy";
+                        break;
+                }
+            }
+
+            doUpdateBadge(badgeGlyphValue, false);
+
+        }
+
+        private void doUpdateBadge(string badgeGlyphValue, bool isNumber)
+        {
+
+            // Get the blank badge XML payload for a badge glyph
+            XmlDocument badgeXml =
+                BadgeUpdateManager.GetTemplateContent(isNumber ? BadgeTemplateType.BadgeNumber : BadgeTemplateType.BadgeGlyph);
+
+            // Set the value of the badge in the XML to our glyph value
+            Windows.Data.Xml.Dom.XmlElement badgeElement =
+                badgeXml.SelectSingleNode("/badge") as XmlElement;
+            badgeElement.SetAttribute("value", badgeGlyphValue);
+
+            // Create the badge notification
+            BadgeNotification badge = new BadgeNotification(badgeXml);
+
+            // Create the badge updater for the application
+            BadgeUpdater badgeUpdater =
+                BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+
+            // And update the badge
+            badgeUpdater.Update(badge);
+        }
+
+        public void clearBadge()
+        {
+            BadgeUpdater badgeUpdater =
+              BadgeUpdateManager.CreateBadgeUpdaterForApplication();
+
+            // And update the badge
+            badgeUpdater.Clear();
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "Alert Helper");
+            Console.WriteLine("omer222: " + message);
+        }
+
+
+        public void ShowUwpMessage(string title)
+        {
+            if (!SharedData.Instance.isUWPForground)
+            {
+                addLog("ShowUwpMessage: " + title);
+                if (ToastNotifier == null)
+                    ToastNotifier = ToastNotificationManager.CreateToastNotifier();
+
+                var xDoc = new XDocument(
+          new XElement("toast",
+       new XAttribute("duration", "short"),
+                    new XElement("visual",
+          new XElement("binding", new XAttribute("template", "ToastGeneric"),
+          new XElement("text", title)
+        )
+        )
+        )
+        );
+                var xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(xDoc.ToString());
+                toast = new ToastNotification(xmlDoc);
+                toast.Priority = ToastNotificationPriority.High;
+                ToastNotifier.Show(toast);
+            }
+        }
+
+        public void ShowUwpIncomingToast(string title)
+        {
+            addLog("ShowUwpIncomingToast1");
+
+            if (!SharedData.Instance.isUWPForground)
+            {
+
+                addLog("doShowUwpIncomingToast");
+                if (ToastNotifier == null)
+                    ToastNotifier = ToastNotificationManager.CreateToastNotifier();
+
+                var xDoc = new XDocument(
+      new XElement("toast",
+      new XAttribute("scenario", "IncomingCall"),
+                //new XAttribute("duration", "long"),
+                new XElement("visual",
+      new XElement("binding", new XAttribute("template", "ToastGeneric"),
+      new XElement("text", title)
+
+
+
+    )
+    ),// actions  
+    new XElement("actions",
+   new XElement("action", new XAttribute("activationType", "protocol"), new XAttribute("content", "decline"), new XAttribute("arguments", "dismiss"), new XAttribute("imageUri", "endcall.png")),
+    new XElement("action", new XAttribute("activationType", "foreground"), new XAttribute("content", "answer"), new XAttribute("arguments", "yes"), new XAttribute("imageUri", "answercall.png"))
+    )
+    )
+    );
+
+                var xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(xDoc.ToString());
+
+                toast = new ToastNotification(xmlDoc);
+                // toast.ExpirationTime = DateTime.Now.AddMilliseconds(20 * 1000);
+                toast.Priority = ToastNotificationPriority.High;
+                toast.Dismissed += Toast_Dismissed;
+                ToastNotifier.Show(toast);
+
+            }
+
+        }
+
+        public void updateUwpIncomingToast()
+        {
+            if (toast != null && ToastNotifier != null)
+            {
+                ToastNotifier.Hide(toast);
+            }
+            ShowUwpMessage("Multiple Incoming Calls!");
+        }
+
+        private void Toast_Dismissed(ToastNotification sender, ToastDismissedEventArgs args)
+        {
+            addLog("Toast_Dismissed: " + args.Reason);
+            toast = null;
+            if (args.Reason == ToastDismissalReason.UserCanceled)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    CallService.Instance.terminateCall();
+                });
+
+            }
+        }
+
+        public void removeUWPToastNotification()
+        {
+
+            addLog("removeUWPToastNotification");
+            try
+            {
+                if (ToastNotifier == null)
+                    ToastNotifier = ToastNotificationManager.CreateToastNotifier();
+                if (toast != null)
+                    ToastNotifier.Hide(toast);
+            }
+            catch (Exception e)
+            {
+                addLog("err: " + e);
+            }
+
+
+        }
+    }
+}
+#endif

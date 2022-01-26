@@ -1,0 +1,47 @@
+package crc64ef98f2062aecbcb3;
+
+
+public class MediaBtnReciever
+	extends android.content.BroadcastReceiver
+	implements
+		mono.android.IGCUserPeer
+{
+/** @hide */
+	public static final String __md_methods;
+	static {
+		__md_methods = 
+			"n_onReceive:(Landroid/content/Context;Landroid/content/Intent;)V:GetOnReceive_Landroid_content_Context_Landroid_content_Intent_Handler\n" +
+			"";
+		mono.android.Runtime.register ("LinphoneXamarin.Android.MediaBtnReciever, LinphoneXamarin.Android", MediaBtnReciever.class, __md_methods);
+	}
+
+
+	public MediaBtnReciever ()
+	{
+		super ();
+		if (getClass () == MediaBtnReciever.class)
+			mono.android.TypeManager.Activate ("LinphoneXamarin.Android.MediaBtnReciever, LinphoneXamarin.Android", "", this, new java.lang.Object[] {  });
+	}
+
+
+	public void onReceive (android.content.Context p0, android.content.Intent p1)
+	{
+		n_onReceive (p0, p1);
+	}
+
+	private native void n_onReceive (android.content.Context p0, android.content.Intent p1);
+
+	private java.util.ArrayList refList;
+	public void monodroidAddReference (java.lang.Object obj)
+	{
+		if (refList == null)
+			refList = new java.util.ArrayList ();
+		refList.add (obj);
+	}
+
+	public void monodroidClearReferences ()
+	{
+		if (refList != null)
+			refList.clear ();
+	}
+}

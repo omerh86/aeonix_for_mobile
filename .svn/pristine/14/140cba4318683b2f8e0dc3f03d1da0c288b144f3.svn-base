@@ -1,0 +1,253 @@
+﻿using System;
+using Linphone;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Xamarin.Forms;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+using System.Threading.Tasks;
+
+namespace LinphoneXamarin.Entities
+{
+    public interface LinphoneRegistrationListener
+    {
+        void onLinphoneStatusChanged(RegistrationState state, string message, ProxyConfig config);
+    }
+
+    public interface MyRegistrationListener
+    {
+        void onMyRegistrationStateChanged(MyRegistrationState state);
+    }
+
+    public interface MyInfoProcessListener
+    {
+        void onMyInfoStateChanged(MyInfoProcessState state);
+    }
+
+    public interface Tr87stateListener
+    {
+        void onTr87Invited();
+        void onTr87InviteFailed();
+        void onTr87Ended();
+        void onTr87ConnectionInfoResponse(InfoMessage infoMessage);
+    }
+
+    public interface LoginRegistrationListener
+    {
+        Task onLoginFailedAsync(LoginError loginError);
+        void onLoginSuccsses();
+        void onLoginLevelUp(int precent, MyRegistrationState registrationState);
+
+    }
+
+    public interface CallsListener
+    {
+        void onListUpdated(List<MyCall> list);
+        void onTransfered(List<MyCall> list);
+        void onEstablished(List<MyCall> list);
+        void onCurrentCallChanged(List<MyCall> list);
+    }
+
+    public interface FavListener
+    {
+        void onFavListChanged();
+        void onPresenceListChanged();
+    }
+
+    public interface CalllogListener
+    {
+        void onCallLogListChanged();
+        void onCallLogRequestError(InfoErr err);
+    }
+
+    public interface GroupListener
+    {
+        void onGroupListChanged();
+    }
+
+    public interface MyContactListener
+    {
+        void onMyInfoChanged(bool includeImage);
+    }
+
+    public interface ISDKContactListener
+    {
+        void onSDKContactArrived();
+    }
+
+    public interface CallViewInitiater
+    {
+        Task onInitiateCallViewAsync();
+        void onDestroyCallView();
+    }
+
+    public interface MyInfoListener
+    {
+        void onTr87subscribed();
+        void onTr87terminated();
+        void onInfoResponse(InfoMessage infoMessage);
+        void onInfoSubscribeResponse(string infoMessage);
+        void onInfoSubscribeEvent(string infoMessage);
+        void onInfoSubscribeMessage(string infoMessage);
+        void onFavPresenceSubscribeEvent(string infoMessage);
+        void onInfoFeatureButtonEvent(string infoMessage);
+        void onESFCommandEvent(string infoMessage);
+        void onStartCollaborationErr(string infoMessage);
+        void onOffercollaborationRequest(string infoMessage);
+        void onOffercollaborationStatus(string infoMessage);
+        void onCollaborationCancledResponse(string infoMessage);
+        void onMYContactPresenceChanged();
+    }
+
+
+    public interface MySearchListener
+    {
+        void onSearchResponse(List<Contact> contacts);
+        void onSearchResponse(Contact contact);
+    }
+
+    public interface MyImageListener
+    {
+        void onImageResponse(long imageSignature, string imageContent);
+    }
+
+    public interface MyInfoProccessListener
+    {
+        void onInfoProccessFinished();
+        void onImageProccessFinished();
+    }
+
+    public interface MyCallIdListener
+    {
+        void onNewCallId(string callId, string calledDeviceIdentifier, string alertedDeviceIdentifier, bool isEstablished);
+
+    }
+    public interface MyConferenceCallListener
+    {
+        void onConferenceEstablished(string conferenceCallId, List<string> oldCallIds, List<string> participate);
+        void onParticipateDroped(string callId, string alias);
+    }
+
+    public interface MYImMessagesListener
+    {
+        void onMessageRecieved(MyMessage myMessage, Destination d);
+        void onMessageRead(string myMessageId, bool isRead);
+        void onMessageIdRecieved(string messageId);
+        void onMessageSendErr(InfoErr err);
+        void onMessageDeleted();
+    }
+
+    public interface IMissedCounterListener
+    {
+        void onMessageCounterchanged(int counter);
+        void onCallCounterchanged(int counter);
+        void onVMCounterChanged(int counter);
+    }
+
+    public interface VideoListener
+    {
+        void setVideo(Call call);
+        void removeVideo();
+        void addIncomingCallComponent(string title);
+        void removeIncomingCallComponent();
+    }
+
+    public interface MySensorListener
+    {
+        void startProximity();
+        void stopProximity();
+    }
+
+    public interface UIVideoListener
+    {
+        Task onVideoStatusChangedAsync(bool isvideo);
+    }
+
+    public interface RingListener
+    {
+        void onRingSoundToggled(bool isRing);
+    }
+
+    public interface configGenerator
+    {
+        string onConfigNeeded();
+        string onConfigFactoryNeeded();
+    }
+
+    public interface callUtilHandler
+    {
+        void screenStatusHandler(bool shouldScrrenOn);
+        void inACallServiceHandler(bool shouldRun);
+    }
+
+    public interface lifeCycleHandler
+    {
+        void doDestroy();
+
+    }
+
+    public interface TransferEventListener
+    {
+        void onTransferEvent(myTransfer myTransfer);
+    }
+
+    public interface SubscribeEventListener
+    {
+        void onSubscribeStatechanged(bool isOn);
+    }
+
+    public interface HeldEventListener
+    {
+        void onHeld(string callId);
+        void onRetrieve(string callId);
+    }
+
+    public interface UIMessageListener
+    {
+        void onCallFailed(string reason);
+        void onInfoEvent(string title, string body, int duration, bool isCollab);
+    }
+
+    public interface MYAudioListener
+    {
+        void onAudioChanged(MYAudioState state);
+        void onBTConnectionFailed();
+        void onMuteChanged(bool isMute);
+    }
+
+    public interface SpeedDialListener
+    {
+        void onSpeedDialChanged(List<SpeedDial> speedDials);
+        void onSpeedDialStatusChanged(List<SpeedDial> speedDials);
+        void onActionComponentVisibilityChanged(bool isVisible);
+    }
+    public interface ISpeedDialAction
+    {
+        void onSpeedActionPressed();
+    }
+
+    public interface IContactService
+    {
+        Task<List<PhoneBookContact>> GetContactListAsync(Func<PhoneBookContact, bool> filter = null);
+        Task<IList<string>> GetDeletedContactIdListAsync(string timeStamp);
+        Task<IList<PhoneBookContact>> GetUpdateContactListAsync(string timeStamp);
+    }
+    public interface IAlertListener
+    {
+        Task DisplayCollabAlert(String title, String message, bool isYesNo, string link);
+    }
+    public interface IVMMessagesListener
+    {
+        void onVmMessageListChanged(List<MyVmMessage> VmMessages);
+        void onCommandResponed(int resultcode);
+        void onVMAudioMessageResponed(int errCode, string messageID, string audioContent);
+        void onBusy(int errCode);
+        void PlaybackEndedListener(object sender, EventArgs e);
+    }
+
+    public interface IExternalContactSyncListener
+    {
+        void onSuccessExternalContatctUploaded();
+        void onProgressExternalContatctUploaded(int chunkLeft);
+        void onFailExternalContatctUploaded();
+    }
+}

@@ -1,0 +1,340 @@
+using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+#if __IOS__
+using UIKit;
+#endif
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class speedDialPage : ContentPage, SpeedDialListener
+    {
+
+        double[] rows;
+        double[] cols;
+        int cellWidth;
+        int cellHeight;
+        int overlaycellPos = 0;
+        private DialSpeedService dialSpeedService;
+        public List<SpeedDial> SpeedDials { set; get; }
+
+        public speedDialPage()
+        {
+            InitializeComponent();
+            this.BindingContext = this;
+            dialSpeedService = DialSpeedService.Instance;
+            rows = new double[dialSpeedService.SPEED_DIALS_ROWS];
+            cols = new double[dialSpeedService.SPEED_DIALS_ROWS];
+            SpeedDials = DialSpeedService.Instance.SpeedDials;
+            dialSpeedService.speedDialListeners.Add(this);
+            populateGrid();
+#if ANDROID
+            cellWidth = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity.WindowManager.DefaultDisplay.Width / cols.Length;
+            cellHeight = (Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity.WindowManager.DefaultDisplay.Height) / rows.Length;
+#else
+            cellWidth = (int)UIScreen.MainScreen.Bounds.Width/ cols.Length;
+             cellHeight =(int)UIScreen.MainScreen.Bounds.Height/ rows.Length;
+            //cellHeight = (int)speedDialGrid.Height / cols.Length;
+            //cellWidth = (int)speedDialGrid.Width / rows.Length;
+#endif
+
+            for (var i = 0; i < cols.Length; i++)
+            {
+                cols[i] = (i + 1) * cellWidth * 0.9;
+                rows[i] = (i + 1) * cellHeight * 0.75;
+                addLog("col: " + rows[i] + ",row: " + rows[i]);
+            }
+
+#if __IOS__
+            abslayout.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() =>
+                {
+                    foreach (var i in speedDialGrid.Children)
+                    {
+                        try
+                        {
+                            var sdv = i as speedDialView;
+                            sdv.Edit = false;
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
+
+                    }
+                }),
+                NumberOfTapsRequired = 2
+            });
+#else
+            abslayout.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() =>
+                {
+                    foreach (var i in speedDialGrid.Children)
+                    {
+                        try
+                        {
+                            var sdv = i as speedDialView;
+                            sdv.Edit = false;
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
+
+                    }
+                })
+            });
+#endif
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+        }
+
+        private void populateGrid()
+        {
+            addLog("populateGrid()");
+            speedDialGrid.Children.Clear();
+            var row = 0;
+            var numberOfCells = rows.Length * cols.Length;
+            for (var i = 0; i < numberOfCells; i++)
+            {
+                if (i != 0 && i % cols.Length == 0)
+                {
+                    row++;
+                }
+#if WINDOWS_UWP
+                var cell = new speedDialView(i, SpeedDialType.None, FeatureButtonStatus.None, "", false, null, null, null, null);
+                cell.DragMode = DragMode.None;
+#else
+                var cell = new BoxView();
+
+#endif
+                cell.BackgroundColor = Color.White;
+                if (row == 0)
+                    cell.Margin = new Thickness(0, 0, 0, 15);
+
+                speedDialGrid.Children.Add(cell, i % cols.Length, row);
+            }
+
+            foreach (var i in SpeedDials)
+            {
+                var speeDialView = new speedDialView(i.position, i.Type, i.Status, i.Label, false, new Command<DragObj>(onDragEnd), new Command<int>(onShortPressed), new Command<int>(onEditPressed), new Command<DragObj>(onDragInProgress));
+                speeDialView.VerticalOptions = LayoutOptions.FillAndExpand;
+                speedDialGrid.Children.Add(speeDialView, i.position % cols.Length, (int)Math.Floor((double)i.position / rows.Length));
+            }
+        }
+
+        private int getColNumber(double x)
+        {
+            for (var i = 0; i < cols.Length; i++)
+            {
+                if (cols[i] > x)
+                {
+                    return i;
+                }
+            }
+            return -2;
+        }
+
+        private int getRowNumber(double y)
+        {
+            for (var i = 0; i < rows.Length; i++)
+            {
+                if (rows[i] > y)
+                {
+                    return i;
+                }
+            }
+            return -2;
+        }
+
+        void onDragEnd(DragObj dragObj)
+        {
+            addLog("onLongPressed");
+#if WINDOWS_UWP
+            var newSpeedDial = SpeedDials.Find(i => i.position == dragObj.coords[0]);
+            var existSpeedDial = SpeedDials.Find(i => i.position == dragObj.coords[1]);
+            if (newSpeedDial != null)
+                newSpeedDial.position = (int)dragObj.coords[1];
+            if (existSpeedDial != null)
+                existSpeedDial.position = (int)dragObj.coords[0];
+            dialSpeedService.uploadGrid();
+#else
+
+            //addLog("x: " + dragObj.coords[0]);
+            //addLog("y: " + dragObj.coords[1]);
+            var col = getColNumber(dragObj.coords[0]);
+            var row = getRowNumber(dragObj.coords[1]);
+            //addLog("col: " + col);
+            //addLog("row: " + row);
+            var pos = col + row * rows.Length;
+            //addLog("pos: " + pos);
+            if (pos > -1)
+            {
+                SpeedDial existSpeedDial = null;
+                SpeedDial newSpeedDial = null;
+                foreach (var i in SpeedDials)
+                {
+                    if (i.position == dragObj.position)
+                    {
+                        newSpeedDial = i;
+                    }
+                    if (i.position.Equals(pos))
+                    {
+                        existSpeedDial = i;
+                    }
+                }
+
+                if (newSpeedDial != null)
+                {
+                    if (existSpeedDial != null)
+                    {
+                        if (newSpeedDial.Equals(existSpeedDial))
+                        {
+                            speedDialGrid.Children[overlaycellPos].BackgroundColor = Color.White;
+                        }
+                        else
+                        {
+                            existSpeedDial.position = newSpeedDial.position;
+                            newSpeedDial.position = pos;
+                            dialSpeedService.uploadGrid();
+                        }
+                    }
+                    else
+                    {
+                        newSpeedDial.position = pos;
+                        dialSpeedService.uploadGrid();
+
+                    }
+                }
+            }
+#endif
+        }
+
+        void onShortPressed(int pos)
+        {
+            addLog("onShortPressed: " + pos);
+            var speedDial = SpeedDials.Find(i => i.position == pos);
+            if (speedDial != null)
+            {
+                speedDial.onSpeedActionPressed();
+            }
+        }
+
+        void onEditPressed(int pos)
+        {
+            addLog("onEditSpeedDialClicked: " + pos);
+            onEditSpeedDialClicked(pos);
+        }
+
+        void onDragInProgress(DragObj dragObj)
+        {
+            try
+            {
+                var col = getColNumber(dragObj.coords[0]);
+                var row = getRowNumber(dragObj.coords[1]);
+                var pos = col + row * rows.Length;
+                if (pos > -1)
+                {
+                    speedDialGrid.Children[overlaycellPos].BackgroundColor = Color.White;
+                    speedDialGrid.Children[pos].BackgroundColor = Color.FromHex("#F3E5AB");
+                    overlaycellPos = pos;
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        public void onAddSpeedDialClicked(object sender, EventArgs e)
+        {
+            var page = (Page)new speedDialEditorPage();
+            Navigation.PushAsync(page, false);
+        }
+
+        public void onEditSpeedDialClicked(int pos)
+        {
+            foreach (var i in SpeedDials)
+            {
+                if (i.position == pos)
+                {
+                    var page = (Page)new speedDialEditorPage(i);
+                    Navigation.PushAsync(page, false);
+                    return;
+                }
+            }
+
+        }
+
+        private void addLog(string s)
+        {
+            Console.WriteLine($"omer56: {s}");
+            MyFileSystem.Instance.writeDebug(s, "speedDialPage");
+        }
+
+        public void onSpeedDialChanged(List<SpeedDial> speedDials)
+        {
+            addLog("onSpeedDialChanged");
+            SpeedDials = speedDials;
+            populateGrid();
+
+        }
+
+        public void onSpeedDialStatusChanged(List<SpeedDial> speedDials)
+        {
+            addLog("onSpeedDialStatusChanged");
+            try
+            {
+                foreach (var i in speedDials)
+                {
+                    foreach (var k in speedDialGrid.Children)
+                    {
+                        if (k is speedDialView && ((speedDialView)k).position == i.position)
+                        {
+                            ((speedDialView)k).Status = i.Status;
+                        }
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                addLog(err.ToString());
+            }
+        }
+
+        public void onActionComponentVisibilityChanged(bool isVisible)
+        {
+
+        }
+
+        public struct DragObj
+        {
+            public float[] coords;
+            public int position;
+
+            public DragObj(float[] p, int position)
+            {
+                this.position = position;
+                this.coords = p;
+
+            }
+        }
+
+    }
+}

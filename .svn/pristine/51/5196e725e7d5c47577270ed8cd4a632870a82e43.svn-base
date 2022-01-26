@@ -1,0 +1,25 @@
+﻿[net]
+download_bw=0
+upload_bw=0
+enable_nat_helper=0
+adaptive_rate_control=0
+adaptive_rate_algorithm="basic"
+
+[sip]
+contact="Linphone Xamarin" <sip:linphone.xamarin@unknown-host>
+use_info=0
+use_ipv6=1
+keepalive_period=30000
+sip_port=-1
+sip_tcp_port=-1
+sip_tls_port=-1
+use_rport=0
+only_one_codec=1
+refresh_generic_subscribe=0
+
+[rtp]
+rtcp_enabled=0
+avpf=0
+
+[app]
+use_callkit=1

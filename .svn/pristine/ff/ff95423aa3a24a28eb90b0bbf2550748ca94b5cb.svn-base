@@ -1,0 +1,463 @@
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\Xamarin.Forms.4.6.0.772\build\Xamarin.Forms.props" Condition="Exists('..\..\packages\Xamarin.Forms.4.6.0.772\build\Xamarin.Forms.props')" />
+  <Import Project="..\LinphoneXamarin\LinphoneXamarin.projitems" Label="Shared" Condition="Exists('..\LinphoneXamarin\LinphoneXamarin.projitems')" />
+  <Import Project="..\..\packages\Xamarin.Build.Download.0.10.0\build\Xamarin.Build.Download.props" Condition="Exists('..\..\packages\Xamarin.Build.Download.0.10.0\build\Xamarin.Build.Download.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5DCDACFC-1F05-490B-8874-6425AB95BBBF}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>LinphoneXamarin</RootNamespace>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AssemblyName>LinphoneXamarin</AssemblyName>
+    <NuGetPackageImportStamp></NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>__IOS__;__MOBILE__;__UNIFIED__;DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <MtouchArch>i386, x86_64</MtouchArch>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchDebug>true</MtouchDebug>
+    <MtouchExtraArgs>--registrar:static</MtouchExtraArgs>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+    <CodesignKey>iPhone Developer: Gal Ben-Yair (JTY2EL7585)</CodesignKey>
+    <CodesignProvision>iOS Team Provisioning Profile: *</CodesignProvision>
+    <AssemblyName>Aeonix</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <DefineConstants>__IOS__;__MOBILE__;__UNIFIED__;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchLink>None</MtouchLink>
+    <MtouchArch>x86_64</MtouchArch>
+    <ConsolePause>false</ConsolePause>
+    <MtouchExtraArgs></MtouchExtraArgs>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <CodesignKey>iPhone Distribution</CodesignKey>
+    <AssemblyName>Aeonix</AssemblyName>
+    <CodesignProvision>AeonixTouch</CodesignProvision>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <MtouchArch>ARMv7, ARM64</MtouchArch>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchDebug>True</MtouchDebug>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <IOSDebugOverWiFi>False</IOSDebugOverWiFi>
+    <IOSDebuggerPort>10000</IOSDebuggerPort>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <MtouchExtraArgs></MtouchExtraArgs>
+    <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
+    <CodesignProvision>iOS Team Provisioning Profile: com.tadiran.aeonixtouch.ios</CodesignProvision>
+    <AssemblyName>LinphoneXamarin</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <DefineConstants>__IOS__;__MOBILE__;__UNIFIED__;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchArch>ARMv7, ARM64</MtouchArch>
+    <ConsolePause>false</ConsolePause>
+    <CodesignKey>iPhone Distribution</CodesignKey>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchExtraArgs></MtouchExtraArgs>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
+    <CodesignProvision>AeonixTouch</CodesignProvision>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\iPhone\Ad-Hoc</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <MtouchArch>ARMv7, ARM64</MtouchArch>
+    <BuildIpa>True</BuildIpa>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <MtouchExtraArgs></MtouchExtraArgs>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <MtouchLink>None</MtouchLink>
+    <MtouchFloat32>true</MtouchFloat32>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\iPhone\AppStore</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <MtouchArch>ARMv7, ARM64</MtouchArch>
+    <CodesignProvision>AeonixTouch</CodesignProvision>
+    <CodesignKey>iPhone Distribution</CodesignKey>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <MtouchExtraArgs></MtouchExtraArgs>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <MtouchLink>None</MtouchLink>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="AppDelegate.cs" />
+    <None Include="app.config" />
+    <None Include="Entitlements.plist" />
+    <None Include="Info.plist" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <BundleResource Include="Resources\fa-regular-400.ttf" />
+    <BundleResource Include="Resources\fa-brands-400.ttf" />
+    <BundleResource Include="Resources\fa-solid-900.ttf" />
+    <None Include="packages.config" />
+    <BundleResource Include="Resources\ringback.wav" />
+    <BundleResource Include="Resources\rootca.pem" />
+    <BundleResource Include="Resources\chat.png" />
+    <BundleResource Include="Resources\contact.png" />
+    <BundleResource Include="Resources\dialpad.png" />
+    <Compile Include="CustomViewCellRenderer.cs" />
+    <Compile Include="GradientColorStackRenderer.cs" />
+    <Compile Include="TabbedPageRenderer.cs" />
+    <BundleResource Include="GoogleService-Info.plist" />
+    <BundleResource Include="pacman.aiff" />
+    <Compile Include="NotificationViewController.cs" />
+    <Compile Include="NotificationService .cs" />
+    <BundleResource Include="Resources\missedcall.wav" />
+    <Compile Include="Utilities.cs" />
+    <Compile Include="GeneralTabbedPageRenderer.cs" />
+    <Compile Include="MyEntryRenderer.cs" />
+    <BundleResource Include="Resources\notification_sound.mp3" />
+    <BundleResource Include="Resources\fav.png" />
+    <BundleResource Include="Resources\groups.png" />
+    <BundleResource Include="Resources\voicemail0.png" />
+    <BundleResource Include="Resources\chat3.png" />
+    <BundleResource Include="Resources\error.mp3" />
+    <BundleResource Include="Resources\favorite.png" />
+    <BundleResource Include="Resources\favorite%402x.png" />
+    <BundleResource Include="Resources\favorite%403x.png" />
+    <BundleResource Include="Resources\chat%402x.png" />
+    <BundleResource Include="Resources\contact%402x.png" />
+    <BundleResource Include="Resources\voicemail0%402x.png" />
+    <BundleResource Include="Resources\voicemail0%403x.png" />
+    <BundleResource Include="Resources\dialpad%402x.png" />
+    <BundleResource Include="Resources\dialpad%403x.png" />
+    <BundleResource Include="Resources\groups%402x.png" />
+    <BundleResource Include="Resources\groups%403x.png" />
+    <BundleResource Include="Resources\user.png" />
+    <BundleResource Include="Resources\linphonerc_default" />
+    <BundleResource Include="Resources\phonebook.png" />
+    <BundleResource Include="Resources\unknown.png" />
+    <BundleResource Include="Resources\gray.png" />
+    <BundleResource Include="Resources\green.png" />
+    <BundleResource Include="Resources\red.png" />
+    <BundleResource Include="Resources\yellow.png" />
+    <BundleResource Include="Resources\ring1.wav" />
+    <BundleResource Include="Resources\ring10.wav" />
+    <BundleResource Include="Resources\ring2.wav" />
+    <BundleResource Include="Resources\ring3.wav" />
+    <BundleResource Include="Resources\ring4.wav" />
+    <BundleResource Include="Resources\ring5.wav" />
+    <BundleResource Include="Resources\ring6.wav" />
+    <BundleResource Include="Resources\ring7.wav" />
+    <BundleResource Include="Resources\ring8.wav" />
+    <BundleResource Include="Resources\ring9.wav" />
+    <Compile Include="CustomToolBarIconsRenderer.cs" />
+    <Compile Include="TableSource.cs" />
+    <Compile Include="iOSLongPressedEffect.cs" />
+    <BundleResource Include="Resources\ring.wav" />
+    <BundleResource Include="Resources\newim.wav" />
+    <BundleResource Include="Resources\bt.png" />
+    <BundleResource Include="Resources\appicon.png" />
+    <BundleResource Include="Resources\logo-no-bg.png" />
+    <BundleResource Include="Resources\logo-no-bg%403x.png" />
+    <BundleResource Include="Resources\logo-no-bg%402x.png" />
+    <BundleResource Include="Resources\message_sent.wav" />
+    <BundleResource Include="Resources\call.png" />
+    <BundleResource Include="Resources\endcall.png" />
+    <BundleResource Include="Resources\gradient.jpg" />
+    <Compile Include="MyFrameRenderer.cs" />
+    <BundleResource Include="Resources\chat%403x.png" />
+    <BundleResource Include="Resources\contact%403x.png" />
+    <BundleResource Include="Resources\users.png" />
+    <BundleResource Include="Resources\delete.png" />
+    <BundleResource Include="Resources\delete%402x.png" />
+    <BundleResource Include="Resources\delete%403x.png" />
+    <BundleResource Include="Resources\search%402x.png" />
+    <BundleResource Include="Resources\search%403x.png" />
+    <BundleResource Include="Resources\bug.png" />
+    <BundleResource Include="Resources\bug%402x.png" />
+    <BundleResource Include="Resources\bug%403x.png" />
+    <BundleResource Include="Resources\search.png" />
+    <Compile Include="DraggableViewRenderer.cs" />
+    <BundleResource Include="Resources\acc_end_wrap_up.png" />
+    <BundleResource Include="Resources\acc_extend_wrap_up.png" />
+    <BundleResource Include="Resources\acc_group_queue_info.png" />
+    <BundleResource Include="Resources\acc_login_group.png" />
+    <BundleResource Include="Resources\acc_login.png" />
+    <BundleResource Include="Resources\acc_logout_group.png" />
+    <BundleResource Include="Resources\acc_logout.png" />
+    <BundleResource Include="Resources\acc_release_with_code.png" />
+    <BundleResource Include="Resources\acc_release.png" />
+    <BundleResource Include="Resources\acc_resume_with_code.png" />
+    <BundleResource Include="Resources\acc_resume.png" />
+    <BundleResource Include="Resources\acc_wrap_up_with_code.png" />
+    <BundleResource Include="Resources\emergency.png" />
+    <BundleResource Include="Resources\speedial.png" />
+    <Compile Include="SQLiteAsync.cs" />
+    <Compile Include="SQLite.cs" />
+    <BundleResource Include="Resources\featuresbutton.png" />
+    <BundleResource Include="Resources\featuresbutton%402x.png" />
+    <BundleResource Include="Resources\featuresbutton%403x.png" />
+    <BundleResource Include="Resources\collaborate.png" />
+    <BundleResource Include="Resources\pickup.png" />
+    <BundleResource Include="Resources\rod.png" />
+    <BundleResource Include="Resources\voicemailspeedbtn.png" />
+    <Compile Include="ContactServiceImplementation.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Icon-60%403x.png" />
+    <BundleResource Include="Resources\Icon-Small-40%403x.png" />
+    <BundleResource Include="Resources\Icon-Small%403x.png" />
+    <InterfaceDefinition Include="Resources\LaunchScreen.storyboard" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Plugin.ContactService, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xamarin.Forms.Contacts.1.0.5\lib\Xamarin.iOS10\Plugin.ContactService.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.LocalNotifications, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xam.Plugins.Notifier.3.0.1\lib\Xamarin.iOS10\Plugin.LocalNotifications.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.LocalNotifications.Abstractions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xam.Plugins.Notifier.3.0.1\lib\Xamarin.iOS10\Plugin.LocalNotifications.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="RoundedBoxView.Forms.Plugin.Abstractions, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xam.Plugins.Forms.RoundedBoxView.1.0.0.7\lib\Xamarin.iOS10\RoundedBoxView.Forms.Plugin.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="RoundedBoxView.Forms.Plugin.iOSUnified, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xam.Plugins.Forms.RoundedBoxView.1.0.0.7\lib\Xamarin.iOS10\RoundedBoxView.Forms.Plugin.iOSUnified.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Diagnostics.Tracer, Version=2.0.0.0, Culture=neutral, PublicKeyToken=173d89ffae9ce988, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Diagnostics.Tracer.2.0.8\lib\netstandard1.3\System.Diagnostics.Tracer.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="ImageCircle.Forms.Plugin">
+      <HintPath>..\..\packages\Xam.Plugins.Forms.ImageCircle.3.0.0.5\lib\xamarinios10\ImageCircle.Forms.Plugin.dll</HintPath>
+    </Reference>
+    <Reference Include="Toasts.Forms.Plugin.Abstractions">
+      <HintPath>..\..\packages\Toasts.Forms.Plugin.3.3.2\lib\Xamarin.iOS10\Toasts.Forms.Plugin.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Toasts.Forms.Plugin.iOS">
+      <HintPath>..\..\packages\Toasts.Forms.Plugin.3.3.2\lib\Xamarin.iOS10\Toasts.Forms.Plugin.iOS.dll</HintPath>
+    </Reference>
+    <Reference Include="KeyboardOverlap.Forms.Plugin.iOSUnified">
+      <HintPath>..\..\packages\Xam.Plugins.Forms.KeyboardOverlap.1.0.0.4\lib\Xamarin.iOS10\KeyboardOverlap.Forms.Plugin.iOSUnified.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Messaging.Abstractions">
+      <HintPath>..\..\packages\Xam.Plugins.Messaging.5.2.0\lib\Xamarin.iOS10\Plugin.Messaging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Messaging">
+      <HintPath>..\..\packages\Xam.Plugins.Messaging.5.2.0\lib\Xamarin.iOS10\Plugin.Messaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Vibrate">
+      <HintPath>..\..\packages\Xam.Plugins.Vibrate.4.0.0.5\lib\xamarinios10\Plugin.Vibrate.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Share.Abstractions">
+      <HintPath>..\..\packages\Plugin.Share.7.1.1\lib\Xamarin.iOS10\Plugin.Share.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Share">
+      <HintPath>..\..\packages\Plugin.Share.7.1.1\lib\Xamarin.iOS10\Plugin.Share.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Clipboard.Abstractions">
+      <HintPath>..\..\packages\Xamarin.Plugins.Clipboard.2.2.1\lib\Xamarin.iOS10\Plugin.Clipboard.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Clipboard">
+      <HintPath>..\..\packages\Xamarin.Plugins.Clipboard.2.2.1\lib\Xamarin.iOS10\Plugin.Clipboard.dll</HintPath>
+    </Reference>
+    <Reference Include="Merq">
+      <HintPath>..\..\packages\Merq.1.1.4\lib\netstandard1.3\Merq.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter">
+      <HintPath>..\..\packages\Microsoft.AppCenter.3.2.1\lib\Xamarin.iOS10\Microsoft.AppCenter.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter.iOS.Bindings">
+      <HintPath>..\..\packages\Microsoft.AppCenter.3.2.1\lib\Xamarin.iOS10\Microsoft.AppCenter.iOS.Bindings.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter.Analytics">
+      <HintPath>..\..\packages\Microsoft.AppCenter.Analytics.3.2.1\lib\Xamarin.iOS10\Microsoft.AppCenter.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter.Analytics.iOS.Bindings">
+      <HintPath>..\..\packages\Microsoft.AppCenter.Analytics.3.2.1\lib\Xamarin.iOS10\Microsoft.AppCenter.Analytics.iOS.Bindings.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter.Crashes">
+      <HintPath>..\..\packages\Microsoft.AppCenter.Crashes.3.2.1\lib\Xamarin.iOS10\Microsoft.AppCenter.Crashes.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AppCenter.Crashes.iOS.Bindings">
+      <HintPath>..\..\packages\Microsoft.AppCenter.Crashes.3.2.1\lib\Xamarin.iOS10\Microsoft.AppCenter.Crashes.iOS.Bindings.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="MediaManager">
+      <HintPath>..\..\packages\Plugin.MediaManager.0.9.7\lib\xamarinios10\MediaManager.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\packages\SharpZipLib.1.2.0\lib\netstandard2.0\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="SkiaSharp">
+      <HintPath>..\..\packages\SkiaSharp.1.68.3\lib\xamarinios1.0\SkiaSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="SkiaSharp.Views.iOS">
+      <HintPath>..\..\packages\SkiaSharp.Views.1.68.3\lib\xamarinios1.0\SkiaSharp.Views.iOS.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive">
+      <HintPath>..\..\packages\System.Reactive.4.4.1\lib\netstandard2.0\System.Reactive.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Mqtt">
+      <HintPath>..\..\packages\System.Net.Mqtt.0.6.3-beta\lib\netstandard2.0\System.Net.Mqtt.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.DeviceInfo">
+      <HintPath>..\..\packages\Xam.Plugin.DeviceInfo.4.1.1\lib\xamarinios10\Plugin.DeviceInfo.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.SimpleAudioPlayer.Abstractions">
+      <HintPath>..\..\packages\Xam.Plugin.SimpleAudioPlayer.1.4.0\lib\Xamarin.iOS10\Plugin.SimpleAudioPlayer.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.SimpleAudioPlayer">
+      <HintPath>..\..\packages\Xam.Plugin.SimpleAudioPlayer.1.4.0\lib\Xamarin.iOS10\Plugin.SimpleAudioPlayer.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK-1.0" />
+    <Reference Include="System.Buffers">
+      <HintPath>..\..\packages\System.Buffers.4.5.1\lib\netstandard2.0\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.7.1\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>..\..\packages\System.Memory.4.5.4\lib\netstandard2.0\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Forms.Core">
+      <HintPath>..\..\packages\Xamarin.Forms.4.6.0.772\lib\Xamarin.iOS10\Xamarin.Forms.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Forms.Platform">
+      <HintPath>..\..\packages\Xamarin.Forms.4.6.0.772\lib\Xamarin.iOS10\Xamarin.Forms.Platform.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Forms.Xaml">
+      <HintPath>..\..\packages\Xamarin.Forms.4.6.0.772\lib\Xamarin.iOS10\Xamarin.Forms.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="SkiaSharp.Views.Forms">
+      <HintPath>..\..\packages\SkiaSharp.Views.Forms.1.68.3\lib\xamarinios1.0\SkiaSharp.Views.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.Essentials">
+      <HintPath>..\..\packages\Xamarin.Essentials.1.5.3.2\lib\xamarinios10\Xamarin.Essentials.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Core">
+      <HintPath>..\..\packages\Xamarin.Firebase.iOS.Core.6.6.6\lib\xamarinios10\Firebase.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.Installations">
+      <HintPath>..\..\packages\Xamarin.Firebase.iOS.Installations.1.1.1\lib\xamarinios10\Firebase.Installations.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.InstanceID">
+      <HintPath>..\..\packages\Xamarin.Firebase.iOS.InstanceID.4.3.3\lib\xamarinios10\Firebase.InstanceID.dll</HintPath>
+    </Reference>
+    <Reference Include="Firebase.CloudMessaging">
+      <HintPath>..\..\packages\Xamarin.Firebase.iOS.CloudMessaging.4.3.0\lib\xamarinios10\Firebase.CloudMessaging.dll</HintPath>
+    </Reference>
+    <Reference Include="IQKeyboardManager">
+      <HintPath>..\..\packages\Xamarin.IQKeyboardManager.1.4.1\lib\Xamarin.iOS10\IQKeyboardManager.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Library\" />
+    <Folder Include="Library\Sounds\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small-40.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-087.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-Small-60.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-120.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-080.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo--058.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-180.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-020.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-1024.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-029.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-076.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-152.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\logo-167.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\splash1125x2436.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\splash1242x2208.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\splash750x1334.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\splash640x960.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\splash640x1136.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ITunesArtwork Include="iTunesArtwork%402x" />
+    <ITunesArtwork Include="iTunesArtwork" />
+  </ItemGroup>
+  <ItemGroup>
+    <NativeReference Include="Frameworks\bctoolbox.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="Frameworks\linphone.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="Frameworks\mediastreamer_base.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="Frameworks\mediastreamer_voip.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="Frameworks\mssilk.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="Frameworks\mswebrtc.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+    <NativeReference Include="Frameworks\ortp.framework">
+      <Kind>Framework</Kind>
+      <SmartLink>False</SmartLink>
+    </NativeReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <Import Project="..\..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
+  <Import Project="..\..\packages\Xamarin.Build.Download.0.10.0\build\Xamarin.Build.Download.targets" Condition="Exists('..\..\packages\Xamarin.Build.Download.0.10.0\build\Xamarin.Build.Download.targets')" />
+  <Import Project="..\..\packages\Merq.1.1.4\build\netstandard1.3\Merq.targets" Condition="Exists('..\..\packages\Merq.1.1.4\build\netstandard1.3\Merq.targets')" />
+  <Import Project="..\..\packages\Xamarin.Firebase.iOS.Core.6.6.6\build\Xamarin.Firebase.iOS.Core.targets" Condition="Exists('..\..\packages\Xamarin.Firebase.iOS.Core.6.6.6\build\Xamarin.Firebase.iOS.Core.targets')" />
+  <Import Project="..\..\packages\Xamarin.Forms.4.6.0.772\build\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.4.6.0.772\build\Xamarin.Forms.targets')" />
+</Project>

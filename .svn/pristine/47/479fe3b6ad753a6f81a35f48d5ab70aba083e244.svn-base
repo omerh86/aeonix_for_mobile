@@ -1,0 +1,113 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+
+using Android.App;
+using Android.Content;
+using Android.OS;
+using Android.Runtime;
+using Android.Support.Design.Widget;
+using Android.Views;
+using Android.Widget;
+using Google.Android.Material.Tabs;
+using LinphoneXamarin.Android;
+using LinphoneXamarin.components;
+using LinphoneXamarin.Entities;
+using Xamarin.Forms;
+using Xamarin.Forms.Platform.Android;
+using Xamarin.Forms.Platform.Android.AppCompat;
+using static LinphoneXamarin.components.Tabs;
+
+[assembly: ExportRenderer(typeof(Tabs), typeof(MyTabsRenderer))]
+namespace LinphoneXamarin.Android
+{
+    public class MyTabsRenderer : TabbedPageRenderer
+    {
+        TabLayout layout;
+
+        public MyTabsRenderer(Context context) : base(context) { }
+
+        protected override void OnElementChanged(ElementChangedEventArgs<TabbedPage> e)
+        {
+            base.OnElementChanged(e);
+            if (Element != null)
+            {
+                ((Tabs)Element).UpdateIcons += Handle_UpdateIcons;
+            }
+
+        }
+
+        protected override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            base.OnElementPropertyChanged(sender, e);
+
+
+            if (layout == null && e.PropertyName == "Renderer")
+            {
+                layout = (TabLayout)ViewGroup.GetChildAt(1);
+            }
+        }
+
+        void Handle_UpdateIcons(object sender, TabEventArgs e)
+        {
+            try
+            {
+                TabLayout tabs = layout;
+
+                if (tabs == null || e == null)
+                    return;
+
+                TabLayout.Tab tab = tabs.GetTabAt(e.childindex);
+                if (tab == null)
+                    return;
+                var fileName = "";
+                switch (e.childindex)
+                {
+                    case 1:
+                        fileName = "contact";
+                        break;
+                    case 2:
+                        fileName = "chat";
+                        break;
+                    case 3:
+                        fileName = "voicemail";
+                        break;
+                }
+
+                if (e.counter > 8)
+                    e.counter = 9;
+
+                SetCurrentTabIcon(tab, fileName + e.counter + ".png");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+        }
+
+        void SetCurrentTabIcon(TabLayout.Tab tab, string icon)
+        {
+            tab.SetIcon(IdFromTitle(icon, ResourceManager.DrawableClass));
+        }
+
+        int IdFromTitle(string title, Type type)
+        {
+            string name = Path.GetFileNameWithoutExtension(title);
+            int id = GetId(type, name);
+            return id;
+        }
+
+        int GetId(Type type, string memberName)
+        {
+            object value = type.GetFields().FirstOrDefault(p => p.Name == memberName)?.GetValue(type)
+                ?? type.GetProperties().FirstOrDefault(p => p.Name == memberName)?.GetValue(type);
+            if (value is int)
+                return (int)value;
+            return 0;
+        }
+    }
+}

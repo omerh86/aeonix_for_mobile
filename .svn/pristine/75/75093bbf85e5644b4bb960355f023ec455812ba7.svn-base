@@ -1,0 +1,161 @@
+﻿using System;
+
+using Linphone;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Util;
+
+namespace LinphoneXamarin.Services
+{
+
+    public sealed class RegistrationService
+    {
+
+        private static RegistrationService instance = null;
+        private static readonly object padlock = new object();
+
+        public RegistrationState registrationState = RegistrationState.None;
+        private LinphoneRegistrationListener registrationListener;
+        private Core LinphoneCore;
+        private CoreListener Listener;
+        public ProxyConfig pc { set; get; }
+
+
+        private void OnRegistration(Core lc, ProxyConfig config, RegistrationState state, string message)
+        {
+            logMessage("omer40: ", "RegistrationService:OnRegistration() currentState=" + registrationState + " state=" + state + ", message=" + message);
+            if (registrationListener != null)
+            {
+                registrationListener.onLinphoneStatusChanged(state, message, config);
+                this.registrationState = state;
+            }
+        }
+
+        RegistrationService()
+        {
+            LinphoneCore = LinphoneBase.Instance.linphoneCore;
+            Listener = LinphoneBase.Instance.coreListener;
+            Listener.OnRegistrationStateChanged = OnRegistration;
+            //LinphoneCore.AddListener(Listener);
+        }
+
+
+        public static RegistrationService Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new RegistrationService();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public void setRegistrationListener(LinphoneRegistrationListener registrationListener)
+        {
+            this.registrationListener = registrationListener;
+        }
+
+        //public void register(string name, string password, string ip, int port, TransportType transportType)
+        //{
+        //    this.register(name, password, ip, port, null, -1, transportType);
+        //}
+
+        public void register(string name, string password, string ip, int port, string proxyIP, int proxyPort, TransportType transportType, bool isEndPoint)
+        {
+            logMessage("omer40: ", "RegistrationService:register() name=" + name + ", ip=" + ip + ", proxyPort=" + proxyPort + ", transportType=" + transportType);
+            pc = LinphoneCore.CreateProxyConfig();
+            pc.Edit();
+
+            pc.Expires = 2147483; // 25 days - does not reach MAX_INT when converted to milli-seconds
+            var identity = Factory.Instance.CreateAddress("sip:" + name + "@" + ip);
+            identity.Username = name;
+            identity.Domain = ip;
+
+            identity.Transport = transportType;
+            identity.Port = port;
+
+            if (identity.Transport == TransportType.Tcp)
+            {
+                LinphoneCore.MediaEncryption = MediaEncryption.None;
+                LinphoneCore.MediaEncryptionMandatory = false;
+                identity.Secure = false;
+            }
+            else
+            {
+                LinphoneCore.MediaEncryption = MediaEncryption.SRTP;
+                LinphoneCore.MediaEncryptionMandatory = true;
+                identity.Secure = true;
+            }
+
+            pc.SetCustomHeader("User-Agent", SharedData.Instance.USER_AGENT);
+            pc.IdentityAddress = identity;
+            pc.ServerAddr = identity.AsString();
+            pc.Route = identity.AsString();
+
+            if (proxyIP != null && proxyIP != "")
+            {
+                var ingateAddress = "<sip:" + name + "@" + proxyIP + ":" + proxyPort + ";transport=" + identity.Transport.ToString().ToLower() + ">";
+                pc.Route = ingateAddress;
+                pc.ServerAddr = ingateAddress;
+            }
+
+            pc.RegisterEnabled = true;
+            pc.Done();
+            LinphoneCore.ClearProxyConfig();
+            LinphoneCore.AddProxyConfig(pc);
+            LinphoneCore.DefaultProxyConfig = pc;
+            LinphoneCore.ClearAllAuthInfo();
+            var authInfo = Factory.Instance.CreateAuthInfo(name, null, password, null, null, ip);
+            LinphoneCore.AddAuthInfo(authInfo);
+            this.refreshConfig();
+            LinphoneCore.RefreshRegisters();
+        }
+
+        public void unRegister(bool configurationChanged = false)
+        {
+            logMessage("omer40: ", "unRegister");
+            LinphoneCore.TerminateAllCalls();
+            LinphoneCore.ClearProxyConfig();
+        }
+
+        public void refreshAuth(CardentialState cardentialState)
+        {
+            //LinphoneBase.Instance.linphoneCore.ClearAllAuthInfo();
+            logMessage("omer40: ", "RegistrationService:refreshAuth()");
+            LoginInfo l = MyFileSystem.Instance.loadLoginCardential(cardentialState);
+            AuthInfo authInfo = Factory.Instance.CreateAuthInfo(l.loginName, null, l.password, null, null, l.sipAdresses[l.favoriteSipAdressIndex].ip);
+            LinphoneBase.Instance.linphoneCore.AddAuthInfo(authInfo);
+            logMessage("omer40: ", "authInfo was added");
+            LinphoneBase.Instance.linphoneCore.RefreshRegisters();
+            logMessage("omer40: ", "RefreshRegisters() was called");
+        }
+
+        private void logMessage(string tag, string message)
+        {
+            Console.WriteLine(tag + message);
+            MyFileSystem.Instance.writeDebug(message, "regis_service");
+
+        }
+
+        private void refreshConfig()
+        {
+            NatPolicy linphoneNatPolicy = LinphoneCore.NatPolicy;
+            linphoneNatPolicy.IceEnabled = false;
+            linphoneNatPolicy.StunEnabled = false;
+            linphoneNatPolicy.TurnEnabled = false;
+            linphoneNatPolicy.UpnpEnabled = false;
+            LinphoneCore.NatPolicy = linphoneNatPolicy;
+            LinphoneCore.Config.SetInt("net", "enable_nat_helper", 0);
+            LinphoneCore.Config.SetInt("sip", "use_rport", 0);
+            LinphoneCore.Config.SetInt("sip", "store_ha1_passwd", 0);
+            LinphoneCore.Config.SetString("sip", "srtp_crypto_suites", "AES_CM_128_HMAC_SHA1_80, AES_CM_128_HMAC_SHA1_32");
+
+            LinphoneCore.SipTransportTimeout = 5 * 1000;
+
+        }
+    }
+}

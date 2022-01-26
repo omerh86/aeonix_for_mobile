@@ -1,0 +1,103 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using Linphone;
+using LinphoneXamarin.Util;
+using Xamarin.Forms;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+
+namespace LinphoneXamarin.Entities
+{
+    public class Contact : BaseContact
+    {
+
+        public ImageSource image
+        {
+            get
+            {
+                var x = MyFileSystem.Instance.loadUserIdImage(this.userName);
+                if (x == null)
+                {
+                    switch (this.type)
+                    {
+                        case ContactType.Group:
+                            return "users.png";
+                        case ContactType.PhoneBook:
+                            return "phonebook.png";
+                        case ContactType.Unknown:
+                        case ContactType.External:
+                            return "unknown.png";
+                        default:
+                            return "user.png";
+                    }
+                }
+                else
+                {
+                    return x;
+                }
+            }
+        }
+
+        public Contact(BaseContact bc)
+        {
+            this.userName = bc.userName;
+            this.displayName = bc.displayName;
+            this.primaryAlias = bc.primaryAlias;
+            this.allAliases = bc.allAliases;
+            this.allExternalAliases = bc.allExternalAliases;
+            this.isFav = bc.isFav;
+            this.type = bc.type;
+            this.imageSignature = bc.imageSignature;
+            this.presenceStatus = bc.presenceStatus;
+            this.monitorCrossRefID = "";
+            this.company = bc.company;
+            this.description = bc.description;
+            this.department = bc.department;
+            this.email = bc.email;
+
+        }
+
+        public Contact(string userName,
+            string displayName,
+            string firstName,
+           string primaryAlias,
+            List<string> allAliases,
+            List<ExtNumber> allExternalAliases,
+            long imageSignature,
+            ContactType type,
+            Presence presenceStatus = Presence.NONE)
+        {
+            this.userName = userName;
+            this.displayName = displayName;
+            this.firstName = firstName;
+            this.primaryAlias = primaryAlias;
+            this.allAliases = allAliases;
+            this.allExternalAliases = allExternalAliases;
+            this.isFav = false;
+            this.type = type;
+            this.imageSignature = imageSignature;
+            this.presenceStatus = presenceStatus;
+            this.monitorCrossRefID = "";
+
+            this.description = "";
+            this.department = "";
+            this.email = "";
+            this.company = "";
+            this.phonebook = "";
+            this.homeAddress = "";
+        }
+
+        public override string ToString()
+        {
+            var s = $"{firstName}_{lastName}_{email}";
+
+            foreach (var i in allExternalAliases)
+                s += $"{i.phoneNumber}_";
+
+            return s;
+
+        }
+
+    }
+}

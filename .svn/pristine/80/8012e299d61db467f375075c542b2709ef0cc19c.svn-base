@@ -1,0 +1,242 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Util;
+using Plugin.SimpleAudioPlayer;
+using System;
+using System.IO;
+using System.Threading.Tasks;
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class MyAudioManager
+    {
+        public MYAudioState myAudioState { set; get; }
+        public MYAudioListener _MYAudioListener { set; get; }
+        private ISimpleAudioPlayer mediaPlayer;
+        public bool isMute { set; get; }
+        public string notificationFilePath { set; get; }
+        private static MyAudioManager instance = null;
+        private static readonly object padlock = new object();
+
+        public static MyAudioManager Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new MyAudioManager();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public MyAudioManager()
+        {
+            myAudioState = MYAudioState.HEARPEACE;
+            mediaPlayer = CrossSimpleAudioPlayer.CreateSimpleAudioPlayer();
+        }
+
+        private void setBTScoMode(bool shouldStart)
+        {
+            addLog("setBTScoMode");
+#if ANDROID
+            Android.MainActivity.setBTScoMode(shouldStart);
+
+#endif
+        }
+
+        public void setCommunicationMode(AudioMode audioMode)
+        {
+#if ANDROID
+            Android.MainActivity.setCommunicationMode(audioMode);
+
+#endif
+
+        }
+
+
+        private bool isBtEnabled()
+        {
+#if ANDROID
+            return Android.MainActivity.isBTEnabled();
+#elif __IOS__
+            return AppDelegate.isBtEnabled();
+#else
+            return false;
+#endif
+        }
+
+        private void turnOnBTIntent()
+        {
+            addLog("turnOnBTIntent");
+#if ANDROID
+            Android.MainActivity.turnOnBTIntent();
+#elif __IOS__
+            AppDelegate.turnOnBTIntent();
+#endif
+        }
+
+        private void setSpeakerOff()
+        {
+#if ANDROID
+            Android.MainActivity.setSpeakerMode(false);
+
+#endif
+
+        }
+
+        private void setSpeakerOn()
+        {
+#if ANDROID
+            Android.MainActivity.setSpeakerMode(true);
+#endif
+
+        }
+
+        public void playFile(string fileName)
+        {
+            mediaPlayer.Load(fileName);
+            mediaPlayer.Play();
+        }
+
+        public void playVMAudioMessage(Stream stream)
+        {
+            mediaPlayer.Load(stream);
+            mediaPlayer.Play();
+        }
+
+        public void removePlaybackEndedListener(IVMMessagesListener vMMessagesListener)
+        {
+            mediaPlayer.PlaybackEnded -= vMMessagesListener.PlaybackEndedListener;
+        }
+
+        public void addPlaybackEndedListener(IVMMessagesListener vMMessagesListener)
+        {
+            mediaPlayer.PlaybackEnded += vMMessagesListener.PlaybackEndedListener;
+        }
+
+        public void stopPlayer()
+        {
+            mediaPlayer.Stop();
+        }
+
+        public void playErrorNotification()
+        {
+            mediaPlayer.Load("reorder.wav");
+            mediaPlayer.Seek(1);
+            mediaPlayer.Play();
+        }
+
+        private void fireAudioChanged()
+        {
+            if (_MYAudioListener != null)
+            {
+                _MYAudioListener.onAudioChanged(myAudioState);
+            }
+        }
+
+        private void fireBTConnectionFailed()
+        {
+            if (_MYAudioListener != null)
+            {
+                _MYAudioListener.onBTConnectionFailed();
+            }
+        }
+
+        public void onAudioStateChanged(MYAudioState mYAudioState)
+        {
+            myAudioState = mYAudioState;
+            fireAudioChanged();
+        }
+
+#if ANDROID
+        public void onSCOChanged(bool isConnected)
+        {
+            addLog("onSCOChanged(): " + isConnected);
+            if (isConnected)
+            {
+                myAudioState = MYAudioState.BT;
+            }
+            else
+            {
+                setSpeakerOff();
+                myAudioState = MYAudioState.HEARPEACE;
+            }
+
+            fireAudioChanged();
+        }
+#endif
+
+        public void onBTConnectionFailed()
+        {
+            fireBTConnectionFailed();
+        }
+
+        public void setAudioState(MYAudioState audioState, bool fromUser)
+        {
+            addLog($"setAudioState(), current state is: {myAudioState}, change to: {audioState},  is from user: " + fromUser);
+
+#if __IOS__
+
+            if (audioState == MYAudioState.BT && fromUser)
+            {
+                if (isBtEnabled())
+                {
+                    AppDelegate.setAudioRoute(audioState);
+                }
+                else
+                {
+                    turnOnBTIntent();
+                }
+            }
+            else
+            {
+                AppDelegate.setAudioRoute(audioState);
+            }
+#else
+            if (audioState == MYAudioState.BT && fromUser)
+            {
+                if (isBtEnabled())
+                {
+                    setBTScoMode(true);
+                }
+                else
+                {
+                    turnOnBTIntent();
+                }
+            }
+            else
+            {
+                switch (audioState)
+                {
+                    case MYAudioState.BT:
+                        setBTScoMode(true);
+                        break;
+                    case MYAudioState.HEARPEACE:
+                    case MYAudioState.DEFAULT:
+                        setBTScoMode(false);
+                        setSpeakerOff();
+                        myAudioState = MYAudioState.HEARPEACE;
+                        break;
+                    case MYAudioState.SPEAKER:
+                        setBTScoMode(false);
+                        setSpeakerOn();
+                        myAudioState = MYAudioState.SPEAKER;
+                        break;
+                }
+                fireAudioChanged();
+            }
+#endif
+        }
+
+        private void addLog(string s)
+        {
+            MyFileSystem.Instance.writeDebug(s, "MyAudioManager");
+            Console.WriteLine("omer345: " + s);
+        }
+
+
+    }
+}

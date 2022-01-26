@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.RootPage"
+              xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+             xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers"
+              FlowDirection="{StaticResource FlowDirection}">
+    <ContentPage.Content>
+        <StackLayout  VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" >
+            <control:CallListView x:Name="_CallListView"/>
+            <AbsoluteLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                <StackLayout  x:Name="rootContainer" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" >
+                    <control:TopBarComponent x:Name="topBarComponent"  Margin="5"></control:TopBarComponent>
+                    <StackLayout x:Name="listcontainer" VerticalOptions="FillAndExpand"/>
+                </StackLayout>
+                <control:MyPresenceComponent x:Name="myPresenceComponent" IsVisible="False" AbsoluteLayout.LayoutBounds=".98,.11" AbsoluteLayout.LayoutFlags="PositionProportional" ></control:MyPresenceComponent>
+                <control:DialComponent x:Name="_DialComponent"  AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" ></control:DialComponent>
+            </AbsoluteLayout>
+            <Grid BackgroundColor="White" HorizontalOptions="FillAndExpand" VerticalOptions="End" AbsoluteLayout.LayoutFlags="All"  Margin="0,-5,0,10"   >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="75" />
+                </Grid.RowDefinitions>
+
+                <AbsoluteLayout Grid.Row="0" Grid.Column="0" >
+                    <Label x:Name="favLbl" Text="{StaticResource favorites}" FontSize="Micro" AbsoluteLayout.LayoutBounds=".5,1" AbsoluteLayout.LayoutFlags="PositionProportional" ></Label>
+                    <ImageButton x:Name="favTab" WidthRequest="45" HeightRequest="45"  Clicked="onFavClicked" AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional"   BackgroundColor="Transparent"/>
+                </AbsoluteLayout>
+
+                <AbsoluteLayout Grid.Row="0" Grid.Column="1" >
+                    <Label x:Name="recentLbl" Text="{StaticResource recent}" FontSize="Micro" AbsoluteLayout.LayoutBounds=".5,1" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                    <ImageButton x:Name="recentTab" WidthRequest="45" HeightRequest="45"  Clicked="onRecentClicked" BackgroundColor="Transparent" AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional" />
+                    <BoxView x:Name="recentCounter1" IsVisible="false"  AbsoluteLayout.LayoutBounds=".8,.2" AbsoluteLayout.LayoutFlags="PositionProportional"  WidthRequest="20" HeightRequest="20" CornerRadius="10" BackgroundColor="Red"></BoxView>
+                    <Label x:Name="recentCounter2" IsVisible="false"  TextColor="White" AbsoluteLayout.LayoutBounds=".78,.2" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                </AbsoluteLayout>
+
+                <AbsoluteLayout Grid.Row="0" Grid.Column="2" >
+                    <Label x:Name="chatLbl"  Text="{StaticResource chat}" FontSize="Micro" AbsoluteLayout.LayoutBounds=".5,1" AbsoluteLayout.LayoutFlags="PositionProportional" />
+                    <ImageButton x:Name="ChatTab" WidthRequest="45" HeightRequest="45" BackgroundColor="Transparent"  Clicked="onChatClicked"  AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                    <BoxView x:Name="chatCounter1" IsVisible="false"  AbsoluteLayout.LayoutBounds=".8,.2" AbsoluteLayout.LayoutFlags="PositionProportional"  WidthRequest="20" HeightRequest="20" CornerRadius="10" BackgroundColor="Red"></BoxView>
+                    <Label x:Name="chatCounter2" IsVisible="false"  TextColor="White" AbsoluteLayout.LayoutBounds=".78,.2" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                </AbsoluteLayout>
+
+                <AbsoluteLayout Grid.Row="0" Grid.Column="3" >
+                    <Label x:Name="dialLbl" Text="{StaticResource dialpad}" FontSize="Micro" AbsoluteLayout.LayoutBounds=".5,1" AbsoluteLayout.LayoutFlags="PositionProportional"></Label>
+                    <ImageButton x:Name="DialPadTab" Source="dialpadtab.png" WidthRequest="45" HeightRequest="45" BackgroundColor="Transparent" Clicked="onDialClicked"  AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                </AbsoluteLayout>
+
+                <AbsoluteLayout Grid.Row="0" Grid.Column="4" >
+                    <Label x:Name="moreLbl" Text="{StaticResource more}" FontSize="Micro"  AbsoluteLayout.LayoutBounds=".5,1" AbsoluteLayout.LayoutFlags="PositionProportional" ></Label>
+                    <ImageButton x:Name="MoreTab" Source="moretab.png" WidthRequest="45" HeightRequest="45"  BackgroundColor="Transparent" Clicked="onMoreClicked"  AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                </AbsoluteLayout>
+
+            </Grid>
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

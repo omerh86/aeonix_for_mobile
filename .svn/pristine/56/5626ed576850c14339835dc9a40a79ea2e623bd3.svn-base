@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.Settings"
+               FlowDirection="{StaticResource FlowDirection}"
+             Title="Settings">
+
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout Padding="5" BackgroundColor="#eee" Orientation="Vertical">
+                <Label Margin="10" Text="Action Features" FontAttributes="Bold" TextColor="#00688f"/>
+                <Frame  Padding="10" BackgroundColor="White">
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label Text="Show Action Features" HorizontalOptions="StartAndExpand" VerticalOptions="Center" FontSize="Medium"/>
+                        <Switch x:Name="actionFeaturesSwitch" VerticalOptions="Center" HorizontalOptions="End"  Toggled="onActionFeaturesToggled"></Switch>
+                    </StackLayout>
+                </Frame>
+                <Label Margin="10" Text="{StaticResource language}" FontAttributes="Bold" TextColor="#00688f"/>
+                <Frame  Padding="10" BackgroundColor="White">
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label Text="{StaticResource language}" HorizontalOptions="StartAndExpand" VerticalOptions="Center" FontSize="Medium"/>
+                        <Picker x:Name="langPicker" VerticalOptions="Center" HorizontalOptions="End" WidthRequest="150" FontSize="Small" SelectedIndexChanged="onPickerSelected" />
+                    </StackLayout>
+                </Frame>
+
+                <Label Margin="10" Text="{StaticResource sound}" FontAttributes="Bold"  TextColor="#00688f"/>
+                <Frame  Padding="10" BackgroundColor="White">
+                    <StackLayout  Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label Text="{StaticResource selectRingtone}" HorizontalOptions="StartAndExpand" VerticalOptions="Center" FontSize="Medium"/>
+                        <Picker x:Name="ringPicker" VerticalOptions="Center" HorizontalOptions="End" WidthRequest="150" FontSize="Small" SelectedIndexChanged="onRingPickerSelected" />
+                    </StackLayout>
+                </Frame>
+                <Frame  Padding="10" BackgroundColor="White">
+                    <StackLayout   Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label Text="{StaticResource incomingCallSound}" HorizontalOptions="StartAndExpand" FontSize="Medium"></Label>
+                        <Switch x:Name="ringSwitch" VerticalOptions="Center" HorizontalOptions="End"  Toggled="onRingToggled"></Switch>
+                    </StackLayout>
+                </Frame>
+                <Frame  Padding="10" BackgroundColor="White">
+                    <StackLayout   Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label Text="{StaticResource messageNotificationSound}" HorizontalOptions="StartAndExpand" FontSize="Medium"></Label>
+                        <Switch  x:Name="messageSwitch" VerticalOptions="Center" HorizontalOptions="End"  Toggled="onMessageToggled"></Switch>
+                    </StackLayout>
+                </Frame>
+                <Label Margin="10" Text="{StaticResource vibration}" FontAttributes="Bold"  TextColor="#00688f"/>
+                <Frame  Padding="10" BackgroundColor="White">
+                    <StackLayout  Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label Text="{StaticResource vibrateRing}" HorizontalOptions="StartAndExpand" FontSize="Medium"></Label>
+                        <Switch  x:Name="ringVibrateSwitch" VerticalOptions="Center" HorizontalOptions="End"  Toggled="onRingVibrateToggled"></Switch>
+                    </StackLayout>
+                </Frame>
+                <Frame  Padding="10" BackgroundColor="White">
+                    <StackLayout  Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                        <Label Text="{StaticResource vibrateMessage}" HorizontalOptions="StartAndExpand" FontSize="Medium"></Label>
+                        <Switch  x:Name="messageVibrateSwitch" VerticalOptions="Center" HorizontalOptions="End"  Toggled="onMessageVibrateToggled"></Switch>
+                    </StackLayout>
+                </Frame>
+                <StackLayout x:Name="vmLayout" IsVisible="False">
+                    <Label Margin="10" Text="{StaticResource vm}" FontAttributes="Bold"  TextColor="#00688f"/>
+                    <Frame  Padding="10" BackgroundColor="White">
+                        <StackLayout  Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                            <Label Text="{StaticResource password}" VerticalOptions="Center" FontSize="Medium"></Label>
+                            <Entry Margin="1"  x:Name="vmPassword" VerticalOptions="Center" HorizontalOptions="FillAndExpand" IsPassword="True" Keyboard="Numeric" TextChanged="Handle_PasswordChanged" />
+                            <Label VerticalOptions="Center" Text="&#xf06e;" Padding="7">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                </Label.FontFamily>
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="Handle_TappedViewPassword"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </StackLayout>
+                    </Frame>
+                </StackLayout>
+                <StackLayout x:Name="syncContactsLayout" IsVisible="false">
+                    <Label Margin="10" Text="{StaticResource contacts}" FontAttributes="Bold"  TextColor="#00688f"/>
+                    <Frame  Padding="10" BackgroundColor="White">
+                        <StackLayout  Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                            <Label Text="{StaticResource sync_contacts}" HorizontalOptions="StartAndExpand" FontSize="Medium"></Label>
+                            <Label x:Name="syncLoader" IsVisible="False"  FontSize="Medium" VerticalOptions="Center"  Text="&#xf017;" >
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                </Label.FontFamily>
+                            </Label>
+                            <ProgressBar x:Name="syncContactsPB" HorizontalOptions="FillAndExpand" IsVisible="false" ></ProgressBar>
+                            <Switch  x:Name="syncContacts" VerticalOptions="Center" HorizontalOptions="End"  Toggled="onSyncContactsToggled"></Switch>
+                        </StackLayout>
+                    </Frame>
+                        <Label x:Name="syncErrLbl" TextColor="Red" Text="Fail To Sync Contacts!" IsVisible="false"/>
+                </StackLayout>
+                <Label Margin="10" Text="{StaticResource micGainLevel}" FontAttributes="Bold"  TextColor="#00688f"/>
+                <Frame  Padding="10" BackgroundColor="White">
+                    <StackLayout  Orientation="Horizontal" HorizontalOptions="Center">
+                        <Button Text="&#xf068;" TextColor="#00688f" FontSize="Large" BackgroundColor="Transparent" Clicked="onGainMicDown">
+                            <Button.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                            </Button.FontFamily>
+                        </Button>
+                        <Label  x:Name="micGainLbl" FontSize="Large" VerticalOptions="Center" HorizontalOptions="End" ></Label>
+                        <Button Text="&#xf067;" TextColor="#00688f" FontSize="Large" BackgroundColor="Transparent" Clicked="onGainMicUp">
+                            <Button.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                            </Button.FontFamily>
+                        </Button>
+                    </StackLayout>
+                </Frame>
+              
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

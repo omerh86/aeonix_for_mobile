@@ -1,0 +1,121 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class SpeedDialComponent : ContentView, SpeedDialListener
+    {
+
+        public static readonly BindableProperty visibiltyCommandProperty =
+BindableProperty.Create("visibiltyCommand", typeof(ICommand), typeof(SpeedDialComponent), null);
+
+        public ICommand visibiltyCommand
+        {
+            get { return (ICommand)GetValue(visibiltyCommandProperty); }
+            set { SetValue(visibiltyCommandProperty, value); }
+        }
+
+        public static void Execute(ICommand command, object val)
+        {
+            if (command == null) return;
+            if (command.CanExecute(null))
+            {
+                command.Execute(val);
+            }
+        }
+
+
+        public SpeedDialComponent()
+        {
+            InitializeComponent();
+            DialSpeedService.Instance.speedDialListeners1 = this;
+            populateComponent(DialSpeedService.Instance.SpeedDials);
+        }
+
+        public void populateComponent(List<SpeedDial> speedDials)
+        {
+            speedDialComponent.Children.Clear();
+            var hideActionBtn = false;
+
+            foreach (var i in speedDials)
+            {
+                if (i.position < 5)
+                {
+                    speedDialView spv = new speedDialView(i.position, i.Type, i.Status, i.Label, true, null, new Command<int>(onShortPressed), null, null);
+                    spv.VerticalOptions = LayoutOptions.FillAndExpand;
+                    spv.DragMode = DragMode.None;
+                    var pos = i.position % 5;
+                    speedDialComponent.Children.Add(spv, pos, 0);
+                    if (hideActionBtn == false && pos != 0 && pos != 4)
+                        hideActionBtn = true;
+                }
+            }
+            addActionBtn.IsVisible = !hideActionBtn;
+            addActionBtn2.IsVisible = hideActionBtn;
+        }
+
+        void onShortPressed(int pos)
+        {
+            addLog("onShortPressed");
+            var speedDial = DialSpeedService.Instance.SpeedDials.Find(i => i.position == pos);
+            if (speedDial != null)
+            {
+                speedDial.onSpeedActionPressed();
+            }
+        }
+
+        private void addLog(string s)
+        {
+            Console.WriteLine($"omer56: {s}");
+            MyFileSystem.Instance.writeDebug(s, "SpeedDialComponent");
+        }
+
+        public void onSpeedDialChanged(List<SpeedDial> speedDials)
+        {
+            populateComponent(speedDials);
+        }
+
+        public void onActionComponentVisibilityChanged(bool isVisible)
+        {
+            Execute(visibiltyCommand, isVisible);
+        }
+
+        public void onSpeedDialStatusChanged(List<SpeedDial> speedDials)
+        {
+            try
+            {
+                foreach (var i in speedDials)
+                {
+                    foreach (var k in speedDialComponent.Children)
+                    {
+                        if (k is speedDialView && ((speedDialView)k).position == i.position)
+                        {
+                            addLog("onSpeedDialStatusChanged");
+                            ((speedDialView)k).Status = i.Status;
+                        }
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                addLog(err.ToString());
+            }
+        }
+
+        private void onAddQuickActions(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new speedDialPage());
+        }
+    }
+}

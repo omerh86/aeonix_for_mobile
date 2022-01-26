@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TabbedPage 
+       Title="{StaticResource aeonixtouch}" 
+        xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            x:Class="LinphoneXamarin.components.Tabs"
+            xmlns:pages="clr-namespace:LinphoneXamarin.components"
+            FlowDirection="{StaticResource FlowDirection}" >
+
+    <!--Android-->
+    <pages:Favorites  Title="{StaticResource favorites}" Icon="favorite.png"/>
+    <pages:Recent x:Name="recentPage" Title="{StaticResource recent}" Icon="contact0.png" />
+    <pages:MyChatsPage x:Name="chatPage"  Title="{StaticResource chat}" Icon="chat0.png" />
+    <pages:DialPad  Title="{StaticResource dialpad}"  Icon="dialpad.png" />
+    <pages:MorePage  Title="More"  Icon="dialpad.png" />
+
+    <!--/IOS-->
+    <!--<pages:DialPad  Title="{StaticResource dialpad}"  Icon="dialpad.png" />
+    <pages:Favorites  Title="{StaticResource favorites}" Icon="favorite.png"/>
+    <pages:Recent x:Name="recentPage" Title="{StaticResource recent}" Icon="contact.png" />
+    <pages:MyChatsPage x:Name="chatPage"  Title="{StaticResource chat}" Icon="chat.png" />
+    <pages:Groups  Title="{StaticResource groups}" Icon="groups.png" />
+    <pages:VoiceMailPage x:Name="vmPage"  Title="{StaticResource vm}" Icon="voicemail.png" />-->
+
+    <!--uwp-->
+    <!--<pages:DialPad  Title="{StaticResource dialpad}"  Icon="dialpad.png" />
+    <pages:ContactTabbedPage x:Name="recentPage" Title="{StaticResource contacts}"  Icon="contact.png" />
+    <pages:MyChatsPage x:Name="chatPage"  Title="{StaticResource chat}" Icon="chat.png" />
+    <pages:VoiceMailPage x:Name="vmPage"  Title="{StaticResource vm}" Icon="voicemail.png" />-->
+    <!--<pages:speedDialPage x:Name="vmPage"  Title="{StaticResource vm}" Icon="voicemail.png" />-->
+
+</TabbedPage>

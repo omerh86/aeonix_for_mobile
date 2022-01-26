@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gradient:GradientView  StartColor="#142665" EndColor="#0090D5"  xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Aeonix Touch"
+             ClassId="inACallPage"
+             xmlns:local="clr-namespace:LinphoneXamarin.components.userControllers"
+             xmlns:gradient="clr-namespace:LinphoneXamarin.styles"
+             x:Class="LinphoneXamarin.components.MainPage"
+             xmlns:controls="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+           xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+                       ios:Page.UseSafeArea="true">
+    <AbsoluteLayout>
+        <StackLayout  x:Name="stack_layout"  AbsoluteLayout.LayoutBounds="0.5,0.5,.9,.9" AbsoluteLayout.LayoutFlags="All">
+            <StackLayout x:Name="infoPanel" Margin="20">
+                <StackLayout Orientation="Horizontal">
+                    <ImageButton Source="secure.png" HeightRequest="30" WidthRequest="30" CornerRadius="15" VerticalOptions="Center" BorderColor="White" BorderWidth="1" BackgroundColor="Transparent"></ImageButton>
+                    <Label x:Name="namelbl" VerticalOptions="Center" FontSize="Medium" TextColor="White"  FontAttributes="Bold" Text=""/>
+                    <Label x:Name="aliaslbl" VerticalOptions="Center" FontSize="Medium" TextColor="White"  FontAttributes="Bold" Text=""/>
+
+                </StackLayout>
+                <Label x:Name="statelbl" FontSize="Medium" TextColor="White" Text="{StaticResource connecting}"/>
+                <Label x:Name="timeLbl" FontSize="Medium" TextColor="White"  FontAttributes="Bold"  VerticalOptions="FillAndExpand"/>
+            </StackLayout>
+            <Grid x:Name="imagesPanel" HorizontalOptions="Center" WidthRequest="140"/>
+            <Grid IsVisible="False" x:Name="controlGrid" HorizontalOptions="CenterAndExpand" VerticalOptions="EndAndExpand" Margin="20" RowSpacing="20" ColumnSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="75" />
+                    <RowDefinition Height="75" />
+                    <RowDefinition Height="75" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="collaboration" VerticalOptions="Start"  Clicked="OnCollaborationClicked"  Text="&#xf2b5;"  BackgroundColor="#0090D5"  TextColor="White" FontSize="Large"  >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="collaborationLbl" VerticalOptions="End" VerticalTextAlignment="End" Text="{StaticResource collaboration}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+                <ImageButton x:Name="video" Source="video.png" VerticalOptions="Start"  Clicked="OnVideoClicked"    BackgroundColor="Transparent"  HeightRequest="55" WidthRequest="55"   />
+                <Label x:Name="videoLbl" VerticalOptions="End" VerticalTextAlignment="End" Text="{StaticResource video}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+                <ImageButton x:Name="hold" Source="hold.png" VerticalOptions="Start"  Clicked="OnHoldClicked"  BackgroundColor="Transparent"  HeightRequest="55" WidthRequest="55" />
+                <Label x:Name="holdlbl" VerticalOptions="End" VerticalTextAlignment="End" Text="{StaticResource hold}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+                <ImageButton x:Name="addCall" Source="add.png"  VerticalOptions="Start" Clicked="onAddcall" BackgroundColor="Transparent" HeightRequest="55" WidthRequest="55"   />
+                <Label x:Name="addlbl" VerticalOptions="End" Text="{StaticResource add}" HorizontalOptions="CenterAndExpand"  FontSize="Micro" TextColor="White"></Label>
+
+                <ImageButton x:Name="transfer" Source="transfer.png"  VerticalOptions="Start" Clicked="onTransfer"   BackgroundColor="Transparent" HeightRequest="55" WidthRequest="55"  />
+                <Label x:Name="transferlbl"  VerticalOptions="End" Text="{StaticResource transfer}" HorizontalOptions="CenterAndExpand"  FontSize="Micro" TextColor="White"></Label>
+
+                <Button x:Name="swap"  VerticalOptions="Start" Clicked="onSwap" Text="&#xf362;"  BackgroundColor="Transparent"  TextColor="White" FontSize="Large" >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="switchlbl" VerticalOptions="End" Text="{StaticResource switch}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+                <ImageButton x:Name="muteBtn" Source="mute.png"  VerticalOptions="Start" Clicked="onMute" HeightRequest="55" WidthRequest="55"  BackgroundColor="Transparent"  />
+                <Label x:Name="mutelbl"  VerticalOptions="End" Text="{StaticResource mute}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+                <!--
+                <Button x:Name="conference"  VerticalOptions="Start" Clicked="onConferenceClicked" Text="&#xf0c0;"  BackgroundColor="Transparent"  TextColor="White" FontSize="Large" >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="conferencelbl" VerticalOptions="End" Text="{StaticResource conference}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White">
+                </Label>
+-->
+                <ImageButton x:Name="dialPadBtn"  VerticalOptions="Start" Clicked="onShowDialPad"  Source="dtmf.png" HeightRequest="55" WidthRequest="55"  BackgroundColor="Transparent"  />
+                <Label x:Name="dialpadlbl" VerticalOptions="End" Text="{StaticResource dialpad}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+
+                <ImageButton x:Name="Terminate" Source="end.png"  Clicked="OnTerminateClicked"  VerticalOptions="Center"    BackgroundColor="Transparent" HeightRequest="55" WidthRequest="55" />
+                <ImageButton x:Name="Answer" Source="answer.png" Clicked="OnAnswerClicked"  VerticalOptions="Center"   BackgroundColor="Transparent" HeightRequest="55" WidthRequest="55"/>
+                
+                <Label x:Name="answerLbl" VerticalOptions="End" Text="{StaticResource hold_answer}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+                <Label x:Name="endLbl" VerticalOptions="End"  Text="{StaticResource end_answer}" HorizontalOptions="CenterAndExpand" FontSize="Micro"   TextColor="White"></Label>
+                <ImageButton x:Name="AnswerAndTerminate" Source="answerend.png" Clicked="OnAnswerTerminateClicked"  VerticalOptions="Center" BackgroundColor="Transparent" HeightRequest="55" WidthRequest="55"/>
+
+                <ImageButton x:Name="videoAnswer"  Source="answervideo.png" Clicked="OnVideoAnswerClicked"  BackgroundColor="Transparent" HeightRequest="55" WidthRequest="55"/>
+
+                <ImageButton x:Name="moreBtn" Source="more.png"  Clicked="OnMoreClicked" VerticalOptions="Start"  BackgroundColor="Transparent"  HeightRequest="55" WidthRequest="55" ></ImageButton>
+                <Label x:Name="moreLbl" VerticalOptions="End" Text="{StaticResource more}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+            </Grid>
+
+            <StackLayout IsVisible="False" x:Name="dialPad" VerticalOptions="EndAndExpand" Margin="20" >
+                <Label Margin="7" x:Name="number" YAlign="Center" HorizontalOptions="Start" FontSize="Large" TextColor="White" Text="" />
+
+                <Grid RowSpacing="1" ColumnSpacing="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="60" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+
+                    </Grid.ColumnDefinitions>
+                    <Label TextColor="White" VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="2" Text="ABC" Grid.Row="0" Grid.Column="1"  />
+                    <Label TextColor="White" VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="3" Text="DEF" Grid.Row="0" Grid.Column="2" />
+                    <Label TextColor="White" VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="4" Text="GHI" Grid.Row="1" Grid.Column="0"  />
+                    <Label TextColor="White" VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="5" Text="JKL" Grid.Row="1" Grid.Column="1"  />
+                    <Label TextColor="White" VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="6" Text="MNO" Grid.Row="1" Grid.Column="2"  />
+                    <Label TextColor="White" VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="7" Text="PQRS" Grid.Row="2" Grid.Column="0"  />
+                    <Label TextColor="White" VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="8" Text="TUV" Grid.Row="2" Grid.Column="1"  />
+                    <Label TextColor="White" VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="9" Text="WXYZ" Grid.Row="2" Grid.Column="2"  />
+                    <Label TextColor="White" VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="0" Text="+" Grid.Row="3" Grid.Column="1" />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="1" Grid.Row="0" Grid.Column="0"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="2" Grid.Row="0" Grid.Column="1"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="3" Grid.Row="0" Grid.Column="2"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="4" Grid.Row="1" Grid.Column="0"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="5" Grid.Row="1" Grid.Column="1"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="6" Grid.Row="1" Grid.Column="2"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="7" Grid.Row="2" Grid.Column="0"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="8" Grid.Row="2" Grid.Column="1" />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="9" Grid.Row="2" Grid.Column="2"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="*" Grid.Row="3" Grid.Column="0"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="0" Grid.Row="3" Grid.Column="1"  />
+                    <Button  TextColor="White" FontAttributes="Bold" BackgroundColor="Transparent" Clicked="onDialPadBtnClicked" FontSize="Small" Text="#" Grid.Row="3" Grid.Column="2" />
+
+                    <ImageButton x:Name="Terminate2" Source="end.png" Clicked="OnTerminateClicked" Grid.Row="4" Grid.Column="1" BackgroundColor="Transparent" VerticalOptions="Center" HeightRequest="55" WidthRequest="55"/>
+
+                    <ImageButton Clicked="onCancelDialPad" Source="dtmf_active.png" BackgroundColor="Transparent" Grid.Row="4" Grid.Column="0" HeightRequest="55" WidthRequest="55"/>
+                </Grid>
+            </StackLayout>
+        </StackLayout>
+
+        <StackLayout x:Name="moreContainer" IsVisible="False" AbsoluteLayout.LayoutBounds=".95,.75" AbsoluteLayout.LayoutFlags="PositionProportional">
+
+            <Frame  BackgroundColor="#102347"  Margin="0"  CornerRadius="10">
+                <StackLayout Orientation="Vertical">
+                    <Label  Text="{StaticResource video}" VerticalOptions="Center" FontSize="Medium" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+      Tapped="OnVideoClicked"
+      NumberOfTapsRequired="1"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  Text="{StaticResource switch}" VerticalOptions="Center" FontSize="Medium" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+      Tapped="onSwap"
+      NumberOfTapsRequired="1"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  Text="{StaticResource transfer}"  FontSize="Medium" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+      Tapped="onTransfer"
+      NumberOfTapsRequired="1"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  Text="{StaticResource conference}"  FontSize="Medium" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+      Tapped="onConferenceClicked"
+      NumberOfTapsRequired="1"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </Frame>
+            <BoxView BackgroundColor="#102347" HorizontalOptions="Center" Rotation="45" Margin="-14" HeightRequest="12" WidthRequest="12" CornerRadius="2" />
+        </StackLayout>
+        <StackLayout x:Name="audioContainer" IsVisible="False" AbsoluteLayout.LayoutBounds="1,.15" AbsoluteLayout.LayoutFlags="PositionProportional">
+            <BoxView BackgroundColor="#102347" HorizontalOptions="Center" Rotation="135" Margin="-14" HeightRequest="12" WidthRequest="12" CornerRadius="2" />
+            <Frame  BackgroundColor="#102347"  Margin="0"  CornerRadius="10">
+                <StackLayout Orientation="Vertical">
+                    <Label  Text="{StaticResource earPeace}" VerticalOptions="Center" FontSize="Medium" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+      Tapped="onHearPeace"
+      NumberOfTapsRequired="1"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  Text="{StaticResource speaker}" VerticalOptions="Center" FontSize="Medium" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+      Tapped="onSpeaker"
+      NumberOfTapsRequired="1"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  Text="{StaticResource blueTooth}"  FontSize="Medium" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+      Tapped="onBT"
+      NumberOfTapsRequired="1"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </Frame>
+
+        </StackLayout>
+
+        <Label  Text="&#xf053;"  TextColor="White" FontSize="Large" Margin="20" AbsoluteLayout.LayoutBounds="0,0" AbsoluteLayout.LayoutFlags="PositionProportional">
+            <Label.FontFamily>
+                <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+            </Label.FontFamily>
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer
+      Tapped="onBackClicked"
+      NumberOfTapsRequired="1"/>
+            </Label.GestureRecognizers>
+        </Label>
+        <StackLayout x:Name="confPanel" IsVisible="false" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All">
+            <StackLayout.Background>
+                <LinearGradientBrush  EndPoint="0,1">
+                    <GradientStop Color="#142665" Offset="0.1" />
+                    <GradientStop Color="#0090D5" Offset="1.0" />
+                </LinearGradientBrush>
+            </StackLayout.Background>
+            <Button Text="&#xf00d;" FontSize="Large" HorizontalOptions="Start" BackgroundColor="Transparent"  TextColor="White" Clicked="onConfPanelToggled" >
+                <Button.FontFamily>
+                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                </Button.FontFamily>
+            </Button>
+            <Label FontSize="Medium" TextColor="White"  HorizontalOptions="Center" VerticalOptions="Fill" Text="{StaticResource participants}" Margin="10"/>
+            <ListView HasUnevenRows="True" HeightRequest="200"  SeparatorVisibility="Default" x:Name="callsListView"  BackgroundColor="Transparent">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal">
+                                <controls:CircleImage Source="{x:Binding image}" Aspect="AspectFill" HeightRequest="40" WidthRequest="40"  HorizontalOptions="Center" Margin="6" >
+                                </controls:CircleImage>
+                                <StackLayout VerticalOptions="Center" Orientation="Vertical">
+                                    <Label  TextColor="White" Text="{x:Binding displayName}"/>
+                                    <Label  TextColor="White" Text="{x:Binding primaryAlias}"/>
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+        </StackLayout>
+        <ImageButton  x:Name="speakerBtn" Margin="20" Clicked="onSpeakerClicked" BackgroundColor="#B4D0DE" WidthRequest="50" HeightRequest="50" CornerRadius="25" AbsoluteLayout.LayoutBounds="1,0"  AbsoluteLayout.LayoutFlags="PositionProportional" />
+        <Label x:Name="infoLbl" IsVisible="false" FontSize="Small" BackgroundColor="Red" TextColor="White" Padding="7"  AbsoluteLayout.LayoutBounds=".5,0" Margin="2"  AbsoluteLayout.LayoutFlags="PositionProportional"/>
+    </AbsoluteLayout>
+</gradient:GradientView>

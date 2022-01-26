@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.userControllers.RecentComponent"
+              x:Name="root"
+             xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers"
+              FlowDirection="{StaticResource FlowDirection}">
+    <ContentView.Content>
+        <StackLayout x:Name="callLogsComponent" VerticalOptions="Fill" >
+            <Frame  BackgroundColor="White" Padding="7"  CornerRadius="10">
+                <StackLayout>
+                    <Frame  BackgroundColor="#eee" HorizontalOptions="Center" Margin="2" Padding="-5"  CornerRadius="20">
+                        <StackLayout x:Name="missedCallContainer" Orientation="Horizontal" HorizontalOptions="Center">
+                            <Button x:Name="switchOn" TextColor="White" Text="{StaticResource recent}" WidthRequest="150" CornerRadius="25" FontSize="Small" >
+                                <Button.Background>
+                                    <LinearGradientBrush  EndPoint="0,1">
+                                        <GradientStop Color="#BAE9FF" Offset="0.1" />
+                                        <GradientStop Color="#0091D3" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Button.Background>
+                            </Button>
+                            <Button x:Name="switchOff" Text="{StaticResource missed}" WidthRequest="150"  FontSize="Small" Clicked="onRecentSwitch" BackgroundColor="Transparent"></Button>
+                        </StackLayout>
+                    </Frame>
+
+                    <AbsoluteLayout>
+
+                        <ListView  IsPullToRefreshEnabled="True" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"
+                          RefreshCommand="{Binding RefreshCommand}"
+                          IsRefreshing="{Binding IsRefreshing}"
+                          IsGroupingEnabled="True"
+                          GroupDisplayBinding="{Binding Title}"
+                          HasUnevenRows="True"
+                          SeparatorVisibility="None"
+                          x:Name="callsLogList"
+                               CachingStrategy="RecycleElementAndDataTemplate"
+                        ItemAppearing="itemAppearing"
+                               ItemTapped="onItemTapped"
+                          ItemsSource="{Binding}">
+                            <ListView.GroupHeaderTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <StackLayout BackgroundColor="White">
+                                            <Label Text="{Binding Title}"  TextColor="#9EA6B4" FontAttributes="Bold"  FontSize="Small" VerticalOptions="Center" HorizontalOptions="Center"></Label>
+                                        </StackLayout>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.GroupHeaderTemplate>
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <control:CallLogCell 
+                                    image="{x:Binding image}"
+                                    contactType="{x:Binding contact.type}" 
+                                    isFav="{x:Binding contact.isFav}"
+                                    userName="{x:Binding contact.userName}"
+                                    displayName="{x:Binding displayName}"
+                                    alias="{x:Binding alias}"  
+                                    presence="{x:Binding contact.presenceStatus}" 
+                                    hasImage="{x:Binding contact.hasImage}"/>
+
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                            <ListView.Footer>
+                                <Button x:Name="loadMore" HeightRequest="100" Clicked="onLoadMoreBtn" IsVisible="False" Text="&#xf103;" BackgroundColor="Transparent" TextColor="DimGray" HorizontalOptions="Center" Margin="5" >
+                                    <Button.FontFamily>
+                                        <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                    </Button.FontFamily>
+                                </Button>
+                            </ListView.Footer>
+                        </ListView>
+                        <Label x:Name="loadingLbl" IsVisible="False" BackgroundColor="White" FontSize="Medium" HorizontalOptions="CenterAndExpand" FontAttributes="Bold" TextColor="Gray" AbsoluteLayout.LayoutBounds=".5,.9"  AbsoluteLayout.LayoutFlags="PositionProportional"></Label>
+                        <StackLayout x:Name="noRecentContainer" IsVisible="False" Margin="10" AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds=".5,0"  >
+                            <Image Source="addrecent.png" HeightRequest="150" WidthRequest="150" Margin="10"/>
+                            <Label Text="No Recent Calls" TextColor="Black" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" Margin="10"/>
+                        </StackLayout>
+                    </AbsoluteLayout>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

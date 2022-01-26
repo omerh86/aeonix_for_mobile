@@ -1,0 +1,69 @@
+﻿
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using System;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class TopBarComponent : ContentView
+    {
+        private MyContanctVM myContanctVM;
+
+        public static readonly BindableProperty SelectPresenceCommandProperty =
+  BindableProperty.Create("SelectPresenceCommand", typeof(ICommand), typeof(TopBarComponent), null);
+
+        public ICommand SelectPresenceCommand
+        {
+            get { return (ICommand)GetValue(SelectPresenceCommandProperty); }
+            set { SetValue(SelectPresenceCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty SearchCommandProperty =
+ BindableProperty.Create("SearchCommand", typeof(ICommand), typeof(TopBarComponent), null);
+
+        public ICommand SearchCommand
+        {
+            get { return (ICommand)GetValue(SearchCommandProperty); }
+            set { SetValue(SearchCommandProperty, value); }
+        }
+        public static void Execute(ICommand command, object val)
+        {
+            if (command == null) return;
+            if (command.CanExecute(null))
+            {
+                command.Execute(val);
+            }
+        }
+
+        public TopBarComponent()
+        {
+            InitializeComponent();
+            if (AeonixInfoService.Instance.myContactListener != null)
+                myContanctVM = AeonixInfoService.Instance.myContactListener;
+            else
+                myContanctVM = new MyContanctVM();
+
+            BindingContext = myContanctVM;
+            search.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => OnSearchTapped()),
+            });
+        }
+
+        public void OnImageTapped(object sender, EventArgs e)
+        {
+            Execute(SelectPresenceCommand, null);
+        }
+
+        public void OnSearchTapped()
+        {
+            Execute(SearchCommand, null);
+        }
+
+
+    }
+}

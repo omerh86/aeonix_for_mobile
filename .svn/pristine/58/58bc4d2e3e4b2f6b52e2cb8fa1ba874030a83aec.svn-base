@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<StackLayout xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.userControllers.CallListView"
+              FlowDirection="{StaticResource FlowDirection}">
+
+    <StackLayout   Orientation="Vertical" Margin="3">
+
+        <Frame Margin="0" CornerRadius="5" Padding="0" BackgroundColor="Transparent">
+            <Label x:Name="callsBtn"   BackgroundColor="#25D366"  HorizontalOptions="End"  TextColor="White" FontAttributes="Bold" FontSize="Large" Text="" >
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+      Tapped="toggleCallList"
+      NumberOfTapsRequired="1"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </Frame>
+        <ListView x:Name="callsListComponent" BackgroundColor="Transparent"  HasUnevenRows="True" IsVisible="False"  HeightRequest="300" ItemTapped="setCurrentCall">
+            <ListView.ItemTemplate>
+                <DataTemplate >
+                    <ViewCell>
+                        <StackLayout  Orientation="Horizontal" BackgroundColor="White" Padding="0,5,0,5">
+                            <Label VerticalOptions="Center" HorizontalOptions="Start" FontSize="Medium" TextColor="Black" FontAttributes="Bold" Text="{x:Binding name}"/>
+                            <Label VerticalOptions="Center"  FontSize="Small" TextColor="Black" FontAttributes="Bold" Text="{x:Binding alias}"/>
+                            <Label VerticalOptions="Center" HorizontalOptions="End" FontSize="Small" TextColor="Black" IsVisible="{x:Binding isCurrentCall}" FontAttributes="Bold" Text="&#xf00c;">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="Font Awesome 5 Free"  />
+                                </Label.FontFamily>
+                            </Label>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </StackLayout>
+
+</StackLayout>

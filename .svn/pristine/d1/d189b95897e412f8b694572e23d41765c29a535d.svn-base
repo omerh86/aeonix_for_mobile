@@ -1,0 +1,68 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using Linphone;
+using LinphoneXamarin.Util;
+using Xamarin.Forms;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+
+namespace LinphoneXamarin.Entities
+{
+    public class BaseContact : INotifyPropertyChanged
+    {
+        public string userName { set; get; }
+        public string displayName { set; get; }
+        public string firstName { set; get; }
+        public string lastName { set; get; }
+        public string email { set; get; }
+        public string primaryAlias { set; get; }
+        public List<string> allAliases { set; get; }
+        public List<ExtNumber> allExternalAliases { set; get; }
+        public string company { get; set; }
+        public string department { get; set; }
+        public string description { get; set; }
+        public string homeAddress { get; set; }
+        public string phonebook { get; set; }
+        public long imageSignature { set; get; }
+        public ContactType type { set; get; }
+
+        private bool _isFav;
+        public bool isFav
+        {
+            get
+            {
+                return _isFav;
+            }
+            set
+            {
+                _isFav = value;
+                OnPropertyChanged("isFav");
+            }
+        }
+
+        private Presence _presenceStatus;
+        public Presence presenceStatus
+        {
+            get
+            {
+                return _presenceStatus;
+            }
+            set
+            {
+                _presenceStatus = value;
+                OnPropertyChanged("presenceStatus");
+            }
+        }
+
+        public string monitorCrossRefID { set; get; }
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged(string nameOfProperty)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameOfProperty));
+        }
+    }
+}

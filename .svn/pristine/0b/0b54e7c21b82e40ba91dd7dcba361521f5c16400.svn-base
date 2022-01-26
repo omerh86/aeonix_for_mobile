@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.userControllers.MyPresenceComponent">
+    <ContentView.Content>
+        <StackLayout>
+            <BoxView BackgroundColor="#102347" HorizontalOptions="Center" Rotation="135" Margin="-14" HeightRequest="12" WidthRequest="12" CornerRadius="2" />
+            <Frame x:Name="presenceList" BackgroundColor="#102347"  Margin="0"  CornerRadius="10">
+                <StackLayout Orientation="Vertical">
+                    <StackLayout Orientation="Horizontal">
+                        <BoxView BackgroundColor="Green" HeightRequest="12" WidthRequest="12" VerticalOptions="Center" CornerRadius="6"/>
+                        <Label x:Name="AvaliableLbl" Text="{StaticResource available}" VerticalOptions="Center" FontSize="Medium" TextColor="White"></Label>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <BoxView BackgroundColor="#FFA500" HeightRequest="12" WidthRequest="12" VerticalOptions="Center" CornerRadius="6"/>
+                        <Label x:Name="busyLbl" Text="{StaticResource atAMeeting}" VerticalOptions="Center" FontSize="Medium" TextColor="White"></Label>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <BoxView BackgroundColor="Red" HeightRequest="12" WidthRequest="12" VerticalOptions="Center" CornerRadius="6"/>
+                        <Label x:Name="dndLbl" Text="{StaticResource doNotDisturb}"  FontSize="Medium" TextColor="White"></Label>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

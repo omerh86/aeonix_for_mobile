@@ -1,0 +1,424 @@
+﻿#if __IOS__
+using System;
+using Foundation;
+using CallKit;
+using UIKit;
+using System.Linq;
+using System.Threading;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Util;
+
+namespace LinphoneXamarin.MyCallKit
+{
+    public class ProviderDelegate : CXProviderDelegate
+    {
+
+        private static readonly object padlock = new object();
+        private static ProviderDelegate instance = null;
+        public ActiveCallManager CallManager { get; set; }
+        public CXProviderConfiguration Configuration { get; set; }
+        public CXProvider Provider { get; set; }
+        public ActiveCall activeCall { get; set; }
+        public ICallKitNotifier callKitNotifier { get; set; }
+
+        public static ProviderDelegate Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    MyFileSystem.Instance.writeDebug("ProviderDelegate getinstance()", "callKitDelegate");
+                    Console.WriteLine("omer928:ProviderDelegate getinstance()");
+                    if (instance == null)
+                    {
+                        instance = new ProviderDelegate();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        #region Constructors
+        private ProviderDelegate()
+        {
+            addLog("ProviderDelegate()");
+            CallManager = new ActiveCallManager();
+
+            // Define handle types
+            var handleTypes = new[] { (NSNumber)(int)CXHandleType.PhoneNumber };
+
+            // Get Image Template
+            var templateImage = UIImage.FromFile("logo-no-bg.png");
+
+            // Setup the initial configurations
+            var ringTone = "ring3.wav";
+   var settings= MyFileSystem.Instance.loadSettings();
+if(settings!=null){
+ringTone=settings.ringFile;
+}
+            Configuration = new CXProviderConfiguration("Aeonix-Touch")
+            {
+                MaximumCallsPerCallGroup = 10,
+                MaximumCallGroups = 10,
+                SupportedHandleTypes = new NSSet<NSNumber>(handleTypes),
+                IconTemplateImageData = templateImage.AsPNG(),
+                RingtoneSound = ringTone
+            };
+
+            // Create a new provider
+            Provider = new CXProvider(Configuration);
+            
+            // Attach this delegate
+            Provider.SetDelegate(this, null);
+
+        }
+        #endregion
+
+        #region Override Methods
+        public override void DidReset(CXProvider provider)
+        {
+  addLog("DidReset()");
+            // Remove all calls
+            Console.WriteLine("omer928:DidReset");
+            CallManager.Calls.Clear();
+        }
+
+        public override void PerformStartCallAction(CXProvider provider, CXStartCallAction action)
+        {
+            // Create new call record
+            addLog("PerformStartCallAction()");
+            var activeCall = new ActiveCall(action.CallUuid, action.CallHandle.Value, true);
+            
+            // Monitor state changes
+            activeCall.StartingConnectionChanged += (call) =>
+            {
+                if (call.IsConnecting)
+                {
+                    // Inform system that the call is starting
+                    addLog("Provider.ReportConnectingOutgoingCall()");
+                   
+                    Provider.ReportConnectingOutgoingCall(call.UUID, new NSDate());
+                }
+            };
+
+            activeCall.ConnectedChanged += (call) =>
+            {
+                if (call.IsConnected)
+                {
+                    addLog("provider.ReportConnectedOutgoingCall()");
+                   
+                    // Inform system that the call has connected
+                    provider.ReportConnectedOutgoingCall(call.UUID, new NSDate());
+                    ReportCall(call.UUID);
+                }
+            };
+
+            // Start call
+            activeCall.StartCall((successful) =>
+            {
+                // Was the call able to be started?
+                if (successful)
+                {
+                    // Yes, inform the system
+                    addLog("call started successfuly");
+                    action.Fulfill();
+
+                    // Add call to manager
+                    CallManager.Calls.Add(activeCall);
+                    activeCall.IsConnecting = true;
+                }
+                else
+                {
+                    // No, inform system
+                    action.Fail();
+                }
+            });
+        }
+
+        public override void PerformAnswerCallAction(CXProvider provider, CXAnswerCallAction action)
+        {
+            addLog("PerformAnswerCallAction()");
+            // Find requested call
+            var call = CallManager.FindCall(action.CallUuid);
+
+            // Found?
+            if (call == null)
+            {
+                // No, inform system and exit
+               return;
+            }
+
+            // Attempt to answer call
+
+            call.AnswerCall((successful) =>
+            {
+                // Was the call successfully answered?
+                if (successful)
+                {
+                    // Yes, inform system
+                    action.Fulfill();
+               
+                }
+                else
+                {
+                    // No, inform system
+                    action.Fail();
+                }
+            },call.isVideo);
+        }
+
+        public override void PerformEndCallAction(CXProvider provider, CXEndCallAction action)
+        {
+            addLog("PerformEndCallAction()");
+            // Find requested call
+            var call = CallManager.FindCall(action.CallUuid);
+
+            // Found?
+            if (call == null)
+            {
+                addLog("PerformEndCallAction() call was not found ");
+                // No, inform system and exit
+                action.Fulfill();
+                return;
+            }
+
+           
+            call.EndCall((successful) =>
+            {
+               
+                if (successful)
+                {
+                    addLog("PerformEndCallAction() action succeseded");
+                    // Remove call from manager's queue
+                    CallManager.Calls.Remove(call);
+
+                    // Yes, inform system
+                    action.Fulfill();
+                }
+                else
+                {
+                    // No, inform system
+                    addLog("PerformEndCallAction() action failed");
+                   
+                    action.Fail();
+                }
+            });
+        }
+
+        public override void PerformSetMutedCallAction(CXProvider provider, CXSetMutedCallAction action)
+        {
+
+            // Find requested call
+            var call = CallManager.FindCall(action.CallUuid);
+
+            // Found?
+            if (call == null)
+            {
+                // No, inform system and exit
+                action.Fulfill();
+                return;
+            }
+
+              addLog("PerformSetMutedCallAction()");
+
+            // Update hold status
+            call.IsMute = action.Muted;
+
+            // Inform system of success
+            action.Fulfill();
+
+        }
+
+
+        public override void PerformSetHeldCallAction(CXProvider provider, CXSetHeldCallAction action)
+        {
+            addLog("PerformSetHeldCallAction()");
+            // Find requested call
+            var call = CallManager.FindCall(action.CallUuid);
+
+            // Found?
+            if (call == null)
+            {
+                // No, inform system and exit
+                action.Fail();
+                return;
+            }
+           
+            // Update hold status
+            call.IsOnHold = action.OnHold;
+
+            // Inform system of success
+            action.Fulfill();
+        }
+
+        public override void TimedOutPerformingAction(CXProvider provider, CXAction action)
+        {
+            addLog("TimedOutPerformingAction()");
+           }
+
+        public override void DidActivateAudioSession(CXProvider provider, AVFoundation.AVAudioSession audioSession)
+        {
+            addLog("DidActivateAudioSession()");
+            addLog("SetAudioSessionActivation to true");
+            //LinphoneBase.Instance.linphoneCore.SetAudioSessionActivation(true);
+            NSError error;
+            audioSession.SetMode(new NSString("voiceChat"), out error);
+            audioSession.SetCategory(AVFoundation.AVAudioSessionCategory.PlayAndRecord);
+
+            //AVFoundation.AVAudioSession.SharedInstance().SetMode(new NSString("voiceChat"), out error);
+            //AVFoundation.AVAudioSession.SharedInstance().SetCategory(AVFoundation.AVAudioSessionCategory.PlayAndRecord);
+
+        }
+
+        public override void DidDeactivateAudioSession(CXProvider provider, AVFoundation.AVAudioSession audioSession)
+        {
+            // End the calls audio session and restart any non-call
+            // related audio
+            
+            addLog("DidDeactivateAudioSession()");
+            addLog("SetAudioSessionActivation to false");
+           
+            //LinphoneBase.Instance.linphoneCore.SetAudioSessionActivation(false);
+        }
+
+        #endregion
+
+        #region Public Methods
+        public void ReportIncomingCall(string handle,bool hasVideo)
+        {
+            addLog("ReportIncomingCall()");
+           
+            // Create update to describe the incoming call and caller
+            var update = new CXCallUpdate();
+            update.RemoteHandle = new CXHandle(CXHandleType.Generic, handle);
+            update.SupportsDtmf = false;
+            update.SupportsGrouping = false;
+            update.HasVideo = hasVideo;
+            update.SupportsHolding = false;
+            // Report incoming call to system
+            var uuid = new NSUuid();
+
+            Provider.ReportNewIncomingCall(uuid, update, (error) =>
+            {
+                // Was the call accepted
+                if (error == null)
+                {
+                    // Yes, report to call manager
+                    CallManager.Calls.Add(new ActiveCall(uuid, handle, hasVideo));
+                }
+                else
+                {
+                    // Report error to user here
+                    addLog("ReportNewIncomingCallError(): "+error);
+
+                }
+            });
+        }
+
+        public void ReportCall(NSUuid uuid)
+        {
+            addLog("ReportCall()");
+
+            var update = new CXCallUpdate();
+
+            update.SupportsDtmf = false;
+            update.SupportsGrouping = false;
+            update.HasVideo = false;
+            update.SupportsHolding = false;
+           
+            Provider.ReportCall(uuid, update);
+        }
+
+
+        public void reportEndCall(NSUuid nSUuid)
+        {
+
+            // Find requested call
+            var call = CallManager.FindCall(nSUuid);
+
+            // Found?
+            if (call != null)
+            {
+                addLog("reportEndCall() nSUuid: " + nSUuid);
+               
+                CallManager.EndCall(call);
+            }
+        }
+
+        public NSUuid getIncomingCallUUID()
+        {
+            addLog("getIncomingCallUUID()");
+            if (CallManager.Calls != null && CallManager.Calls.Count > 0)
+                return CallManager.Calls[0].UUID;
+            return null;
+        }
+
+        public void reportMuteCall(NSUuid nSUuid)
+        {
+
+            // Find request  ed call
+            var call = CallManager.FindCall(nSUuid);
+
+            // Found?
+            if (call != null)
+            {
+                addLog("reportMuteCall() nSUuid: " + nSUuid);
+               
+                if (call.IsMute)
+                    CallManager.RemoveCallFromOnMute(call);
+                else
+                    CallManager.PlaceCallOnMute(call);
+            }
+        }
+
+        public void reportHoldCall(NSUuid nSUuid,bool ishold)
+        {
+                addLog("reportHoldCall() nSUuid: " + nSUuid);
+            var call = CallManager.FindCall(nSUuid);
+
+            // Found?
+            if (call != null)
+            {
+               
+                if (ishold)
+                    CallManager.PlaceCallOnHold(call);
+                else
+                    CallManager.RemoveCallFromOnHold(call);
+            }
+        }
+
+
+        public void reportOutGoingCall(string name)
+        {
+            foreach (var c in CallManager.Calls)
+                CallManager.PlaceCallOnHold(c);
+
+            CallManager.StartCall(name);
+        }
+
+        public void reportCallConnected(NSUuid nSUuid)
+        {
+
+            var call = CallManager.FindCall(nSUuid);
+
+            // Found?
+            if (call != null)
+            {
+                addLog("reportCallConnected() nSUuid: " + nSUuid);
+
+                call.IsConnected = true;
+            }
+        }
+
+
+        #endregion
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "callKitDelegate");
+            Console.WriteLine($"omer928: {message}");
+        }
+
+    }
+}
+#endif

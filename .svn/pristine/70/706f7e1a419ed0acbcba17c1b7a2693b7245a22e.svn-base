@@ -1,0 +1,67 @@
+﻿
+using Xamarin.Forms;
+using LinphoneXamarin.Util;
+
+namespace LinphoneXamarin.Entities
+{
+    public class MySettings
+    {
+        public bool isMessageSound { set; get; }
+        public bool isRingSound { set; get; }
+        public bool isMessageVibrate { set; get; }
+        public bool isRingVibrate { set; get; }
+        public string ringFile { set; get; }
+        public float micGain { set; get; }
+        public string micDevice { set; get; }
+        public string videoDevice { set; get; }
+        public string inAcallDevice { set; get; }
+        public string ringDevice { set; get; }
+        public HotKey answerKey { set; get; }
+        public HotKey endKey { set; get; }
+        public HotKey callKey { set; get; }
+        public bool isTermOfUse { set; get; }
+        public bool IsSyncContacts { set; get; }
+        public string voiceMailPassword { set; get; }
+        public Language lang { set; get; }
+        public bool isActionComponentVisble { set; get; }
+
+
+
+
+        public MySettings(bool isMessageSound, bool isRingSound, bool isMessageVibrate, bool isRingVibrate, Language lang)
+        {
+            this.isMessageSound = isMessageSound;
+            this.isRingSound = isRingSound;
+            this.isMessageVibrate = isMessageVibrate;
+            this.isRingVibrate = isRingVibrate;
+            this.lang = lang;
+            this.ringDevice = "Default";
+            this.inAcallDevice = "Default";
+            this.micDevice = "Default";
+            this.videoDevice = "Default";
+            ringFile = "ring5.wav";
+            micGain = 0;
+            isTermOfUse = false;
+            answerKey = HotKey.CtrlQ;
+            endKey = HotKey.CtrlW;
+            callKey = HotKey.Ctrlf7;
+            voiceMailPassword = "";
+            IsSyncContacts = false;
+            isActionComponentVisble = true;
+        }
+
+        public void loadlangResources()
+        {
+            MyFileSystem.Instance.writeDebug("loadlangResources", "MY_SETTINGS");
+            Application.Current.Resources = MyFileSystem.Instance.getResourceDictionary(lang);
+            if (lang == Language.HEBREW)
+                Application.Current.Resources.Add("FlowDirection", FlowDirection.RightToLeft);
+            else
+            {
+                Application.Current.Resources.Add("FlowDirection", FlowDirection.LeftToRight);
+            }
+
+        }
+
+    }
+}

@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using Linphone;
+
+namespace LinphoneXamarin.Entities
+{
+    public class LoginInfo
+    {
+        public string loginName { set; get; }
+        public string userName { set; get; }
+        public string password { set; get; }
+        public string aeonixVersion { set; get; }
+        public string tenantPrefix { set; get; }
+        public List<IPInfo> sipAdresses { set; get; }
+        public int favoriteSipAdressIndex { set; get; }
+
+
+
+        public LoginInfo(string loginName, string userName, string password, List<IPInfo> sipAdresses)
+        {
+
+            this.loginName = loginName;
+            this.userName = userName;
+            this.password = password;
+            this.sipAdresses = sipAdresses;
+            this.favoriteSipAdressIndex = 0;
+        }
+
+        public class IPInfo
+        {
+            public string ip { set; get; }
+            public int port { set; get; }
+            public string proxyIp { set; get; }
+            public int proxyPort { set; get; }
+            public TransportType transport { set; get; }
+
+            public IPInfo(string ip, int port, string proxyIp, int proxyPort, TransportType transport)
+            {
+                this.ip = ip;
+                this.port = port;
+                this.proxyIp = proxyIp;
+                this.proxyPort = proxyPort;
+                this.transport = transport;
+            }
+        }
+
+    }
+}

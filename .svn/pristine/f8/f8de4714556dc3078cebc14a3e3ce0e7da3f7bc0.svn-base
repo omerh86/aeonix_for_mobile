@@ -1,0 +1,257 @@
+﻿using LinphoneXamarin.Entities;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using Linphone;
+using Xamarin.Forms;
+
+namespace LinphoneXamarin.Util
+{
+    public sealed class MyEnumHelper
+    {
+        private static MyEnumHelper instance = null;
+        private static readonly object padlock = new object();
+
+        MyEnumHelper()
+        {
+
+
+        }
+        public static MyEnumHelper Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new MyEnumHelper();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public Presence getPresenceTypeByString(string explicitPresence, string implicitPresence)
+        {
+            int counter = 0;
+            switch (implicitPresence)
+            {
+                case "OFFLINE":
+                    return Presence.OFFLINE;
+
+                case "ONLINE":
+                case "AVAILABLE":
+                    counter++;
+                    break;
+                case "BUSY":
+                    return Presence.BUSY;
+
+            }
+            switch (explicitPresence)
+            {
+                case "OFFLINE":
+                    return Presence.OFFLINE;
+
+                case "AT_THE_MEETING":
+                    return Presence.MEETING;
+                case "UNREACHABLE":
+                    return Presence.DND;
+
+            }
+            if (counter == 0)
+            {
+                return Presence.NONE;
+            }
+            else
+            {
+                return Presence.ONLINE;
+            }
+        }
+
+        public string getLanguageAsString(Language lang)
+        {
+            switch (lang)
+            {
+                case Language.CHINESE:
+                    return "zh";
+                case Language.ENGLISH:
+                    return "en";
+                case Language.HEBREW:
+                    return "he";
+                case Language.PORTUGUESE:
+                    return "pt";
+                case Language.SPANISH:
+                    return "sp";
+                default:
+                    return "NONE";
+            }
+        }
+
+        public string getPresenceByType(Presence presence)
+        {
+            switch (presence)
+            {
+                case Presence.OFFLINE:
+                    return "OFFLINE";
+                case Presence.ONLINE:
+                    return "ONLINE";
+                case Presence.DND:
+                    return "UNREACHABLE";
+                case Presence.MEETING:
+                    return "AT_THE_MEETING";
+                default:
+                    return "NONE";
+            }
+        }
+
+
+
+        public CallDirection getCallDirectionByString(string callDirection, int callDuration)
+        {
+            switch (callDirection)
+            {
+                case "OUTGOING":
+                    return CallDirection.OutGoing;
+                case "INCOMING":
+                    if (callDuration > 0)
+                        return CallDirection.Incoming;
+                    else
+                        return CallDirection.Missed;
+                default:
+                    return CallDirection.Missed;
+            }
+        }
+
+
+
+        public string getLoginErrorAsString(LoginError loginError)
+        {
+            var result = "Registration Failed: ";
+            switch (loginError)
+            {
+                case LoginError.ForcedStop:
+                    return result += "Registration Stopped!";
+                case LoginError.InvalidDomain:
+                    return result += "Domain or port are incorrect!";
+                case LoginError.InvalidCardentials:
+                    return result += "Username or password are incorrect!";
+                case LoginError.RegistrationFailed:
+                    return result += "Can't connect to the server!";
+                default:
+                    return result += "Unknown error!";
+            }
+        }
+
+        public string getMyRegistrationStateAsString(MyRegistrationState myRegistrationState)
+        {
+
+            switch (myRegistrationState)
+            {
+                case MyRegistrationState.ConnectingTR87:
+                    return (string)Application.Current.Resources["connecting"];
+                case MyRegistrationState.ConnectingAeonix:
+                    return (string)Application.Current.Resources["finalizingconnection"];
+                case MyRegistrationState.InviteTr87:
+                    return (string)Application.Current.Resources["validateCredentials"];
+                case MyRegistrationState.ReConnectingAeonix:
+                    return (string)Application.Current.Resources["reconnecting"];
+                default:
+                    return (string)Application.Current.Resources["loading"];
+            }
+        }
+
+        public string getInfoErrAsString(InfoErr err)
+        {
+
+            switch (err)
+            {
+                case InfoErr.BUSY:
+                    return (string)Application.Current.Resources["busy"];
+                case InfoErr.NO_DATA:
+                    return (string)Application.Current.Resources["noData"];
+
+                default:
+                    return "error";
+            }
+        }
+
+        public string getCallStateAsString(CallState callState)
+        {
+
+            switch (callState)
+            {
+
+                case CallState.OutgoingInit:
+                case CallState.OutgoingProgress:
+                case CallState.OutgoingRinging:
+                case CallState.OutgoingEarlyMedia:
+                    return (string)Application.Current.Resources["dialing"];
+                case CallState.StreamsRunning:
+                case CallState.UpdatedByRemote:
+                case CallState.PausedByRemote:
+                    return (string)Application.Current.Resources["inACall"];
+                case CallState.IncomingReceived:
+                    return (string)Application.Current.Resources["incomingReceived"];
+                case CallState.End:
+                    return (string)Application.Current.Resources["callEnded"];
+                case CallState.Paused:
+                case CallState.Pausing:
+                    return (string)Application.Current.Resources["hold"];
+                case CallState.Resuming:
+                    return (string)Application.Current.Resources["resume"];
+                default:
+                    return callState.ToString();
+            }
+        }
+
+        public string getStartCollaborationError(string errorCode)
+        {
+
+            switch (errorCode)
+            {
+                case "1":
+                    return (string)Application.Current.Resources["noCollabServer"];
+                case "2":
+                    return $"{(string)Application.Current.Resources["invalid"]} {(string)Application.Current.Resources["partner"]}";
+                case "3":
+                    return $"{(string)Application.Current.Resources["invalid"]} {(string)Application.Current.Resources["callId"]}";
+                case "4":
+                    return $"{(string)Application.Current.Resources["invalid"]} {(string)Application.Current.Resources["user"]}";
+                case "5":
+                    return (string)Application.Current.Resources["noConfDefined"];
+                case "6":
+                    return $"{(string)Application.Current.Resources["invalid"]} {(string)Application.Current.Resources["conference"]}";
+                case "7":
+                    return $"{(string)Application.Current.Resources["invalid"]} {(string)Application.Current.Resources["sessionId"]}";
+                case "8":
+                    return (string)Application.Current.Resources["collaboration_service_not_available"];
+                case "9":
+                    return (string)Application.Current.Resources["collaboration_permission"];
+                default:
+                    return "";
+            }
+        }
+
+        public string getCollaborationError(string error)
+        {
+
+            switch (error)
+            {
+                case "NO RESPONSE":
+                    return (string)Application.Current.Resources["noResponse"];
+                case "ACCEPTED":
+                    return (string)Application.Current.Resources["accepted"];
+                case "REJECTED":
+                    return (string)Application.Current.Resources["rejected"];
+                case "CANCELLED":
+                    return (string)Application.Current.Resources["cancelled"];
+
+                default:
+                    return "";
+            }
+        }
+    }
+}

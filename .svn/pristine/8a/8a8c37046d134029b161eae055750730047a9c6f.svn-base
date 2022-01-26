@@ -1,0 +1,27 @@
+﻿using System;
+using Linphone;
+using LinphoneXamarin.Util;
+
+namespace LinphoneXamarin.Entities
+{
+    public class myTransfer
+    {
+        public string oldCallId1 { set; get; }
+        public string oldCallId2 { set; get; }
+        public string newCallId { set; get; }
+        public string deviceId1 { set; get; }
+        public string deviceId2 { set; get; }
+
+
+
+        public myTransfer(string oldCallId1, string oldCallId2, string newCallId, string deviceId1, string deviceId2)
+        {
+            this.oldCallId1 = oldCallId1;
+            this.oldCallId2 = oldCallId2;
+            this.newCallId = newCallId;
+            this.deviceId1 = deviceId1;
+            this.deviceId2 = deviceId2;
+        }
+
+    }
+}

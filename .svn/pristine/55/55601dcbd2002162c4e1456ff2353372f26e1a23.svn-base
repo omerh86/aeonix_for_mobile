@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.Util
+{
+
+    public class AliasTypeConverter : IValueConverter, IMarkupExtension
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+
+            switch ((string)value)
+            {
+                case "MOBILE":
+                    return (string)Application.Current.Resources["mobile"];
+                case "OFFICE":
+                    return (string)Application.Current.Resources["office"];
+                case "HOME":
+                    return (string)Application.Current.Resources["home"];
+                case "FAX":
+                    return (string)Application.Current.Resources["fax"];
+                case "OTHER":
+                    return (string)Application.Current.Resources["other"];
+                case "DEFAULT":
+                    return (string)Application.Current.Resources["default"];
+                case "INTERNAL":
+                    return (string)Application.Current.Resources["internal"];
+                case "EXTERNAL":
+                    return (string)Application.Current.Resources["external"];
+                default:
+                    return (string)Application.Current.Resources["external"];
+
+
+
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+            //throw new NotImplementedException();
+        }
+
+        public object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+    }
+}

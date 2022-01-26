@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<gradient:GradientView  StartColor="#72A2C0" EndColor="#192E5B" xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="LinphoneXamarin.components.RegistrationLostPage"
+               xmlns:gradient="clr-namespace:LinphoneXamarin.styles" >
+
+    <StackLayout>
+        <Label Text="Refreshing Register" FontSize="Large" TextColor="White" FontAttributes="Bold"
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="CenterAndExpand" />
+    </StackLayout>
+
+</gradient:GradientView>

@@ -1,0 +1,69 @@
+﻿using LinphoneXamarin.Entities;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.Util
+{
+
+    public class SpeedDialTextConverter : IValueConverter, IMarkupExtension
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            switch ((SpeedDialType)value)
+            {
+                case SpeedDialType.Acc:
+                    return "Aeonix Contact Center";
+                case SpeedDialType.Acc_EndWrapUP:
+                    return "End Wrap-up";
+                case SpeedDialType.Acc_ExtendWrapUp:
+                    return "Extend Wrap-up";
+                case SpeedDialType.Acc_GroupLog:
+                    return "Group Login & Logout";
+                case SpeedDialType.Acc_GroupQInfo:
+                    return "Group Q Info";
+                case SpeedDialType.Acc_LogPrimaryGroup:
+                    return "Login & Logout Primary Group";
+                case SpeedDialType.Acc_Release_Resume:
+                    return "Release & Resume";
+                case SpeedDialType.Acc_Release_ResumeWithCode:
+                    return "Release & Resume With Code";
+                case SpeedDialType.Acc_WrapUpWithcode:
+                    return "Wrap-up With Code";
+                case SpeedDialType.Emergency:
+                    return "Emergency Call";
+                case SpeedDialType.GroupPickup:
+                    return "Group Pickup";
+                case SpeedDialType.PageQ:
+                    return "Page Q";
+                case SpeedDialType.Rod:
+                    return "Record On Demand";
+                case SpeedDialType.Speedial:
+                    return "Speed Dial";
+                case SpeedDialType.Url:
+                    return "Collaboration";
+                case SpeedDialType.VM:
+                    return "Voice Mail";
+                default:
+                    return value.ToString();
+            }
+
+
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+            //throw new NotImplementedException();
+        }
+
+        public object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+    }
+}

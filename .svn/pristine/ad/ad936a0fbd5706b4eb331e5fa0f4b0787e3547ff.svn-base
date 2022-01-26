@@ -1,0 +1,326 @@
+﻿using LinphoneXamarin.Entities;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using LinphoneXamarin.Services;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+using System.Windows.Input;
+using System.Threading;
+using LinphoneXamarin.Util;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    public partial class MySearch : StackLayout, MySearchListener, INotifyPropertyChanged
+    {
+        ContactService contactService;
+        List<Contact> contactList = new List<Contact>();
+        private string currentFilter;
+        double lastScrollPosition;
+        double scrollPosition;
+        public static readonly BindableProperty ScrollCommandProperty =
+     BindableProperty.Create("ScrollCommand", typeof(ICommand), typeof(MySearch), null);
+
+        public ICommand ScrollCommand
+        {
+            get { return (ICommand)GetValue(ScrollCommandProperty); }
+            set { SetValue(ScrollCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty SearchCommandProperty =
+       BindableProperty.Create("SearchCommand", typeof(ICommand), typeof(MySearch), null);
+
+        public ICommand SearchCommand
+        {
+            get { return (ICommand)GetValue(SearchCommandProperty); }
+            set { SetValue(SearchCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty ContactinfoCommandProperty =
+      BindableProperty.Create("ContactinfoCommand", typeof(ICommand), typeof(MySearch), null);
+
+        public ICommand ContactinfoCommand
+        {
+            get { return (ICommand)GetValue(ContactinfoCommandProperty); }
+            set { SetValue(ContactinfoCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty MessageCommandProperty =
+      BindableProperty.Create("MessageCommand", typeof(ICommand), typeof(MySearch), null);
+
+        public ICommand MessageCommand
+        {
+            get { return (ICommand)GetValue(MessageCommandProperty); }
+            set { SetValue(MessageCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty CallCommandProperty =
+      BindableProperty.Create("CallCommand", typeof(ICommand), typeof(MySearch), null);
+
+        public ICommand CallCommand
+        {
+            get { return (ICommand)GetValue(CallCommandProperty); }
+            set { SetValue(CallCommandProperty, value); }
+        }
+
+        // Helper method for invoking commands savely
+        public static void Execute(ICommand command, object val)
+        {
+            if (command == null) return;
+            if (command.CanExecute(null))
+            {
+                command.Execute(val);
+            }
+        }
+
+        public MySearch()
+        {
+            InitializeComponent();
+            BindingContext = this;
+            backLbl.GestureRecognizers.Add(
+         new TapGestureRecognizer()
+         {
+             Command = new Command(() =>
+             {
+                 onBackClicked();
+             })
+         });
+            contactService = ContactService.Instance;
+            searchInput.BindingContext = alias;
+            searchList.BindingContext = contactList;
+            searchList.ItemsSource = contactList;
+            scrollPosition = 0;
+            lastScrollPosition = 0;
+            componentVisibilityHandler();
+#if ANDROID || __IOS__
+            searchList.Scrolled += SearchList_Scrolled;
+#endif
+        }
+
+        ~MySearch()
+        {
+            // BindingContext = null;
+            addLog("OnDisappearing");
+            RemoveBinding(ScrollCommandProperty);
+            RemoveBinding(SearchCommandProperty);
+            RemoveBinding(MessageCommandProperty);
+            RemoveBinding(CallCommandProperty);
+            RemoveBinding(ContactinfoCommandProperty);
+            RemoveBinding(aliasProperty);
+            RemoveBinding(shuoldNotifyScrollingProperty);
+            RemoveBinding(actionTypeProperty);
+            RemoveBinding(isSearchInputProperty);
+        }
+
+        public static readonly BindableProperty aliasProperty =
+         BindableProperty.Create("alias", typeof(string), typeof(MySearch), "");
+
+        public string alias
+        {
+            get { return (string)GetValue(aliasProperty); }
+            set
+            {
+                SetValue(aliasProperty, value);
+                doSearch(value);
+            }
+        }
+
+        public static readonly BindableProperty shuoldNotifyScrollingProperty =
+         BindableProperty.Create("shuoldNotifyScrolling", typeof(bool), typeof(MySearch), true);
+
+        public bool shuoldNotifyScrolling
+        {
+            get { return (bool)GetValue(shuoldNotifyScrollingProperty); }
+            set
+            {
+                SetValue(shuoldNotifyScrollingProperty, value);
+                lastScrollPosition = scrollPosition;
+            }
+        }
+
+        public static readonly BindableProperty actionTypeProperty =
+BindableProperty.Create("actionType", typeof(ContactCellAction), typeof(MySearch), ContactCellAction.Default);
+
+        public ContactCellAction actionType
+        {
+            get
+            {
+                ContactCellAction actionType = (ContactCellAction)GetValue(actionTypeProperty);
+                return actionType;
+            }
+            set
+            {
+                SetValue(actionTypeProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty isSearchInputProperty =
+        BindableProperty.Create("isSearchInput", typeof(bool), typeof(MySearch), false);
+
+        public bool isSearchInput
+        {
+            get { return (bool)GetValue(isSearchInputProperty); }
+            set
+            {
+                SetValue(isSearchInputProperty, value);
+                componentVisibilityHandler();
+            }
+        }
+
+        private void onSearchedClicked(object sender, TextChangedEventArgs e)
+        {
+            doSearch(searchInput.Text);
+        }
+
+        private void onClearSearch(object sender, EventArgs e)
+        {
+            doClearSearch();
+        }
+
+        public void doClearSearch()
+        {
+            lastScrollPosition = scrollPosition;
+            searchInput.Text = "";
+            searchInput.Unfocus();
+        }
+
+        public void onBackClicked()
+        {
+            Navigation.PopAsync();
+        }
+
+        private void componentVisibilityHandler()
+        {
+            if (isSearchInput)
+            {
+                inputComponent.IsVisible = true;
+                searchList.IsVisible = true;
+                new Task(() =>
+                {
+                    Thread.Sleep(200);
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        var x = searchInput.Focus();
+                    });
+                }).Start();
+
+            }
+            else
+            {
+                inputComponent.IsVisible = false;
+                searchList.IsVisible = false;
+            }
+        }
+
+        private void doSearch(string filter)
+        {
+            lastScrollPosition = scrollPosition;
+            currentFilter = filter;
+            if (filter.Length < 1)
+            {
+                contactList = new List<Contact>();
+                searchList.ItemsSource = contactList;
+                if (!isSearchInput)
+                    searchList.IsVisible = false;
+
+                Execute(SearchCommand, true);
+            }
+            else
+            {
+                if (!isSearchInput)
+                    searchList.IsVisible = true;
+                Task.Run(() => doSearchTask(filter));
+            }
+
+        }
+
+        private void doSearchTask(string filter)
+        {
+
+            Thread.Sleep(1000);
+
+            if (filter.Equals(currentFilter))
+            {
+                getCachehSearch();
+                AeonixInfoService.Instance.searchContacts(this, currentFilter);
+                Execute(SearchCommand, false);
+            }
+        }
+
+        public void getCachehSearch()
+        {
+            var settings = MyFileSystem.Instance.loadSettings();
+            if (settings != null)
+            {
+                contactList = contactService.getContactByPartialName(currentFilter, !settings.IsSyncContacts);
+                updateSearchResponse();
+            }
+
+        }
+
+        public void onSearchResponse(List<Contact> contacts)
+        {
+            int addCounter = 0;
+            foreach (var i in contacts)
+            {
+                if (!contactList.Exists(e => e.userName == i.userName))
+                {
+                    contactList.Add(i);
+                    addCounter++;
+                }
+            }
+            addLog("how many was added: " + addCounter);
+            if (addCounter > 0)
+            {
+                updateSearchResponse();
+            }
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "search_component");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        private void updateSearchResponse()
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                searchList.ItemsSource = null;
+                contactList.Sort((s1, s2) => s1.displayName.CompareTo(s2.displayName));
+                searchList.ItemsSource = contactList;
+                addLog("search list count: " + contactList.Count);
+            });
+        }
+
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void SearchList_Scrolled(object sender, ScrolledEventArgs e)
+        {
+
+            scrollPosition = e.ScrollY;
+            if (Math.Abs(scrollPosition - lastScrollPosition) > 120 && contactList.Count > 0)
+            {
+                Execute(ScrollCommand, true);
+                lastScrollPosition = e.ScrollY;
+            }
+
+        }
+
+        public void onSearchResponse(Contact contact)
+        {
+
+        }
+    }
+}

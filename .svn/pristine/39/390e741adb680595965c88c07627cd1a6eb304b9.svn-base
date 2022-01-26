@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage BackgroundColor="White" xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.BugReport"
+             FlowDirection="{StaticResource FlowDirection}"
+             Title="Problem Report">
+
+
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout Spacing="15" Margin="15">
+
+                <Label Text="{StaticResource ThanksForReportingYourBug}"  FontSize="Large" TextColor="Black" HorizontalOptions="CenterAndExpand" />
+                <StackLayout Margin="15">
+                    <Label FontSize="Medium" Text="{StaticResource title}"/>
+                    <Entry x:Name="titleEnrty" BackgroundColor="White" />
+
+
+                    <Label FontSize="Medium" Text="{StaticResource description}"/>
+                    <StackLayout BackgroundColor="Gray" Padding="2">
+                        <Editor x:Name="descriptionEntry"  HeightRequest="200" FontSize="Small" BackgroundColor="White"/>
+                    </StackLayout>
+                    
+                    <Button Margin="20" Text="{StaticResource send}"  BackgroundColor="#00688f" TextColor="White" Clicked="sendReport" HorizontalOptions="Center"></Button>
+                    <Label x:Name="errLbl" HorizontalOptions="Center" Text="" Margin="10" FontSize="Small"/>
+                    <Button Margin="20" Text="{StaticResource openLogDirectory}"   TextColor="#00688f" Clicked="openLogFolder" HorizontalOptions="Center">
+                        <Button.IsVisible>
+                            <OnPlatform x:TypeArguments="x:Boolean" WinPhone="True" Android="False" iOS="False"  />
+                        </Button.IsVisible>
+                    </Button>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="LinphoneXamarin.components.userControllers.SpeedDialComponent">
+    <ContentView.Content>
+        <AbsoluteLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <Frame  Margin="5" BackgroundColor="White" Padding="5" CornerRadius="10" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All">
+                <Grid VerticalOptions="FillAndExpand" 
+                    x:Name="speedDialComponent"
+                HorizontalOptions="FillAndExpand"   
+                ColumnSpacing="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="110" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+
+                    </Grid.ColumnDefinitions>
+                </Grid>
+            </Frame>
+            <Button x:Name="addActionBtn" CornerRadius="25" TextColor="White" Padding="10,0,10,0" Text="Add Quick actions" AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional" Clicked="onAddQuickActions">
+                <Button.Background>
+                    <LinearGradientBrush  EndPoint="0,1">
+                        <GradientStop Color="#BAE9FF" Offset="0.1" />
+                        <GradientStop Color="#0091D3" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Button.Background>
+            </Button>
+        </AbsoluteLayout>
+    </ContentView.Content>
+</ContentView>

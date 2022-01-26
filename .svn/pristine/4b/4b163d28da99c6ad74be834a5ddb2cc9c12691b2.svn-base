@@ -1,0 +1,102 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Util;
+namespace LinphoneXamarin.Services
+{
+
+    class SharedData
+    {
+
+        public string TouchVersion { set; get; }
+        public string USER_AGENT { set; get; }
+        public bool isCallView { set; get; }
+        public LaunchAction launchAction { set; get; }
+        public bool isUWPForground { set; get; }
+        public bool isIOSForground { set; get; }
+        public bool isAndroidIncomingAnswered { set; get; }
+        public bool isCollaborateAllowed { set; get; }
+        public bool isVMMessagesAllowed { set; get; }
+        public bool shouldUploadAllcontacts { set; get; }
+        public string customHub { set; get; }
+        public List<string> emergencyNumbers { set; get; }
+        public int tabIndex { set; get; }
+        public bool isSupportVoicemailSSO { set; get; }
+        public bool canSendVoicemailViaEmail { get; set; }
+
+        private static SharedData instance = null;
+        private static readonly object padlock = new object();
+
+
+        public SharedData()
+        {
+            TouchVersion = Plugin.DeviceInfo.CrossDeviceInfo.Current.AppVersion;
+#if WINDOWS_UWP
+            USER_AGENT = "Tadiran ATouch PC/" + TouchVersion + " (belle-sip/1.6.3)";
+#else
+            USER_AGENT = "Tadiran ATouch " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform.ToString() + "/" + TouchVersion + " (belle-sip/1.6.3)";
+#endif
+            tabIndex = 0;
+        }
+
+        public static SharedData Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new SharedData();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public void resetLastSessionDataHandler(string currentEp)
+        {
+            MyFileSystem fs = MyFileSystem.Instance;
+            var lastEP = fs.loadEP();
+
+            if (lastEP != null && lastEP.Equals(currentEp))
+                addLog("sameUser has logged in");
+            else
+                resetUserData(currentEp);
+
+
+        }
+
+        private void addLog(string message)
+        {
+            Console.WriteLine("omer40: " + message);
+            MyFileSystem.Instance.writeDebug(message, "SharedData");
+        }
+
+        private void resetUserData(string currentEp)
+        {
+            new Task(() =>
+            {
+                addLog("resetUserData since its new user");
+                var fs = MyFileSystem.Instance;
+                this.shouldUploadAllcontacts = true;
+                fs.saveEP(currentEp);
+                fs.saveVMCounter(0);
+                fs.saveVMID(null);
+                fs.saveContacts(null);
+                fs.saveMyContact(null);
+                fs.saveSpeedials(null);
+
+                ImgDBRepository.Instance.resetTable();
+                messageDBRepository.Instance.resetTables();
+                ContactService cs = ContactService.Instance;
+                cs.clearServerUsers();
+                CallLogService.Instance.clearCallLogs();
+                DialSpeedService.Instance.SpeedDials = new List<SpeedDial>();
+            }).Start();
+        }
+
+    }
+}

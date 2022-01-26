@@ -1,0 +1,998 @@
+using System;
+using Xamarin.Forms;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Entities;
+
+using Linphone;
+using LinphoneXamarin.styles;
+using System.Diagnostics;
+using System.Collections.Generic;
+using LinphoneXamarin.Util;
+#if __IOS__
+using LinphoneXamarin.MyCallKit;
+#endif
+using static LinphoneXamarin.Util.MySendRequestHelper;
+using System.Threading.Tasks;
+using System.Threading;
+using Xamarin.Forms.Xaml;
+using Plugin.Vibrate;
+using System.Runtime.CompilerServices;
+using Device = Xamarin.Forms.Device;
+using Xamarin.Essentials;
+using Acr.UserDialogs;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class MainPage : GradientView, CallsListener, MyConferenceCallListener, UIVideoListener, MYAudioListener, IAlertListener
+    {
+
+
+        CallService callService;
+        List<MyCall> callsList;
+        List<Entities.Contact> conferenceParticipates;
+        DateTime dt;
+        string phoneNumber = "";
+        private bool isLoadingConference = false;
+
+
+        public MainPage()
+        {
+            InitializeComponent();
+            NavigationPage.SetHasNavigationBar(this, false);
+            dt = new DateTime(1970, 1, 1);
+            callService = CallService.Instance;
+            callsList = callService.myCalls;
+            addingLabelsGestures();
+            conferenceParticipates = new List<Entities.Contact>();
+            conferenceParticipates.Add(new Entities.Contact("", "", "", "", null, null, 0, ContactType.Unknown));
+
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            addLog("OnAppearing callview page");
+            var aeonixInfoService = AeonixInfoService.Instance;
+            callService.myConferenceCallListener = this;
+            MyAudioManager.Instance._MYAudioListener = this;
+            callService.uIVideoListener = this;
+            callService.setCallsListener(this);
+            callService.myAudioListener = this;
+            addLog("callService.componentCallsListeners count: " + callService.componentCallsListeners.Count);
+            SharedData.Instance.isCallView = true;
+            onAudioChanged(MyAudioManager.Instance.myAudioState);
+            this.setActionsStatus();
+            updateCallTimer();
+            updateInfoLbls();
+            if (aeonixInfoService.alertListener == null)
+                AeonixInfoService.Instance.alertListener = this;
+#if __IOS__
+            if (callsList.Count > 0 && callsList[0] != null)
+                setMuteColor(callsList[0].isMute);
+#endif
+
+#if WINDOWS_UWP
+            speaker.IsEnabled = false;
+            speaker.IsVisible = false;
+            speakerlbl.IsVisible = false;
+            Windows.UI.Xaml.Window.Current.SizeChanged += onWindoSizeChanged;
+#endif
+        }
+
+#if WINDOWS_UWP
+
+        public void onWindoSizeChanged(Object sender, Windows.UI.Core.WindowSizeChangedEventArgs args)
+        {
+            addLog("SizeChanged(): " + args.Size.Width + " , " + args.Size.Height); ;
+
+            if (args.Size.Height > 550 && callsList != null && callsList.Count > 0 && callsList[0] != null && !callsList[0].isInConference)
+            {
+                infoPanel.IsVisible = true;
+                aliaslblSmall.IsVisible = false;
+            }
+            else
+            {
+                aliaslblSmall.IsVisible = true;
+                infoPanel.IsVisible = false;
+            }
+
+        }
+
+#endif
+
+        protected override void OnDisappearing()
+        {
+            addLog("OnDisappearing callview page");
+            base.OnDisappearing();
+            this.BindingContext = null;
+#if WINDOWS_UWP
+            Windows.UI.Xaml.Window.Current.SizeChanged -= onWindoSizeChanged;
+#endif
+
+            var aeonixInfoService = AeonixInfoService.Instance;
+            var loginService = LoginService.Instance;
+            callService.uIVideoListener = null;
+            callService.myAudioListener = null;
+            SharedData.Instance.isCallView = false;
+            callService.myConferenceCallListener = null;
+            MyAudioManager.Instance._MYAudioListener = null;
+            var list1 = callService.componentCallsListeners.FindAll(i => i.isTemp);
+            if (list1 != null)
+            {
+                addLog("list count is count is: " + list1.Count);
+                foreach (var i in list1)
+                {
+                    callService.componentCallsListeners.Remove(i);
+                    addLog("remove callist");
+                }
+            }
+            var list2 = aeonixInfoService.uIInfoListener.FindAll(i => i.isTemp);
+            if (list2 != null)
+            {
+                foreach (var i in list2)
+                {
+                    aeonixInfoService.uIInfoListener.Remove(i);
+                }
+            }
+
+            var list3 = loginService.loginRegistrationUiListeners.FindAll(i => i.isTemp);
+            if (list3 != null)
+            {
+                foreach (var i in list3)
+                {
+                    loginService.loginRegistrationUiListeners.Remove(i);
+                }
+            }
+
+            stopProximity();
+#if ANDROID
+            if (callsList != null && callsList.Count > 0 && callsList[0] != null && callsList[0].state == CallState.StreamsRunning && callsList[0].isVideo)
+            {
+                //active video call
+                OnVideoClicked(null, null);
+            }
+            else
+            {
+                //just to make sure
+                var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as VideoListener;
+                x.removeVideo();
+            }
+#endif
+        }
+
+        void startProximity()
+        {
+#if ANDROID
+            var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as MySensorListener;
+            x.startProximity();
+#endif
+
+#if __IOS__
+            AppDelegate.startProximity();
+#endif
+        }
+
+        void stopProximity()
+        {
+#if ANDROID
+            var y = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as MySensorListener;
+            y.stopProximity();
+#endif
+#if __IOS__
+            AppDelegate.stopProximity();
+#endif
+        }
+
+        private void addingLabelsGestures()
+        {
+
+            //Terminate.GestureRecognizers.Add(new TapGestureRecognizer
+            //{
+            //    Command = new Command(() => OnTerminateClicked()),
+            //});
+            //Terminate2.GestureRecognizers.Add(new TapGestureRecognizer
+            //{
+            //    Command = new Command(() => OnTerminateClicked()),
+            //});
+            //Answer.GestureRecognizers.Add(new TapGestureRecognizer
+            //{
+            //    Command = new Command(() => OnAnswerClicked()),
+            //});
+            BTBtn.GestureRecognizers.Add(new TapGestureRecognizer
+            {
+                Command = new Command(() => onBT()),
+            });
+        }
+
+        public void onListUpdated(List<MyCall> list)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                this.callsList = list;
+                this.setActionsStatus();
+            });
+        }
+
+        public void onTransfered(List<MyCall> list)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                addLog("onTransfered ");
+                this.callsList = list;
+                updateInfoLbls();
+            });
+        }
+
+        public void onBackClicked(object sender, EventArgs e)
+        {
+            Navigation.PopAsync();
+        }
+
+
+        public void onEstablished(List<MyCall> list)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                addLog("onEstablished ");
+                this.callsList = list;
+                updateInfoLbls();
+            });
+        }
+
+        public void onCurrentCallChanged(List<MyCall> list)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                addLog("onCurrentCallChanged ");
+                try
+                {
+                    this.callsList = list;
+                    updateInfoLbls();
+                }
+                catch (Exception e)
+                {
+                    addLog(e.ToString());
+                }
+            });
+        }
+
+        private void updateInfoLbls()
+        {
+
+            if (callsList != null && callsList.Count > 0 && callsList[0] != null)
+            {
+                Console.WriteLine("omer407: updateInfoLbls " + callsList[0].name);
+                statelbl.Text = MyEnumHelper.Instance.getCallStateAsString(callsList[0].state);
+                if (callsList[0].isHeld)
+                    statelbl.Text = (string)Application.Current.Resources["held"];
+                namelbl.Text = callsList[0].name;
+                aliaslbl.Text = callsList[0].alias;
+                img.Source = callsList[0].image;
+            }
+        }
+
+        private void setActionsStatus()
+        {
+
+
+            if (callsList != null && callsList.Count > 0 && callsList[0] != null)
+            {
+                if (callsList[0].isInConference)
+                {
+                    setconferenceMode();
+                    componentVisibiltyHandler(ActionBarComponent.Conference);
+                }
+                else
+                {
+                    this.BindingContext = callsList[0];
+                    statelbl.Text = MyEnumHelper.Instance.getCallStateAsString(callsList[0].state);
+                    if (callsList[0].isHeld)
+                        statelbl.Text = "Held";
+
+                    Console.WriteLine("omer407: status:  " + callsList[0].state);
+                    switch (callsList[0].state)
+                    {
+                        case CallState.IncomingReceived:
+                        case CallState.IncomingEarlyMedia:
+                            setAnswerMode();
+                            componentVisibiltyHandler(ActionBarComponent.Default);
+                            break;
+                        case CallState.OutgoingProgress:
+                        case CallState.OutgoingRinging:
+                        case CallState.OutgoingEarlyMedia:
+                            setOutgoingMode();
+                            componentVisibiltyHandler(ActionBarComponent.Default);
+                            break;
+                        case CallState.StreamsRunning:
+                        case CallState.Paused:
+                        case CallState.PausedByRemote:
+                            setStreamMode();
+                            componentVisibiltyHandler(ActionBarComponent.Default);
+                            break;
+                    }
+                }
+            }
+
+        }
+
+        private void OnAnswerClicked(object sender, EventArgs e)
+        {
+
+            addLog("OnAnswerClicked");
+            callService.answerCall(false);
+            CrossVibrate.Current.Vibration();
+        }
+
+        private void OnAnswerTerminateClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                addLog("OnAnswerTerminateClicked");
+                callService._shouldUpdateIOSCall = true;
+                callService.answerCall(false);
+                if (callsList.Count > 1)
+                    callService.terminateCallByCallID(callsList[1].callid);
+
+            }
+            catch (Exception err)
+            {
+                addLog(err.ToString());
+            }
+        }
+
+        private void OnVideoAnswerClicked(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+
+            callService.answerCall(true);
+            CrossVibrate.Current.Vibration();
+        }
+
+        private void OnTerminateClicked(object sender, EventArgs e)
+        {
+            addLog("OnTerminateClicked()");
+            callService.terminateCall();
+            CrossVibrate.Current.Vibration();
+        }
+
+        private void componentVisibiltyHandler(ActionBarComponent actionBarComponent)
+        {
+
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                switch (actionBarComponent)
+                {
+                    case ActionBarComponent.Conference:
+                        infoPanel.IsVisible = false;
+                        confPanel.IsVisible = true;
+                        controlGrid.IsVisible = true;
+                        dialPad.IsVisible = false;
+                        break;
+                    case ActionBarComponent.DialPad:
+                        dialPad.IsVisible = !dialPad.IsVisible;
+                        controlGrid.IsVisible = !dialPad.IsVisible;
+                        break;
+                    default:
+
+                        confPanel.IsVisible = false;
+                        dialPad.IsVisible = false;
+                        controlGrid.IsVisible = true;
+#if WINDOWS_UWP
+
+                        if (Windows.UI.Xaml.Window.Current.CoreWindow.Bounds.Height < 510)
+                        {
+                            infoPanel.IsVisible = false;
+                            aliaslblSmall.IsVisible = true;
+                        }
+                        else
+                        {
+                            infoPanel.IsVisible = true;
+                            aliaslblSmall.IsVisible = false;
+                        }
+#else
+                        infoPanel.IsVisible = true;
+#endif
+                        break;
+                }
+            });
+
+
+        }
+
+        private void onDoTransfer(object sender, ItemTappedEventArgs e)
+        {
+            Button btn = (Button)sender;
+
+            MyCall selected = e.Item as MyCall;
+            if (!selected.isCurrentCall)
+                callService.transfer(selected);
+            componentVisibiltyHandler(ActionBarComponent.Default);
+        }
+
+        private void onConferenceClicked(object sender, EventArgs e)
+        {
+            if (callsList.Count > 1)
+            {
+                Button btn = (Button)sender;
+
+                if (!isLoadingConference)
+                {
+                    statelbl.Text = "try to establish conference";
+                    isLoadingConference = true;
+                    callService.CreateConference();
+                    new Task(() =>
+                    {
+                        Thread.Sleep(6000);
+                        if (isLoadingConference)
+                        {
+                            Device.BeginInvokeOnMainThread(() =>
+                             {
+                                 if (callsList.Count > 1)
+                                 {
+                                     statelbl.Text = "conference can't be establish";
+                                     callsList[0].isInConference = false;
+                                     isLoadingConference = false;
+                                     componentVisibiltyHandler(ActionBarComponent.Default);
+                                 }
+                             });
+
+                        }
+                    }).Start();
+                }
+            }
+            else
+            {
+                addLog("conference button should not appear when call list length is " + callsList.Count);
+            }
+
+        }
+
+        private void onTransfer(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+
+            var result = callsList.Find(delegate (MyCall c)
+            {
+                return !c.isCurrentCall;
+            });
+            if (result != null)
+            {
+                callService.transfer(result);
+            }
+
+        }
+
+        private void onSwap(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+
+            callService.switchCurrentCall();
+        }
+
+        private void OnVideoClicked(object sender, EventArgs e)
+        {
+            if (sender != null)
+            {
+                Button btn = (Button)sender;
+
+            }
+            if (callsList[0].isVideo)
+            {
+                callsList[0].isSelfPendingVideo = false;
+                callService.OnVideoClicked();
+            }
+            else
+            {
+                callsList[0].isSelfPendingVideo = !callsList[0].isSelfPendingVideo;
+                callService.OnVideoClicked();
+                setVideoColor();
+            }
+        }
+
+        private void onMute(object sender, EventArgs e)
+        {
+
+#if __IOS__
+            ProviderDelegate.Instance.reportMuteCall(callsList[0].uuid);
+#else
+            callService.onMuteToggle();
+#endif
+
+        }
+
+        private void OnCollaborationClicked(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+
+            var infoService = AeonixInfoService.Instance;
+            infoService.startCollaboration("CALL", null, callsList[0].callid);
+        }
+
+        private void OnHoldClicked(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+
+            callService.toggleHold();
+        }
+
+        private void onBT()
+        {
+
+            if (MyAudioManager.Instance.myAudioState != MYAudioState.BT)
+                MyAudioManager.Instance.setAudioState(MYAudioState.BT, true);
+            else
+                MyAudioManager.Instance.setAudioState(MYAudioState.HEARPEACE, true);
+        }
+
+        private void onSpeaker(object sender, EventArgs e)
+        {
+            if (sender != null)
+            {
+                Button btn = (Button)sender;
+
+            }
+            if (MyAudioManager.Instance.myAudioState != MYAudioState.SPEAKER)
+            {
+                MyAudioManager.Instance.setAudioState(MYAudioState.SPEAKER, true);
+            }
+            else
+            {
+                MyAudioManager.Instance.setAudioState(MYAudioState.HEARPEACE, true);
+            }
+
+        }
+
+        private void setMuteColor(bool isMute)
+        {
+            muteBtn.TextColor = isMute ? Color.DarkBlue : Color.White;
+        }
+
+        private void setVideoColor()
+        {
+            if (callsList != null && callsList[0] != null)
+            {
+                if (callsList[0].isVideo)
+                {
+                    video.TextColor = Color.DarkBlue;
+                    videoLbl.Text = (string)Application.Current.Resources["video"];
+                }
+                else if (callsList[0].isSelfPendingVideo)
+                {
+                    video.TextColor = Color.Orange;
+                    videoLbl.Text = (string)Application.Current.Resources["pending"];
+                }
+                else
+                {
+                    video.TextColor = Color.White;
+                    videoLbl.Text = (string)Application.Current.Resources["video"];
+                }
+            }
+        }
+
+        private void setHoldColor()
+        {
+            if (callsList != null && callsList[0] != null)
+            {
+                hold.TextColor = callsList[0].state == CallState.Paused ? Color.DarkBlue : Color.White;
+            }
+        }
+
+        private void onAddcall(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+            if (callService.callViewInitiater == null)
+            {
+                ((App)App.Current).goToNavBar();
+            }
+            else
+                Navigation.PopToRootAsync();
+        }
+
+        private void onShowDialPad(object sender, EventArgs e)
+        {
+            componentVisibiltyHandler(ActionBarComponent.DialPad);
+        }
+
+        private void onCancelDialPad(object sender, EventArgs e)
+        {
+            componentVisibiltyHandler(ActionBarComponent.Default);
+        }
+
+        private void onDialPadBtnClicked(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+            CallService.Instance.SendDtmf(btn.Text);
+
+            if (phoneNumber.Length == 0)
+                phoneNumber = btn.Text;
+            else
+            {
+                phoneNumber = phoneNumber.Insert(phoneNumber.Length, btn.Text);
+            }
+            number.Text = phoneNumber;
+        }
+
+        private void clear(object sender, EventArgs e)
+        {
+            if (phoneNumber.Length > 0)
+            {
+                phoneNumber = phoneNumber.Substring(0, phoneNumber.Length - 1);
+                number.Text = phoneNumber;
+
+            }
+
+        }
+
+        private void setAnswerMode()
+        {
+            try
+            {
+                controlGrid.Children.Clear();
+#if __IOS__
+                if (callsList.Count > 1 && !callsList[0].isPendingIncoming && !callsList[1].isPendingIncoming)
+                {
+                    controlGrid.Children.Add(Answer, 1, 2);
+                    controlGrid.Children.Add(Terminate, 3, 2);
+                    controlGrid.Children.Add(AnswerAndTerminate, 0, 2);
+                    controlGrid.Children.Add(AnswerAndTerminateLbl, 0, 2);
+                    controlGrid.Children.Add(AnswerAndHoldLbl, 1, 2);
+                  
+                }
+#else
+                if (callsList[0].isRemotePendingVideo)
+                    controlGrid.Children.Add(videoAnswer, 1, 1);
+
+                controlGrid.Children.Add(Answer, 0, 2);
+                controlGrid.Children.Add(Terminate, 2, 2);
+                if (callsList.Count > 1 && !callsList[0].isPendingIncoming && !callsList[1].isPendingIncoming)
+                {
+                    controlGrid.Children.Add(AnswerAndTerminate, 0, 2);
+                    controlGrid.Children.Add(AnswerAndTerminateLbl, 0, 2);
+                    controlGrid.Children.Add(AnswerAndHoldLbl, 1, 2);
+                }
+#endif
+
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        private void setStreamMode()
+        {
+            try
+            {
+                setVideoColor();
+                setHoldColor();
+                setMuteColor(callsList[0].isMute);
+                controlGrid.Children.Clear();
+
+                if (callsList.Count > 1 && callsList[1].state != CallState.IncomingReceived)
+                {
+                    controlGrid.Children.Add(muteBtn, 0, 0);
+                    controlGrid.Children.Add(mutelbl, 0, 0);
+                    controlGrid.Children.Add(hold, 1, 0);
+                    controlGrid.Children.Add(holdlbl, 1, 0);
+                    controlGrid.Children.Add(addCall, 2, 0);
+                    controlGrid.Children.Add(addlbl, 2, 0);
+                    controlGrid.Children.Add(swap, 0, 1);
+                    controlGrid.Children.Add(switchlbl, 0, 1);
+                    controlGrid.Children.Add(transfer, 1, 1);
+                    controlGrid.Children.Add(transferlbl, 1, 1);
+                    controlGrid.Children.Add(speaker, 2, 1);
+                    controlGrid.Children.Add(speakerlbl, 2, 1);
+                    controlGrid.Children.Add(video, 0, 2);
+                    controlGrid.Children.Add(videoLbl, 0, 2);
+                    controlGrid.Children.Add(conference, 1, 2);
+                    controlGrid.Children.Add(conferencelbl, 1, 2);
+
+                    if (SharedData.Instance.isCollaborateAllowed)
+                    {
+                        controlGrid.Children.Add(collaboration, 0, 3);
+                        controlGrid.Children.Add(collaborationLbl, 0, 3);
+                    }
+                }
+                else
+                {
+                    controlGrid.Children.Add(muteBtn, 0, 1);
+                    controlGrid.Children.Add(mutelbl, 0, 1);
+                    controlGrid.Children.Add(addCall, 1, 1);
+                    controlGrid.Children.Add(addlbl, 1, 1);
+                    controlGrid.Children.Add(hold, 2, 1);
+                    controlGrid.Children.Add(holdlbl, 2, 1);
+
+                    controlGrid.Children.Add(video, 0, 2);
+                    controlGrid.Children.Add(videoLbl, 0, 2);
+                    controlGrid.Children.Add(speaker, 2, 2);
+                    controlGrid.Children.Add(speakerlbl, 2, 2);
+                    if (SharedData.Instance.isCollaborateAllowed)
+                    {
+                        controlGrid.Children.Add(collaboration, 3, 5, 1, 2);
+                        controlGrid.Children.Add(collaborationLbl, 3, 5, 1, 2);
+                    }
+                }
+                controlGrid.Children.Add(BTBtn, 0, 3);
+                controlGrid.Children.Add(Terminate, 1, 3);
+                controlGrid.Children.Add(dialPadBtn, 2, 3);
+                controlGrid.Children.Add(dialpadlbl, 2, 3);
+
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        private void updateCallTimer()
+        {
+            addLog("update time start");
+            Xamarin.Forms.Device.StartTimer(TimeSpan.FromSeconds(1), () =>
+            {
+                try
+                {
+                    if (SharedData.Instance.isCallView)
+                    {
+
+                        if (callsList != null &&
+                callsList.Count > 0 &&
+                callsList[0] != null &&
+                !callsList[0].isVideo &&
+                (callsList[0].state == CallState.StreamsRunning ||
+                callsList[0].state == CallState.PausedByRemote ||
+                callsList[0].state == CallState.Paused) &&
+                callsList[0].connectedTime > -1)
+                            Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+                            {
+                                if (callsList.Count > 0)
+                                {
+                                    long diff = (long)(DateTime.UtcNow - dt).TotalSeconds - callsList[0].connectedTime;
+                                    if (diff > 0)
+                                    {
+                                        var s = GetTime(diff);
+                                        timeLbl.Text = s;
+                                    }
+                                    else
+                                    {
+                                        timeLbl.Text = "";
+                                    }
+                                }
+                            });
+                        return true;
+                    }
+                    else
+                    {
+                        addLog("update time finish");
+                        timeLbl.Text = "";
+                        return false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    addLog("update time finish");
+                    timeLbl.Text = "";
+                    return false;
+                }
+            });
+        }
+
+        private string GetTime(long Time)
+        {
+            long Hrs = 0;    //number of hours
+            long Min = 0;    //number of Minutes
+            long Sec = 0;    //number of Sec
+
+            //Seconds
+            Sec = Time % 60;
+
+            //Minutes
+            Min = ((Time - Sec) / 60) % 60;
+
+            //Hours
+            Hrs = ((Time - (Sec + (Min * 60))) / 3600) % 60;
+            return string.Format("{0:D2}:{1:D2}:{2:D2}", Hrs, Min, Sec);
+            //return Hrs + ":" + Min + ":" + Sec;
+        }
+
+        private void setOutgoingMode()
+        {
+            controlGrid.Children.Clear();
+            controlGrid.Children.Add(speaker, 1, 1);
+            controlGrid.Children.Add(speakerlbl, 1, 1);
+            controlGrid.Children.Add(Terminate, 1, 2);
+
+        }
+
+        private void setconferenceMode()
+        {
+            Console.WriteLine("omer110: setconferenceMode");
+            controlGrid.Children.Clear();
+            controlGrid.Children.Add(muteBtn, 1, 1);
+            controlGrid.Children.Add(mutelbl, 1, 1);
+            controlGrid.Children.Add(speaker, 2, 1);
+            controlGrid.Children.Add(speakerlbl, 2, 1);
+            controlGrid.Children.Add(addCall, 3, 1);
+            controlGrid.Children.Add(addlbl, 3, 1);
+            if (callsList.Count > 1)
+            {
+                controlGrid.Children.Add(swap, 4, 1);
+                controlGrid.Children.Add(switchlbl, 4, 1);
+            }
+
+            controlGrid.Children.Add(Terminate, 2, 2);
+            this.populateConferenceParticipates(callsList[0].conferenceParticipates);
+            callsList[0].isInConference = true;
+        }
+
+        public void onConferenceEstablished(string conferenceCallId, List<string> oldCallIds, List<string> participate)
+        {
+            isLoadingConference = false;
+
+            addLog("conference callId is: " + conferenceCallId);
+            this.populateConferenceParticipates(participate);
+            setconferenceMode();
+            componentVisibiltyHandler(ActionBarComponent.Conference);
+
+
+
+        }
+
+        public void onParticipateDroped(string callId, string alias)
+        {
+            addLog($"onParticipateDroped, alias is {alias}, callId is {callId}");
+            var result = callsList.Find(delegate (MyCall c)
+            {
+                return c.isInConference && c.callid == callId;
+            });
+            if (result != null && result.conferenceParticipates != null)
+            {
+                addLog($"remove {alias} from participate list");
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    result.conferenceParticipates.Remove(alias);
+                    populateConferenceParticipates(result.conferenceParticipates);
+
+                });
+            }
+
+        }
+
+        private void populateConferenceParticipates(List<string> participate)
+        {
+            if (participate != null)
+            {
+                addLog($"populateConferenceParticipates, count is {participate.Count}");
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    ContactService contactService = ContactService.Instance;
+                    this.conferenceParticipates = new List<Entities.Contact>();
+                    foreach (var p in participate)
+                    {
+                        var c = contactService.getContactByAlias(p);
+                        if (c != null)
+                        {
+                            this.conferenceParticipates.Add(c);
+                            addLog($"participate {p} replaced with {c.displayName}");
+                        }
+                        else
+                        {
+                            var myContact = contactService.myContact;
+                            if (myContact != null && myContact.primaryAlias.Equals(p))
+                                this.conferenceParticipates.Add(myContact);
+                            else
+                                this.conferenceParticipates.Add(new Entities.Contact("", p, "", "", new List<string>(), new List<ExtNumber>(), 0, ContactType.Aeonix));
+                        }
+                    }
+
+                    callsListView.ItemsSource = this.conferenceParticipates;
+
+                });
+            }
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "call page");
+            Console.WriteLine($"omer156: {message}");
+        }
+
+        public async Task onVideoStatusChangedAsync(bool isvideo)
+        {
+            setVideoColor();
+        }
+
+
+        public void onAudioChanged(MYAudioState state)
+        {
+            Console.WriteLine("omer428: onAudioChanged: " + state);
+
+            Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+            {
+                switch (state)
+                {
+                    case MYAudioState.BT:
+                        stopProximity();
+                        speaker.TextColor = Color.White;
+#if ANDROID
+                        //speaker.Opacity = 0.5;
+                        //speaker.IsEnabled = false;
+#endif
+                        BTBtn.BackgroundColor = Color.DarkBlue;
+
+                        break;
+                    case MYAudioState.HEARPEACE:
+                        startProximity();
+#if ANDROID
+                        //speaker.Opacity = 1;
+                        //speaker.IsEnabled = true;
+#endif
+
+                        speaker.TextColor = Color.White;
+                        BTBtn.BackgroundColor = Color.Transparent;
+
+                        break;
+                    case MYAudioState.SPEAKER:
+                        stopProximity();
+#if ANDROID
+                        speaker.Opacity = 1;
+                        speaker.IsEnabled = true;
+#endif
+
+                        speaker.TextColor = Color.DarkBlue;
+                        BTBtn.BackgroundColor = Color.Transparent;
+                        break;
+                }
+            });
+
+        }
+
+        public void onBTConnectionFailed()
+        {
+            Console.WriteLine("omer428: onBTConnectionFailed");
+        }
+
+        CancellationTokenSource cancelToken;
+        public async Task DisplayCollabAlert(string title, string message, bool isYesNo, string link)
+        {
+            if (isYesNo)
+            {
+                cancelToken = new CancellationTokenSource();
+                MyAudioManager.Instance.playFile("notification_sound.mp3");
+                bool answer = await UserDialogs.Instance.ConfirmAsync(title, message, (string)Application.Current.Resources["yes"], (string)Application.Current.Resources["no"], cancelToken.Token);
+                //bool answer = await DisplayAlert(title, message, (string)Application.Current.Resources["yes"], (string)Application.Current.Resources["no"]);
+                if (answer)
+                {
+                    AeonixInfoService.Instance.sendCollaborationOfferStatus("ACCEPTED");
+                    //go to link
+                    Browser.OpenAsync(new Uri(link), BrowserLaunchMode.SystemPreferred);
+                }
+                else
+                {
+                    AeonixInfoService.Instance.sendCollaborationOfferStatus("REJECTED");
+                }
+            }
+            else
+            {
+                if (cancelToken != null)
+                    cancelToken.Cancel();
+
+                //await DisplayAlert(title, message, "OK");
+            }
+
+        }
+
+        public void onMuteChanged(bool isMute)
+        {
+            addLog($"onMuteChanged, isMute {isMute}");
+            setMuteColor(isMute);
+        }
+
+        public enum ActionBarComponent
+        {
+            DialPad,
+            Conference,
+            Default
+        }
+    }
+}

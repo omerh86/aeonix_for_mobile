@@ -1,0 +1,211 @@
+﻿
+using System;
+
+using System.Linq;
+
+using LinphoneXamarin.Services;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+using LinphoneXamarin.Util;
+
+using Xamarin.Essentials;
+using System.Collections.Generic;
+#if WINDOWS_UWP
+using Windows.ApplicationModel.Email;
+#endif
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class BugReport : ContentPage
+    {
+
+        string logPath;
+        string description;
+
+        public BugReport()
+        {
+            InitializeComponent();
+
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            var fs = MyFileSystem.Instance;
+            SharedData.Instance.isOverideBackBtn = false;
+            var login = fs.loadLoginCardential(Entities.CardentialState.TR87);
+            var user = fs.loadLoginCardential(Entities.CardentialState.Aeonix);
+            if (user == null)
+            {
+                description = "A-touch Version: " +
+                              SharedData.Instance.TouchVersion + "\n" +
+                              "Platform: " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform + "\n" +
+                              "Device ID: " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Id + "\n" +
+                              "Phone manufacturer: " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Manufacturer + " , " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Model + "\n" +
+                              "OS version : " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Version + "\n";
+            }
+            else if (login != null && login.sipAdresses != null && login.sipAdresses.Count > 0)
+            {
+                description = "A-touch Version: " +
+                               SharedData.Instance.TouchVersion + "\n" +
+                               "Platform: " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform + "\n" +
+                               "Device ID: " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Id + "\n" +
+                               "Phone manufacturer: " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Manufacturer + " , " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Model + "\n" +
+                               "OS version : " + Plugin.DeviceInfo.CrossDeviceInfo.Current.Version + "\n" +
+                               "Phone ID: " + fs.loadEP() + "\n" +
+                               "User ID: " + user.userName + "\n";
+                try
+                {
+
+                    description += "Login sip Address: " + login.sipAdresses.ElementAt(0).ip + ":" + login.sipAdresses.ElementAt(0).port + "\n" +
+                    "EP sip Address: " + user.sipAdresses.ElementAt(user.favoriteSipAdressIndex).ip + ":" + user.sipAdresses.ElementAt(user.favoriteSipAdressIndex).port + "\n";
+                }
+                catch (Exception e)
+                {
+                    addLog("favoriteSipAdressIndex: " + user.favoriteSipAdressIndex + ", err: " + e);
+                }
+
+            }
+            addLog(description);
+            logPath = fs.CompressATouchLogs();
+            errLbl.Text = "";
+            titleEnrty.Focus();
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            SharedData.Instance.isOverideBackBtn = true;
+        }
+
+        private MailValidation isMailContentValidate()
+        {
+            if (titleEnrty.Text == null || titleEnrty.Text == "")
+                return MailValidation.NO_TITLE;
+
+            return MailValidation.VALID;
+        }
+
+        //private void openLogFolder(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        Device.OpenUri(new Uri(MyFileSystem.Instance.ANX_LOG_PATH));
+        //    }
+        //    catch (Exception err)
+        //    {
+        //        addLog("error: " + err);
+        //    }
+        //}
+
+        private async void openLogFolder(object sender, EventArgs e)
+        {
+#if WINDOWS_UWP
+            try
+            {
+
+                var success = await Windows.System.Launcher.LaunchFolderPathAsync(MyFileSystem.Instance.ANX_LOG_PATH);
+
+                if (success)
+                {
+
+                }
+                else
+                {
+                    errLbl.Text = "failed to open logs folder";
+                }
+            }
+            catch (Exception err)
+            {
+                addLog("error: " + err);
+            }
+#endif
+        }
+
+        private void sendReport(object sender, EventArgs e)
+        {
+            try
+            {
+
+                var to = "bs-.support@tadirantele.com";
+                var title = titleEnrty.Text;
+                var mailDescription = "\nDescription:\n" + descriptionEntry.Text + "\n\n" + description;
+
+                var mailValidation = isMailContentValidate();
+                if (mailValidation == MailValidation.VALID)
+                {
+                    errLbl.Text = "loading";
+                    errLbl.TextColor = Color.DimGray;
+#if WINDOWS_UWP
+                    var logPath = "Please attach log.zip file from:\n" + MyFileSystem.Instance.ANX_ZIP_PATH + "\n\n";
+                    to = "tadirantelecomapps@gmail.com";
+                    SendUWPEmail(logPath, to, title, logPath + mailDescription);
+
+#else
+                    var message = new EmailMessage
+                    {
+                        To = new List<string>() { to },
+                        Subject = title,
+                        Body = mailDescription,
+                        Attachments = new List<EmailAttachment>() { new EmailAttachment(logPath, "zip") },
+                    };
+
+                    Email.ComposeAsync(message);
+
+#endif
+                    Navigation.PopAsync();
+
+                }
+                else
+                {
+                    errLbl.TextColor = Color.Red;
+                    if (mailValidation == MailValidation.NO_TITLE)
+                        errLbl.Text = "Add title";
+                }
+            }
+            catch (Exception ex)
+            {
+                addLog(ex.ToString());
+                errLbl.Text = ex.ToString();
+            }
+
+        }
+
+#if WINDOWS_UWP
+        private async void SendUWPEmail(string logPath, string to, string title, string description)
+        {
+            EmailMessage emailMessage = new EmailMessage();
+            emailMessage.To.Add(new EmailRecipient(to));
+            emailMessage.Subject = title;
+            emailMessage.Body = description;
+
+            //Windows.Storage.StorageFile attachmentFile = await Windows.Storage.StorageFile.GetFileFromPathAsync(logPath);
+
+            //if (attachmentFile != null)
+            //{
+            //    var stream = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromFile(attachmentFile);
+            //    var attachment = new Windows.ApplicationModel.Email.EmailAttachment(
+            //             attachmentFile.Name,
+            //             stream);
+            //    emailMessage.Attachments.Add(attachment);
+            //}
+            await EmailManager.ShowComposeNewEmailAsync(emailMessage);
+        }
+#endif
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "Bug_Report");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        enum MailValidation
+        {
+            VALID, NO_TITLE, ATTACMENT_ERR
+        }
+
+
+    }
+}

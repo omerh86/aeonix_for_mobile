@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="LinphoneXamarin.components.speedDialPage"
+             Title="Quick Action Buttons">
+    <ContentPage.Content>
+        <AbsoluteLayout x:Name="abslayout" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <Frame AbsoluteLayout.LayoutFlags="All" Padding="0" Margin="0" CornerRadius="10"
+                AbsoluteLayout.LayoutBounds=".5,0.1,.95,.85">
+                <Grid   BackgroundColor="#F8FBFC"
+               x:Name="speedDialGrid"
+                    RowSpacing="0"
+                ColumnSpacing="0">
+                </Grid>
+            </Frame>
+            <StackLayout x:Name="addActionsContainer" IsVisible="False" Margin="10" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"  >
+                <Image Source="addactions.png" HeightRequest="150" WidthRequest="150" Margin="10"/>
+                <Label Text="Start Adding Quick Actions" TextColor="Black" HorizontalOptions="Center" FontSize="Title" Margin="10"/>
+            </StackLayout>
+
+            <Button AbsoluteLayout.LayoutFlags="PositionProportional" ClassId="{StaticResource add}" Clicked="onAddSpeedDialClicked" TextColor="White" HeightRequest="50" WidthRequest="50" FontSize="Large" AbsoluteLayout.LayoutBounds=".95,.95" BorderRadius="25" BackgroundColor="#00688f" Text="&#xf067;">
+                <Button.FontFamily>
+                    <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                </Button.FontFamily>
+                <Button.Background>
+                    <LinearGradientBrush  EndPoint="0,1">
+                        <GradientStop Color="#BAE9FF" Offset="0.1" />
+                        <GradientStop Color="#0091D3" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Button.Background>
+            </Button>
+
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

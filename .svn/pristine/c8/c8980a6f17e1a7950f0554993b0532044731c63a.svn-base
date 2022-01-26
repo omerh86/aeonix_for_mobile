@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+ xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+ xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+ IgnorableNamespaces="uap mp uap3 rescap desktop4">
+ 
+
+  <Identity
+    Name="5e73ac6f-a53b-4822-87cf-154709c8a23b"
+    Publisher="CN=a180104"
+    Version="6.1.9.0" />
+
+  <Properties>
+    <DisplayName>windowPackage</DisplayName>
+    <PublisherDisplayName>Tadiran Telecom</PublisherDisplayName>
+    <Logo>Images\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+   <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.14393.0" MaxVersionTested="10.0.14393.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="$targetnametoken$.exe"
+      EntryPoint="$targetentrypoint$">
+      <uap:VisualElements
+        DisplayName="Aeonix Touch"
+        Description="Aeonix Touch PC"
+        BackgroundColor="#FFFFFF"
+        Square150x150Logo="Images\Square150x150Logo.png"
+        Square44x44Logo="Images\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png"  Square71x71Logo="Images\SmallTile.png" Square310x310Logo="Images\LargeTile.png">
+        </uap:DefaultTile >
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="portrait"/></uap:InitialRotationPreference>
+        <uap:SplashScreen Image="Images\SplashScreen.png"/>
+        <uap:LockScreen BadgeLogo="Images\BadgeLogo.png" Notification="badgeAndTileText"/>
+      </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.voipCall">
+        </uap:Extension>
+        <desktop:Extension
+          xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+          Category="windows.fullTrustProcess"
+          Executable="HotKeyWindow\HotKeyWindow.exe"/>
+        <uap:Extension Category="windows.appService">
+          <uap:AppService Name="HotkeyConnection" />
+        </uap:Extension>
+        <uap5:Extension Category="windows.startupTask">
+          <uap5:StartupTask
+            TaskId="MyStartupId"
+            Enabled="true"
+            DisplayName="Aeonix Touch" />
+        </uap5:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" />
+    <rescap:Capability Name="extendedExecutionUnconstrained"/>
+    <rescap:Capability Name="confirmAppClose" />
+    <uap:Capability Name="phoneCall"/>
+    <uap:Capability Name="voipCall"/>
+    <uap:Capability Name="contacts"/>
+    <uap3:Capability Name="backgroundMediaPlayback" />
+    <uap:Capability Name="removableStorage"/>
+    <DeviceCapability Name="microphone"/>
+    <DeviceCapability Name="bluetooth"/>
+    <DeviceCapability Name="webcam"/>
+  </Capabilities>
+
+
+</Package>

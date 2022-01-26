@@ -1,0 +1,195 @@
+﻿using System;
+using LinphoneXamarin.Entities;
+using Linphone;
+using LinphoneXamarin.Util;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using LinphoneXamarin.components.userControllers;
+using Xamarin.Forms;
+using System.Threading;
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class DialSpeedService
+    {
+        public readonly int MAX_SPEED_DIALS = 25;
+        public readonly int SPEED_DIALS_COLUMS = 5;
+        public readonly int SPEED_DIALS_ROWS = 5;
+        private static DialSpeedService instance = null;
+        private static readonly object padlock = new object();
+        public SpeedDialListener speedDialListeners1 { set; get; }
+        public SpeedDialListener speedDialListeners2 { set; get; }
+        public List<SpeedDial> SpeedDials { set; get; }
+        public bool shouldUploadGridGui { set; get; }
+        public bool isFeatureGridAvailable { set; get; }
+
+        DialSpeedService()
+        {
+            isFeatureGridAvailable = true;
+            SpeedDials = MyFileSystem.Instance.loadSpeedials();
+            if (SpeedDials == null)
+            {
+                SpeedDials = new List<SpeedDial>();
+            }
+            shouldUploadGridGui = true;
+        }
+        public static DialSpeedService Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new DialSpeedService();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public void setVmFetureButton(string alias)
+        {
+            addLog("setVmFetureButton()");
+            var sd = SpeedDials.Find(k => k.Type == SpeedDialType.VM);
+            if (sd == null)
+            {
+                addLog($"addVmFetureButton with alias {alias}");
+                addSpeedDial(new SpeedDial(getSpeedDialDefaultPosition(), SpeedDialType.VM, (string)Application.Current.Resources["VoiceMail"], alias));
+                onSpeedDialChanged();
+                saveGrid();
+            }
+            else if (alias != sd.Number)
+            {
+                addLog($"changeVmFetureButton number from {sd.Number} to {alias}");
+                sd.Number = alias;
+                saveGrid();
+            }
+            else
+                addLog($"VmFetureButton alias remain {sd.Number}!");
+        }
+
+        public void removeVmFetureButton()
+        {
+            var sd = SpeedDials.FindIndex(k => k.Type == SpeedDialType.VM);
+            if (sd > -1)
+            {
+                addLog("removeVmFetureButton()");
+                SpeedDials.RemoveAt(sd);
+                onSpeedDialChanged();
+                saveGrid();
+            }
+
+        }
+
+        public void saveGrid()
+        {
+            MyFileSystem.Instance.saveSpeedials(SpeedDials);
+        }
+
+        public void uploadGrid()
+        {
+            onSpeedDialChanged();
+            AeonixInfoService.Instance.setfeatureButtons(SpeedDials);
+            saveGrid();
+            shouldUploadGridGui = false;
+            addLog("shouldUploadGridGui set to false!");
+        }
+
+        public void addSpeedDial(SpeedDial speedDial)
+        {
+            addLog("add featurebutton to position " + speedDial.position);
+            SpeedDials.Add(speedDial);
+        }
+
+        public void setSpeedDial(SpeedDial speedDial)
+        {
+            SpeedDial result = SpeedDials.Find(delegate (SpeedDial c)
+                          {
+                              return c.position.Equals(speedDial.position);
+                          });
+            if (result != null)
+            {
+                addLog("updating featurebutton in position " + speedDial.position);
+                result.Label = speedDial.Label;
+                result.Number = speedDial.Number;
+                result.Type = speedDial.Type;
+                result.Status = speedDial.Status;
+            }
+            else
+            {
+                addLog("add featurebutton to position " + speedDial.position);
+                SpeedDials.Add(speedDial);
+            }
+        }
+
+        public void removeSpeedDial(SpeedDial speedDial)
+        {
+            SpeedDials.Remove(speedDial);
+        }
+
+        public int getSpeedDialDefaultPosition()
+        {
+            SpeedDial sd;
+            for (var i = 0; i < MAX_SPEED_DIALS; i++)
+            {
+                sd = SpeedDials.Find(k => k.position == i);
+                if (sd == null)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public void onSpeedDialChanged()
+        {
+            CallLogService.Instance.featureMissedCounterListeners.Clear();
+            addLog("onSpeedDialChanged()");
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (speedDialListeners1 != null)
+                    speedDialListeners1.onSpeedDialChanged(SpeedDials);
+
+                if (speedDialListeners2 != null)
+                    speedDialListeners2.onSpeedDialChanged(SpeedDials);
+            });
+        }
+
+        public void onActionComponentVisibilityChanged(bool isVisible)
+        {
+            addLog("onActionComponentVisibilityChanged()");
+            if (speedDialListeners1 != null)
+                speedDialListeners1.onActionComponentVisibilityChanged(isVisible);
+
+            if (speedDialListeners2 != null)
+                speedDialListeners2.onActionComponentVisibilityChanged(isVisible);
+
+        }
+
+        public void onSpeedDialStatusChanged(List<SpeedDial> speedDials)
+        {
+            addLog("onSpeedDialStatusChanged()");
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                if (speedDialListeners1 != null)
+                    speedDialListeners1.onSpeedDialStatusChanged(SpeedDials);
+
+                if (speedDialListeners2 != null)
+                    speedDialListeners2.onSpeedDialStatusChanged(SpeedDials);
+            });
+        }
+
+        private void addLog(string s)
+        {
+            Console.WriteLine($"omer3232: {s}");
+            MyFileSystem.Instance.writeDebug(s, "DialSpeedService");
+        }
+
+    }
+}

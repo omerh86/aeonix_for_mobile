@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.RootPage"
+              xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+             xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers">
+    <ContentPage.Content>
+        <AbsoluteLayout HorizontalOptions="FillAndExpand">
+            <StackLayout  x:Name="rootContainer" AbsoluteLayout.LayoutBounds=".1,.1,1,1" AbsoluteLayout.LayoutFlags="All" >
+                <control:TopBarComponent x:Name="topBarComponent"  VerticalOptions="StartAndExpand" Margin="5"></control:TopBarComponent>
+                <StackLayout x:Name="listcontainer"/>
+                <Grid HorizontalOptions="FillAndExpand" VerticalOptions="Fill" Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="75" />
+                    </Grid.RowDefinitions>
+                    <Label x:Name="favLbl" Text="Favorite"  Grid.Row="0" Grid.Column="0" VerticalTextAlignment="End" HorizontalTextAlignment="Center"></Label>
+                    <Button x:Name="favTab" Text="&#xf004;" Clicked="onFavClicked" Grid.Row="0" Grid.Column="0" FontSize="Large" BackgroundColor="Transparent">
+                        <Button.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Button.FontFamily>
+                    </Button>
+
+                    <AbsoluteLayout Grid.Row="0" Grid.Column="1" >
+                        <Button x:Name="recentTab" Text="&#xf2b9;" Clicked="onRecentClicked" BackgroundColor="Transparent" FontSize="Large"  AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional" >
+                            <Button.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                            </Button.FontFamily>
+                        </Button>
+                        <Label x:Name="recentLbl" Text="Recent"    AbsoluteLayout.LayoutBounds=".5,1" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                        <BoxView x:Name="recentCounter1" IsVisible="false"  AbsoluteLayout.LayoutBounds=".8,.2" AbsoluteLayout.LayoutFlags="PositionProportional"  WidthRequest="20" HeightRequest="20" CornerRadius="10" BackgroundColor="Red"></BoxView>
+                        <Label x:Name="recentCounter2" IsVisible="false"  TextColor="White" AbsoluteLayout.LayoutBounds=".8,.2" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                    </AbsoluteLayout>
+
+                    <AbsoluteLayout Grid.Row="0" Grid.Column="2" >
+                        <Button x:Name="ChatTab"  Text="&#xf27a;" BackgroundColor="Transparent"  Clicked="onChatClicked" FontSize="Large" AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional">
+                            <Button.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                            </Button.FontFamily>
+                        </Button>
+                        <Label x:Name="chatLbl" Text="Chat" AbsoluteLayout.LayoutBounds=".5,1" AbsoluteLayout.LayoutFlags="PositionProportional" />
+                        <BoxView x:Name="chatCounter1" IsVisible="false"  AbsoluteLayout.LayoutBounds=".8,.2" AbsoluteLayout.LayoutFlags="PositionProportional"  WidthRequest="20" HeightRequest="20" CornerRadius="10" BackgroundColor="Red"></BoxView>
+                        <Label x:Name="chatCounter2" IsVisible="false" TextColor="White" AbsoluteLayout.LayoutBounds=".8,.2" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                    </AbsoluteLayout>
+                    <Label x:Name="dialLbl" Text="Dial"  Grid.Row="0" Grid.Column="3" VerticalTextAlignment="End" HorizontalTextAlignment="Center"></Label>
+                    <Button x:Name="DialPadTab"  Text="&#xf00a;" BackgroundColor="Transparent" Clicked="onDialClicked" FontSize="Large" Grid.Row="0" Grid.Column="3">
+                        <Button.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Button.FontFamily>
+                    </Button>
+
+                    <Label x:Name="moreLbl" Text="More"  Grid.Row="0" Grid.Column="4" VerticalTextAlignment="End" HorizontalTextAlignment="Center" ></Label>
+                    <Button x:Name="MoreTab"  Text="&#xf141;" BackgroundColor="Transparent" Clicked="onMoreClicked" FontSize="Large" Grid.Row="0" Grid.Column="4">
+                        <Button.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Button.FontFamily>
+                    </Button>
+                </Grid>
+            </StackLayout>
+            <control:CallListView AbsoluteLayout.LayoutBounds=".9,.25" AbsoluteLayout.LayoutFlags="PositionProportional" ></control:CallListView>
+            <control:MyPresenceComponent x:Name="myPresenceComponent" IsVisible="False" AbsoluteLayout.LayoutBounds=".98,.11" AbsoluteLayout.LayoutFlags="PositionProportional" ></control:MyPresenceComponent>
+        </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

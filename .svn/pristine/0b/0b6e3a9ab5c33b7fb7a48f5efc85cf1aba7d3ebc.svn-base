@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage  xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            x:Class="LinphoneXamarin.components.Login"
+            FlowDirection="{StaticResource FlowDirection}"
+             Title="{StaticResource login}"
+              BackgroundImageSource="loginbg.png">
+
+    <StackLayout  x:Name="stack_layout" VerticalOptions="FillAndExpand"
+                 HorizontalOptions="FillAndExpand" >
+
+        <Image Source="logo_tadiran.png" VerticalOptions="Start" HorizontalOptions="Start" WidthRequest="70" HeightRequest="70"></Image>
+        <Label Text="aeonix" HorizontalOptions="Center" TextColor="#07185A" FontAttributes="Bold" VerticalTextAlignment="End" Margin="0" VerticalOptions="End" FontSize="45" />
+        <Label Text="touch" HorizontalOptions="Center" TextColor="#0096D6" VerticalTextAlignment="Start" VerticalOptions="Start" Margin="0,-25,0,0" FontAttributes="Bold" FontSize="45" />
+        <StackLayout x:Name="load" IsVisible="False" Margin="10">
+            <Label Margin="10" Text="{StaticResource loading}" FontSize="Large" TextColor="Black" HorizontalOptions="Center" />
+            <Label x:Name="progressLabel" Margin="10"   FontSize="Large" TextColor="Black" HorizontalOptions="Center" />
+            <Label x:Name="progressStateLabel" Margin="10"   FontSize="Small" TextColor="DimGray" HorizontalOptions="Center" />
+            <Button BackgroundColor="Transparent" TextColor="Red" FontSize="Small" FontAttributes="Bold"  Text="{StaticResource cancel}" Clicked="onCancelLogin" HorizontalOptions="Center" />
+        </StackLayout>
+        <ScrollView  HorizontalOptions="FillAndExpand">
+
+            <StackLayout Margin="7" VerticalOptions="Center" x:Name="stack_registrar"  HorizontalOptions="FillAndExpand">
+                <Label Margin="10" TextColor="Black" Text="{StaticResource login}" FontSize="Medium" FontAttributes="Bold"/>
+                <StackLayout Orientation="Horizontal" BackgroundColor="White" Margin="5" Padding="2"  HorizontalOptions="FillAndExpand">
+                    <Label   Text="&#xf007;" VerticalOptions="Center" Margin="5" FontSize="Medium">
+                        <Label.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Label.FontFamily>
+                    </Label>
+                    <StackLayout  HorizontalOptions="FillAndExpand">
+                        <Label x:Name="usernameLbl" TextColor="#0090D5" Text="{StaticResource userName}" FontSize="Micro"   />
+                        <Entry  x:Name="username" VerticalOptions="Center"  HorizontalOptions="FillAndExpand"  BackgroundColor="Transparent" Margin="0,-7,0,0" Placeholder="{StaticResource userName}" TextChanged="Handle_TextChanged"/>
+                    </StackLayout>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" BackgroundColor="White" Margin="5" Padding="2"  HorizontalOptions="FillAndExpand">
+                    <Label   Text="&#xf023;" VerticalOptions="Center" Margin="7" FontSize="Medium">
+                        <Label.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Label.FontFamily>
+                    </Label>
+                    <StackLayout  HorizontalOptions="FillAndExpand">
+                        <Label x:Name="passwordLbl" TextColor="#0090D5" Text="{StaticResource password}" FontSize="Micro" />
+                        <Entry   x:Name="password" VerticalOptions="Center" HorizontalOptions="FillAndExpand" BackgroundColor="Transparent" Margin="0,-7,0,0" Placeholder="{StaticResource password}" IsPassword="true" TextChanged="Handle_TextChanged"/>
+                    </StackLayout>
+                    <Label   Text="&#xf070;" VerticalOptions="Center" Margin="7" FontSize="Medium" HorizontalOptions="End">
+                        <Label.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Label.FontFamily>
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="Handle_TappedViewPassword"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+
+                <Grid HorizontalOptions="FillAndExpand" Margin="5" RowSpacing="20" ColumnSpacing="20">
+                    <StackLayout BackgroundColor="White" Grid.Row="0" Grid.Column="0" Padding="2">
+                        <Label x:Name="domainLbl" TextColor="#0090D5" Text="{StaticResource domain}" FontSize="Micro" />
+                        <Entry  x:Name="domain" BackgroundColor="Transparent" Margin="0,-7,0,0" Placeholder="{StaticResource domain}"  TextChanged="Handle_TextChanged"/>
+                    </StackLayout>
+                    <StackLayout BackgroundColor="White" Grid.Row="0" Grid.Column="1" Padding="2">
+                        <Label x:Name="portLbl" TextColor="#0090D5"  VerticalOptions="Start" Text="{StaticResource port}" FontSize="Micro"   />
+                        <Entry  BackgroundColor="Transparent"   x:Name="port" Margin="0,-7,0,0" Placeholder="{StaticResource port}" Keyboard="Numeric" TextChanged="Handle_TextChanged" />
+                    </StackLayout>
+                    <StackLayout BackgroundColor="White" Grid.Row="1" Grid.Column="0" Padding="2">
+                        <Label x:Name="proxyLbl" TextColor="#0090D5" Text="{StaticResource proxy}" FontSize="Micro"  />
+                        <Entry  BackgroundColor="Transparent" Margin="0,-7,0,0"  Placeholder="{StaticResource proxy}" x:Name="proxy" />
+                    </StackLayout>
+                    <StackLayout BackgroundColor="White" Grid.Row="1" Grid.Column="1" Padding="2">
+                        <Label x:Name="proxyPortLbl" TextColor="#0090D5" Text="{StaticResource proxyPort}"  FontSize="Micro"/>
+                        <Entry  BackgroundColor="Transparent" Margin="0,-7,0,0" x:Name="proxyPort" Placeholder="{StaticResource proxyPort}" Keyboard="Numeric" TextChanged="Handle_TextChanged" />
+                    </StackLayout>
+                </Grid>
+
+                <!--<Button x:Name="register" Text="Register" Clicked="OnRegisterClicked" HorizontalOptions="Center" />-->
+                <Button Margin="10" BackgroundColor="#00688f" WidthRequest="200" TextColor="White" BorderRadius="25"  x:Name="register" Text="{StaticResource login}" Clicked="OnRegisterClicked" HorizontalOptions="Center">
+                    <Button.Background>
+                        <LinearGradientBrush  EndPoint="0,1">
+                            <GradientStop Color="#BAE9FF" Offset="0.1" />
+                            <GradientStop Color="#0091D3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
+                <Label x:Name="registration_status" TextColor="Red" HorizontalOptions="Center" />
+            </StackLayout>
+        </ScrollView>
+        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand" VerticalOptions="EndAndExpand" Margin="15">
+            <Label x:Name="versionLbl"  TextColor="DimGray" HorizontalOptions="StartAndExpand" FontAttributes="Italic" FontSize="Micro" />
+            <Label  BackgroundColor="Transparent" TextColor="DimGray" FontSize="Micro" Text="{StaticResource bugReport}" >
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+      Tapped="bugReport_Clicked"
+      NumberOfTapsRequired="1"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </StackLayout>
+    </StackLayout>
+</ContentPage>

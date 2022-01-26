@@ -1,0 +1,65 @@
+﻿#if WINDOWS_UWP
+using LinphoneXamarin.Entities;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.Util
+{
+
+    public class HotKeyConverter : IValueConverter, IMarkupExtension
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+
+            switch ((HotKey)value)
+            {
+                case HotKey.Altf7:
+                    return "Alt + F7";
+                case HotKey.AltQ:
+                    return "Alt + q";
+                case HotKey.AltW:
+                    return "Alt + w";
+                case HotKey.Ctrlf7:
+                    return "Ctrl + F7";
+                case HotKey.CtrlQ:
+                    return "Ctrl + q";
+                case HotKey.CtrlW:
+                    return "Ctrl + w";
+                case HotKey.CtrlE:
+                    return "Ctrl + e";
+                case HotKey.CtrlR:
+                    return "Ctrl + r";
+                case HotKey.CtrlT:
+                    return "Ctrl + t";
+                case HotKey.AltlE:
+                    return "Alt + e";
+                case HotKey.AltlR:
+                    return "Alt + r";
+                case HotKey.AltlT:
+                    return "Alt + t";
+                default:
+                    return value;
+
+
+
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+            //throw new NotImplementedException();
+        }
+
+        public object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+    }
+}
+#endif

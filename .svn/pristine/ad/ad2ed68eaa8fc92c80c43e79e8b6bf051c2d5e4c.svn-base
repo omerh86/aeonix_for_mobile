@@ -1,0 +1,119 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Xamarin.Forms;
+
+namespace LinphoneXamarin.Entities
+{
+    public class MyContanctVM : INotifyPropertyChanged, MyContactListener
+    {
+        public ImageSource myImage { get; set; }
+        public Color myStatuscolor { get; set; }
+        public string myStatusText { get; set; }
+        public string myAlias { get; set; }
+        public string myName { get; set; }
+
+        public MyContanctVM()
+        {
+            addLog("MyContanctVM()");
+            AeonixInfoService.Instance.myContactListener = this;
+            ImgService.Instance.myContactListener = this;
+            onMyInfoChanged(true);
+        }
+
+        public void onMyInfoChanged(bool includeImage)
+        {
+            var myContact = ContactService.Instance.myContact;
+            if (myContact != null)
+            {
+                myStatuscolor = updatePresenceLabel(myContact.presenceStatus);
+                myStatusText = updatePresenceText(myContact.presenceStatus);
+                myAlias = myContact.primaryAlias;
+                myName = myContact.displayName;
+                if (includeImage)
+                    myImage = myContact.image;
+
+                Console.WriteLine($"includeImage: {includeImage}");
+            }
+            else
+            {
+
+                myImage = "user.png";
+                myStatusText = "";
+                myStatuscolor = Color.Green;
+                myAlias = "";
+                myName = "";
+            }
+            this.OnPropertyChanged("myStatuscolor");
+            this.OnPropertyChanged("myStatusText");
+            this.OnPropertyChanged("myAlias");
+            this.OnPropertyChanged("myName");
+            if (includeImage)
+                this.OnPropertyChanged("myImage");
+        }
+
+        private Color updatePresenceLabel(Presence presence)
+        {
+            switch (presence)
+            {
+                case Presence.ONLINE:
+                    return Color.Green;
+
+                case Presence.OFFLINE:
+                    return Color.DarkGray;
+
+                case Presence.MEETING:
+                    return Color.Orange;
+
+                case Presence.DND:
+                    return Color.Red;
+
+                default:
+                    return Color.Transparent;
+
+            }
+        }
+
+        private string updatePresenceText(Presence presence)
+        {
+            switch (presence)
+            {
+                case Presence.ONLINE:
+                    return (string)Application.Current.Resources["available"];
+
+                case Presence.MEETING:
+                    return (string)Application.Current.Resources["atAMeeting"];
+
+                case Presence.DND:
+                    return (string)Application.Current.Resources["doNotDisturb"];
+
+                default:
+                    return "";
+
+            }
+        }
+
+        #region INotifyPropertyChanged Implementation
+        public event PropertyChangedEventHandler PropertyChanged;
+        void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged == null)
+                return;
+
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+
+        private void addLog(string message)
+        {
+            Console.WriteLine("omer442: " + message);
+            MyFileSystem.Instance.writeDebug(message, "MyContanctVM");
+        }
+    }
+}
+

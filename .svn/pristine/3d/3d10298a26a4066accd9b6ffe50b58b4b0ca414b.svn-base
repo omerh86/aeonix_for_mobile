@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="LinphoneXamarin.components.userControllers.speedDialView"
+             xmlns:Helpers="clr-namespace:LinphoneXamarin.Util">
+    <ContentView.Content>
+        <StackLayout Padding="5" VerticalOptions="Fill" HorizontalOptions="Fill">
+            <AbsoluteLayout >
+                <Image x:Name="btn" BackgroundColor="Transparent" HeightRequest="50" WidthRequest="50" AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional" Source="{x:Binding Type, Converter={Helpers:SpeedDialIconConverter}}" />
+                <ImageButton x:Name="presenceLabel"  CornerRadius="6" WidthRequest="12" HeightRequest="12" BackgroundColor="{x:Binding Status, Converter={Helpers:FeatureButtonStatusColorConverter}}"  AbsoluteLayout.LayoutBounds=".5,1"  AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                <ImageButton IsVisible="{x:Binding Edit}" AbsoluteLayout.LayoutBounds=".05,.01" Source="action_button_edit.png" BackgroundColor="Transparent" WidthRequest="20" HeightRequest="20" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                <BoxView x:Name="counterFrame" IsVisible="False" BackgroundColor="red" HeightRequest="18" WidthRequest="18" AbsoluteLayout.LayoutBounds=".99,0" AbsoluteLayout.LayoutFlags="PositionProportional" CornerRadius="9"/>
+                <Label x:Name="counterLbl" IsVisible="false"  HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="White" AbsoluteLayout.LayoutBounds=".91,0" AbsoluteLayout.LayoutFlags="PositionProportional" FontAttributes="Bold" />
+            </AbsoluteLayout>
+            <Label VerticalOptions="FillAndExpand" TextColor="Black" HorizontalTextAlignment="Center"  FontSize="Micro" Padding="1"  MaxLines="2" Text="{x:Binding Label}" />
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

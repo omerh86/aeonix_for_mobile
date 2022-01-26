@@ -1,0 +1,93 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Xamarin.Essentials;
+using Xamarin.Forms;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+
+namespace LinphoneXamarin.EsfUtil
+{
+    class CollaborationHandler
+    {
+        private string _CollabinitUserName;
+        private string _CollabinitEP;
+        private string _CollabLink;
+
+        public static void startCollaboration(string option, string partner, string callID, UIMessageListener[] uIMessageListeners)
+        {
+            var startCollaborationRequestObj = new StartCollaborationRequestObj();
+            startCollaborationRequestObj.option = option;
+            if (partner != null)
+                startCollaborationRequestObj.partner = partner;
+            if (callID != null)
+                startCollaborationRequestObj.callId = callID;
+
+            string strToSend = MySendRequestHelper.Instance.getStartCollaborationRequest(startCollaborationRequestObj);
+            AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            foreach (var i in uIMessageListeners)
+                i?.setCollaborationMessage((string)Application.Current.Resources["waiting_for_collaboration_connection"]);
+        }
+        public static void onstartCollaborationError(string info, UIMessageListener[] uIMessageListeners)
+        {
+            var startCollaborationErrorRootObj = MySendRequestHelper.Instance.getStartCollaborationErrorRootObj(info);
+            if (startCollaborationErrorRootObj != null &&
+                startCollaborationErrorRootObj.StartCollaborationError != null)
+            {
+                var reason = MyEnumHelper.Instance.getStartCollaborationError(startCollaborationErrorRootObj.StartCollaborationError.cause);
+                foreach (var i in uIMessageListeners)
+                    i?.onInfoEvent($"{(string)Application.Current.Resources["collaboration_offer_status"]} {reason}", "", 5, false);
+            }
+        }
+        public static void onCollaborationCancled(string info, ICollabAlertListener alertListener)
+        {
+            var CollaborationCancelRequestRootObj = MySendRequestHelper.Instance.getCancelCollaborationRequestRootObj(info);
+            if (CollaborationCancelRequestRootObj != null &&
+                CollaborationCancelRequestRootObj.CancelCollaborationRequest != null)
+            {
+                alertListener?.CancelCollabAlert();
+            }
+        }
+        public static void onCollaborationOfferStatus(string info, UIMessageListener[] uIMessageListeners)
+        {
+            var _collaborationOfferStatus = MySendRequestHelper.Instance.getCollaborationOfferStatusRootObj(info);
+            if (_collaborationOfferStatus != null &&
+                _collaborationOfferStatus.OfferCollaborationStatus != null)
+            {
+                foreach (var i in uIMessageListeners)
+                    i?.onInfoEvent($"{(string)Application.Current.Resources["collaboration_offer_status"]} {MyEnumHelper.Instance.getCollaborationError(_collaborationOfferStatus.OfferCollaborationStatus.result)}", "", 5, false);
+            }
+        }
+        public void sendCollaborationOfferStatus(string result)
+        {
+            var collaborationOfferStatusObj = new CollaborationOfferStatusObj(result, _CollabinitUserName, _CollabinitEP, _CollabLink);
+            string strToSend = MySendRequestHelper.Instance.getCollaborationOfferStatus(collaborationOfferStatusObj);
+            AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            if (result.Equals("ACCEPTED"))
+                fireCollaborationLink(_CollabLink);
+        }
+        public void onCollaborationOfferRequest(string info, ICollabAlertListener alertListener)
+        {
+            var offerCollaborationRequestRootObj = MySendRequestHelper.Instance.getOfferCollaborationRequestRootObj(info);
+            if (offerCollaborationRequestRootObj != null &&
+                offerCollaborationRequestRootObj.OfferCollaborationRequest != null)
+            {
+                if (offerCollaborationRequestRootObj.OfferCollaborationRequest.role.Equals("MODERATOR"))
+                    fireCollaborationLink(offerCollaborationRequestRootObj.OfferCollaborationRequest.link);
+                else
+                {
+                    _CollabinitUserName = offerCollaborationRequestRootObj.OfferCollaborationRequest.initUser;
+                    _CollabinitEP = offerCollaborationRequestRootObj.OfferCollaborationRequest.initDevice;
+                    _CollabLink = offerCollaborationRequestRootObj.OfferCollaborationRequest.link;
+                    alertListener?.DisplayCollabAlert(offerCollaborationRequestRootObj.OfferCollaborationRequest.conferenceName, (string)Application.Current.Resources["new_collaboration_offer"]);
+                }
+            }
+        }
+        private void fireCollaborationLink(string url)
+        {
+            Browser.OpenAsync(new Uri(url), BrowserLaunchMode.SystemPreferred);
+        }
+    }
+}

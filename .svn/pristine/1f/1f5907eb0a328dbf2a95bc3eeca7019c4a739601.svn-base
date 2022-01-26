@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.Messages"
+             xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" 
+    ios:Page.UseSafeArea="true" FlowDirection="{StaticResource FlowDirection}">
+
+    <ContentPage.Content>
+
+        <StackLayout x:Name="stack_layout" Orientation="Vertical" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  Spacing="15">
+            <StackLayout IsVisible="false" x:Name="searchComponent" Margin="5"  Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                <Frame BackgroundColor="#E5EAEE" Margin="5" Padding="-2" HorizontalOptions="FillAndExpand" CornerRadius="25">
+                    <Entry   TextChanged="onSearchedClicked" HorizontalOptions="FillAndExpand"  x:Name="searchInput" Placeholder="search" />
+                </Frame>
+
+                <Label x:Name="upLbl" VerticalOptions="Center" Text="&#xf107;"  TextColor="DimGray" FontSize="Medium">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Label.FontFamily>
+                </Label>
+                <Label x:Name="downLbl"   Text="&#xf106;" VerticalOptions="Center"  Margin="18"  TextColor="DimGray" FontSize="Medium">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Label.FontFamily>
+                </Label>
+                <Label x:Name="clearLbl" Text="&#xf55a;" VerticalOptions="Center"  Margin="8" TextColor="DimGray" FontSize="Medium">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Label.FontFamily>
+                </Label>
+                <!--<Button HorizontalOptions="End" Text="Clear" Clicked="onClearSearch" />-->
+
+            </StackLayout>
+            <!--<ListView  HasUnevenRows="True" x:Name="messageListView" SeparatorVisibility="None" IsGroupingEnabled="True" VerticalOptions="FillAndExpand"  BackgroundColor="Transparent"    Margin="7">
+                
+              
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <control:MessageViewCell  searchResultText="{Binding Source={x:Reference searchInput} , Path=BindingContext}"  messageText="{Binding messageText}" formattedTime="{Binding formattedTime}" isTemp="{Binding isTemp}" isMine="{Binding isMine}" isRedMessage="{Binding isRedMessage}"/>
+
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>-->
+            <ListView  HasUnevenRows="True" 
+                       x:Name="messageListView"
+                       SeparatorVisibility="None"
+                       VerticalOptions="FillAndExpand"
+                       BackgroundColor="Transparent"
+                       IsGroupingEnabled="True"
+                       GroupDisplayBinding="{Binding Title}" 
+                       Margin="7">
+
+                <ListView.GroupHeaderTemplate>
+                    <DataTemplate >
+                        <ViewCell >
+                            <StackLayout BackgroundColor="Transparent">
+                                <Label Text="{Binding Title}" VerticalTextAlignment="Center" TextColor="#9EA6B4" FontAttributes="Bold"  FontSize="Small"  HorizontalOptions="Center"></Label>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.GroupHeaderTemplate>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <control:MessageViewCell  longActionPressedCommand="{Binding Source={x:Reference messageListView} , Path=BindingContext}" 
+                            searchResultText="{Binding Source={x:Reference searchInput} , Path=BindingContext}" 
+                                                 messageId="{Binding messageId}"
+                                                 messageText="{Binding messageText}"
+                                                 formattedTime="{Binding formattedTime}"
+                                                 isTemp="{Binding isTemp}"
+                                                 isMine="{Binding isMine}" 
+                                                 isRedMessage="{Binding isRedMessage}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <StackLayout  Orientation="Horizontal" Margin="6"  VerticalOptions="End" HorizontalOptions="FillAndExpand">
+                <Frame BackgroundColor="#E5EAEE" Padding="0" HorizontalOptions="FillAndExpand" HasShadow="false" CornerRadius="25">
+                    <AbsoluteLayout  Padding="0" Margin="0" HorizontalOptions="FillAndExpand">
+                        <Editor x:Name="messageEntry" MaxLength="249"  Placeholder="{StaticResource message}" FontSize="Medium" Margin="0" WidthRequest="200" AbsoluteLayout.LayoutBounds=".0,1,1,1" AbsoluteLayout.LayoutFlags="All" />
+                        <Label x:Name="pending" IsVisible="false" FontSize="Medium" Text="&#xf017;" AbsoluteLayout.LayoutBounds=".95,.1" AbsoluteLayout.LayoutFlags="PositionProportional">
+                            <Label.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-regular-400.ttf#Font Awesome 5 Free" Android="fa-regular-400.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                            </Label.FontFamily>
+                        </Label>
+                        <Label x:Name="errorLbl" IsVisible="False" Text="Message could not be send!" TextColor="Red"></Label>
+                    </AbsoluteLayout>
+
+                </Frame>
+                <ImageButton x:Name="sendBtn" Clicked="onSend" Source="backright.png" BackgroundColor="#0091D3" WidthRequest="30" HeightRequest="30" CornerRadius="15"  HorizontalOptions="End" VerticalOptions="End"  Margin="5"/>
+
+            </StackLayout>
+        </StackLayout>
+
+
+    </ContentPage.Content>
+</ContentPage>

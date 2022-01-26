@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gradient:GradientView  StartColor="#142665" EndColor="#0090D5"  xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Aeonix Touch"
+             ClassId="inACallPage"
+             xmlns:local="clr-namespace:LinphoneXamarin.components.userControllers"
+             xmlns:gradient="clr-namespace:LinphoneXamarin.styles"
+             x:Class="LinphoneXamarin.components.MainPage"
+             xmlns:controls="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+           xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+                       ios:Page.UseSafeArea="true">
+
+    <StackLayout  x:Name="stack_layout"  VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+        <Button Clicked="onBackClicked" HorizontalOptions="Start"  Text="&#xf053;" BorderColor="Transparent" BackgroundColor="Transparent" TextColor="White" FontSize="Medium" >
+            <Button.FontFamily>
+                <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+            </Button.FontFamily>
+        </Button>
+
+        <StackLayout x:Name="infoPanel" Margin="10">
+            <StackLayout Orientation="Horizontal">
+                <Label x:Name="namelbl" FontSize="Medium" TextColor="White"  FontAttributes="Bold" Text=""/>
+                <Label x:Name="aliaslbl" FontSize="Medium" TextColor="White"  FontAttributes="Bold" Text=""/>
+            </StackLayout>
+            <Label x:Name="statelbl" FontSize="Medium" TextColor="White" Text="{StaticResource connecting}"/>
+            <Label x:Name="timeLbl" FontSize="Medium" TextColor="White"  FontAttributes="Bold"  VerticalOptions="FillAndExpand"/>
+        </StackLayout>
+        <Grid x:Name="imagesPanel" HorizontalOptions="Center" WidthRequest="120"  >
+
+        </Grid>
+        <StackLayout x:Name="confPanel" Margin="10" IsVisible="false" VerticalOptions="FillAndExpand">
+            <Label FontSize="Medium" TextColor="White"  HorizontalOptions="Center" VerticalOptions="Fill" Text="Conference" Margin="10"/>
+            <ListView HasUnevenRows="True" HeightRequest="200"  SeparatorVisibility="Default" x:Name="callsListView"  BackgroundColor="Transparent">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal">
+                                <controls:CircleImage Source="{x:Binding image}" Aspect="AspectFill" HeightRequest="40" WidthRequest="40"  HorizontalOptions="Center" Margin="6" >
+                                </controls:CircleImage>
+                                <StackLayout VerticalOptions="Center" Orientation="Vertical">
+                                    <Label  TextColor="White" Text="{x:Binding displayName}"/>
+                                    <Label  TextColor="White" Text="{x:Binding primaryAlias}"/>
+                                </StackLayout>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <BoxView BackgroundColor="White" Opacity="0.5" Margin="8,0,8,0" HeightRequest="2" ></BoxView>
+
+        </StackLayout>
+        <StackLayout VerticalOptions="EndAndExpand" Margin="10,0,10,30" >
+            <Grid IsVisible="False" x:Name="controlGrid" HorizontalOptions="CenterAndExpand" RowSpacing="40" ColumnSpacing="40">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60" />
+                    <RowDefinition Height="60" />
+                    <RowDefinition Height="60" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60" />
+                    <ColumnDefinition Width="60" />
+                    <ColumnDefinition Width="60" />
+                </Grid.ColumnDefinitions>
+
+
+                <Button x:Name="collaboration" VerticalOptions="Start"  Clicked="OnCollaborationClicked"  Text="&#xf2b5;"  BackgroundColor="#0090D5"  TextColor="White" FontSize="Large"  >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="collaborationLbl" VerticalOptions="End" VerticalTextAlignment="End" Text="{StaticResource collaboration}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+                <Button x:Name="video" VerticalOptions="Start"  Clicked="OnVideoClicked"  Text="&#xf03d;"  BackgroundColor="Transparent"  TextColor="White" FontSize="Large"  >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="videoLbl" VerticalOptions="End" VerticalTextAlignment="End" Text="{StaticResource video}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+
+                <Button x:Name="hold"  Clicked="OnHoldClicked"  Text="&#xf28b;"  BackgroundColor="Transparent" TextColor="White" FontSize="Large"  >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="holdlbl" VerticalOptions="End" VerticalTextAlignment="End" Text="{StaticResource hold}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+                <Button x:Name="addCall"   VerticalOptions="Start" IsEnabled="True" Clicked="onAddcall" Text="&#xf067;"  BackgroundColor="Transparent" TextColor="White" FontSize="Large" >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+
+                <Label x:Name="addlbl" VerticalOptions="End" Text="{StaticResource add}" HorizontalOptions="CenterAndExpand"  FontSize="Micro" TextColor="White"></Label>
+
+                <Button x:Name="transfer"  VerticalOptions="Start" Clicked="onTransfer" Text="&#xf066;"  BackgroundColor="Transparent" TextColor="White" FontSize="Large" >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="transferlbl"  VerticalOptions="End" Text="{StaticResource transfer}" HorizontalOptions="CenterAndExpand"  FontSize="Micro" TextColor="White"></Label>
+
+                <Button x:Name="swap"  VerticalOptions="Start" Clicked="onSwap" Text="&#xf362;"  BackgroundColor="Transparent"  TextColor="White" FontSize="Large" >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="switchlbl" VerticalOptions="End" Text="{StaticResource switch}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+                <Button x:Name="speaker"  VerticalOptions="Start" Clicked="onSpeaker" Text="&#xf028;"  BackgroundColor="Transparent"  TextColor="White" FontSize="Large" >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="speakerlbl" VerticalOptions="End" Text="{StaticResource speaker}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+                <Button x:Name="muteBtn"  VerticalOptions="Start" Clicked="onMute" Text="&#xf131;"  BackgroundColor="Transparent"  TextColor="White" FontSize="Large" >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="mutelbl"  VerticalOptions="End" Text="{StaticResource mute}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+
+                <Image  x:Name="BTBtn" VerticalOptions="Center" HeightRequest="40" WidthRequest="40"  Margin="25,1,25,1" Source="bt.png"/>
+                <Label x:Name="BTlbl" VerticalOptions="End" Text="BT" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+
+
+                <Button x:Name="conference"  VerticalOptions="Start" Clicked="onConferenceClicked" Text="&#xf0c0;"  BackgroundColor="Transparent"  TextColor="White" FontSize="Large" >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="conferencelbl" VerticalOptions="End" Text="{StaticResource conference}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White">
+                </Label>
+
+                <Button x:Name="dialPadBtn"  VerticalOptions="Start" Clicked="onShowDialPad" Text="&#xf00a;"  BackgroundColor="Transparent"  TextColor="White" FontSize="Large" >
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="dialpadlbl" VerticalOptions="End" Text="{StaticResource dialpad}" HorizontalOptions="CenterAndExpand" FontSize="Micro"  TextColor="White"></Label>
+
+
+                <Button x:Name="Terminate"  Clicked="OnTerminateClicked"  VerticalOptions="Center" BorderRadius="10" BorderColor="White" BorderWidth="2"  Text="&#xf3dd;"  BackgroundColor="Red"  TextColor="White" FontSize="Medium">
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+
+                <Button x:Name="Answer" Clicked="OnAnswerClicked"  VerticalOptions="Center" Text="&#xf095;" BorderRadius="10" BorderColor="White" BorderWidth="2" BackgroundColor="Green"  TextColor="White" FontSize="Medium">
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+                <Button x:Name="AnswerAndTerminate" Clicked="OnAnswerTerminateClicked"  VerticalOptions="Center" Text="&#xf095;" BorderRadius="10" BorderColor="White" BorderWidth="2" BackgroundColor="Green"  TextColor="White" FontSize="Medium">
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+                <Label x:Name="AnswerAndTerminateLbl" VerticalOptions="Center" HorizontalOptions="End"  Text="&#xf3dd;" Padding="5" TextColor="Red" FontSize="Micro">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Label.FontFamily>
+                </Label>
+                <Label x:Name="AnswerAndHoldLbl" VerticalOptions="Center" HorizontalOptions="End"  Text="&#xf28b;" Padding="5" TextColor="white" FontSize="Micro">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Label.FontFamily>
+                </Label>
+
+
+                <Button x:Name="videoAnswer"  Clicked="OnVideoAnswerClicked"  Text="&#xf03d;" BackgroundColor="Transparent"  TextColor="White" FontSize="Large">
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                    </Button.FontFamily>
+                </Button>
+
+            </Grid>
+            <StackLayout IsVisible="False" x:Name="dialPad" >
+                <Label Margin="7" x:Name="number" YAlign="Center" HorizontalOptions="Start" FontSize="Large" TextColor="White" Text="" />
+
+                <Grid RowSpacing="1" ColumnSpacing="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="60" />
+                        <RowDefinition Height="60" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+
+                    </Grid.ColumnDefinitions>
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="1" Grid.Row="0" Grid.Column="0"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="2" Grid.Row="0" Grid.Column="1"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="3" Grid.Row="0" Grid.Column="2"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="4" Grid.Row="1" Grid.Column="0"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="5" Grid.Row="1" Grid.Column="1"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="6" Grid.Row="1" Grid.Column="2"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="7" Grid.Row="2" Grid.Column="0"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="8" Grid.Row="2" Grid.Column="1" />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="9" Grid.Row="2" Grid.Column="2"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="*" Grid.Row="3" Grid.Column="0"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="0" Grid.Row="3" Grid.Column="1"  />
+                    <Button  TextColor="Black" BackgroundColor="White" Clicked="onDialPadBtnClicked" FontSize="Micro" Text="#" Grid.Row="3" Grid.Column="2" />
+                    <Button x:Name="Terminate2"  Clicked="OnTerminateClicked" Grid.Row="4" Grid.Column="0" VerticalOptions="Center" BorderRadius="10" BorderColor="White" BorderWidth="2"  Text="&#xf095;"  BackgroundColor="Red"  TextColor="White" FontSize="Medium">
+                        <Button.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                        </Button.FontFamily>
+                    </Button>
+                    <!--<Image x:Name="Terminate2" Grid.Row="4" Grid.Column="0"   VerticalOptions="Start" HorizontalOptions="Center" BackgroundColor="Transparent"  Source="endcall.png"/>-->
+                    <Button TextColor="DarkBlue"  Clicked="onCancelDialPad" BackgroundColor="Transparent" FontSize="Medium" Text="&#xf00a;" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" >
+                        <Button.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Button.FontFamily>
+                    </Button>
+                </Grid>
+
+            </StackLayout>
+        </StackLayout>
+    </StackLayout>
+</gradient:GradientView>

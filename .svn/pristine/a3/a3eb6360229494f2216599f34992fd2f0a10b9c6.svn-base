@@ -1,0 +1,15 @@
+﻿using System;
+using Linphone;
+using SQLite;
+
+namespace LinphoneXamarin.Entities
+{
+    public class MyImgItem
+    {
+        [PrimaryKey, AutoIncrement]
+        public int ID { get; set; }
+        public string userName { set; get; }
+        public long imgSignature { set; get; }
+
+    }
+}

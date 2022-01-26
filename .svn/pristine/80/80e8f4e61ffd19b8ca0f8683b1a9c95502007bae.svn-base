@@ -1,0 +1,155 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text;
+using Xamarin.Forms;
+
+namespace LinphoneXamarin.Entities
+{
+    public class MyVmMessage : INotifyPropertyChanged
+    {
+        public string messageID { set; get; }
+        public string messageName { set; get; }
+        public string transcription { set; get; }
+        public long dateTime { set; get; }
+        public long durationSec { set; get; }
+        public string messageImportance { set; get; }
+        public bool load { set; get; }
+        public bool pendingSend { set; get; }
+        public VmMessageStatus status { set; get; }
+        public string from { set; get; }
+
+        private bool _isloading;
+
+        public bool isloading
+        {
+            get
+            {
+                return _isloading;
+            }
+            set
+            {
+                _isloading = value;
+                OnPropertyChanged("isloading");
+            }
+        }
+
+        private bool _heard;
+
+        public bool heard
+        {
+            get
+            {
+                return _heard;
+            }
+            set
+            {
+                _heard = value;
+                OnPropertyChanged("heard");
+            }
+        }
+
+        private bool _priority { set; get; }
+        public bool priority
+        {
+            get
+            {
+                return _priority;
+            }
+            set
+            {
+                _priority = value;
+                setMessageImportance();
+            }
+        }
+        private bool _privateMsg { set; get; }
+        public bool privateMsg
+        {
+            get
+            {
+                return _privateMsg;
+            }
+            set
+            {
+                _privateMsg = value;
+                setMessageImportance();
+            }
+        }
+
+        public bool isDeleteEnabled
+        {
+            get
+            {
+                return !status.Equals(VmMessageStatus.DELETED); ;
+            }
+        }
+
+        public bool isRestoredEnabled
+        {
+            get
+            {
+                return status.Equals(VmMessageStatus.DELETED);
+            }
+
+        }
+
+        public bool isSaveEnabled
+        {
+            get
+            {
+                return status.Equals(VmMessageStatus.NEW);
+            }
+
+        }
+
+        private bool _isPlaying;
+
+        public bool isPlaying
+        {
+            get
+            {
+                return _isPlaying;
+            }
+            set
+            {
+                _isPlaying = value;
+                OnPropertyChanged("isPlaying");
+            }
+        }
+
+        private float _progress;
+        public float progress
+        {
+            get
+            {
+                return _progress;
+            }
+            set
+            {
+                _progress = value;
+                OnPropertyChanged("progress");
+            }
+        }
+
+        private void setMessageImportance()
+        {
+            if (priority && privateMsg)
+                messageImportance = $", {(string)Application.Current.Resources["p_p_message"]}";
+            else if (priority)
+                messageImportance = $", {(string)Application.Current.Resources["priority_meassage"]}";
+            else if (privateMsg)
+                messageImportance = $", {(string)Application.Current.Resources["private_message"]}";
+            else
+                messageImportance = "";
+
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string nameOfProperty)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameOfProperty));
+        }
+    }
+}

@@ -1,0 +1,52 @@
+﻿using System;
+using Linphone;
+using LinphoneXamarin.Util;
+using SQLite;
+using Xamarin.Forms;
+
+namespace LinphoneXamarin.Entities
+{
+    public class MyChat
+    {
+        [PrimaryKey]
+        public string chatId { set; get; }
+        public string chatName { set; get; }
+        public string lastMessageText { set; get; }
+        public long lastMessageTime { set; get; }
+        public int unRedMessages { set; get; }
+        public bool isUnRedMessagesVisible { set; get; }
+        public ChatType chatType { set; get; }
+        public string formattedTime { set; get; }
+        public ImageSource image
+        {
+            get
+            {
+                var x = MyFileSystem.Instance.loadUserIdImage(chatId);
+                if (x == null)
+                {
+                    return "user.png";
+                }
+                else
+                {
+                    return x;
+                }
+            }
+        }
+
+        public MyChat()
+        {
+        }
+
+        public MyChat(string chatId, string chatName, string lastMessageText, long lastMessageTime, ChatType chatType)
+        {
+            this.chatId = chatId;
+            this.chatName = chatName;
+            this.lastMessageText = lastMessageText;
+            this.lastMessageTime = lastMessageTime;
+            this.unRedMessages = unRedMessages;
+            this.chatType = chatType;
+          
+        }
+
+    }
+}

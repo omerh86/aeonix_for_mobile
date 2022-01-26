@@ -1,0 +1,94 @@
+﻿
+using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class MorePage : ContentPage
+    {
+        public List<MoreItem> moreItems { set; get; }
+        public MyContanctVM myContanctVM { set; get; }
+        public MorePage()
+        {
+            InitializeComponent();
+            NavigationPage.SetHasNavigationBar(this, false);
+            moreItems = new List<MoreItem>() { new MoreItem("Quick Actions", "quickactions.png"), new MoreItem("Settings", "settings.png"), new MoreItem("Problem Report", "problemreport.png"), new MoreItem("About", "about.png"), new MoreItem("Log out", "signout.png") };
+            if (AeonixInfoService.Instance.myContactListener != null)
+                myContanctVM = AeonixInfoService.Instance.myContactListener;
+            else
+                myContanctVM = new MyContanctVM();
+
+            this.BindingContext = this;
+            myContactContainer.BindingContext = myContanctVM;
+            myPresenceComponent.SelectedCommand = new Command<object>(onSelectedPresence);
+        }
+
+        async void OnItemTappedAsync(object sender, ItemTappedEventArgs e)
+        {
+
+            switch (e.ItemIndex)
+            {
+
+                case 0:
+                    await Navigation.PushAsync(new speedDialPage(), false);
+                    break;
+                case 1:
+                    await Navigation.PushAsync(new Settings(), false);
+                    break;
+                case 2:
+                    await Navigation.PushAsync(new BugReport(), false);
+                    break;
+                case 3:
+                    await Navigation.PushAsync(new About(), false);
+                    break;
+                case 4:
+                    var ls = LoginService.Instance;
+                    ls.forceResetLoginProccesss();
+                    ls.loginRegistrationUiListeners = new List<CallListView>();
+                    CallService.Instance.componentCallsListeners = new List<CallListView>();
+                    DialSpeedService.Instance.speedDialListeners1 = null;
+                    DialSpeedService.Instance.speedDialListeners2 = null;
+                    AeonixInfoService.Instance.uIInfoListener = new List<CallListView>();
+                    CallLogService.Instance.featureMissedCounterListeners.Clear();
+                    break;
+            }
+            Navigation.RemovePage(this);
+        }
+
+        void onSelectedPresence(object obj)
+        {
+            myPresenceComponent.IsVisible = !myPresenceComponent.IsVisible;
+        }
+
+        public void OnImageTapped(object sender, EventArgs e)
+        {
+            myPresenceComponent.IsVisible = !myPresenceComponent.IsVisible;
+        }
+        public void onBackClicked(object sender, EventArgs e)
+        {
+            Navigation.PopAsync();
+        }
+
+        public class MoreItem
+        {
+            public string label { set; get; }
+            public string icon { set; get; }
+
+            public MoreItem(string label, string icon)
+            {
+                this.label = label;
+                this.icon = icon;
+            }
+        }
+    }
+}

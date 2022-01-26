@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="LinphoneXamarin.components.userControllers.SpeedDialComponent">
+    <ContentView.Content>
+        <Frame  Margin="5" BackgroundColor="White" Padding="7" CornerRadius="10" >
+            <AbsoluteLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" FlowDirection="LeftToRight">
+                <Grid 
+                    x:Name="speedDialComponent"
+                     AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All"
+                ColumnSpacing="2"
+                      Margin="0,0,25,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                </Grid>
+                <Button x:Name="addActionBtn" CornerRadius="25" TextColor="White" Padding="10,0,10,0" Text="{StaticResource add_actions}" AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional" Clicked="onAddQuickActions">
+                    <Button.Background>
+                        <LinearGradientBrush  EndPoint="0,1">
+                            <GradientStop Color="#BAE9FF" Offset="0.1" />
+                            <GradientStop Color="#0091D3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Button.Background>
+                </Button>
+                <ImageButton x:Name="addActionBtn2" BackgroundColor="Transparent"  Source="settingsarrow.png" AbsoluteLayout.LayoutBounds=".98,.5" AbsoluteLayout.LayoutFlags="PositionProportional" Clicked="onAddQuickActions" HeightRequest="20" WidthRequest="20"/>
+            </AbsoluteLayout>
+
+        </Frame>
+
+
+    </ContentView.Content>
+</ContentView>

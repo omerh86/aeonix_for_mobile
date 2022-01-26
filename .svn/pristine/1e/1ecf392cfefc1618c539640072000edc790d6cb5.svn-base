@@ -1,0 +1,295 @@
+﻿using System;
+using System.Text;
+using System.Windows.Input;
+using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using Plugin.Vibrate;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+#if ANDROID
+using Android.Media;
+#endif
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class DialPad : ContentPage
+    {
+        StringBuilder phoneNumber = new StringBuilder("");
+        RowDefinitionCollection bigRowDefinitions;
+        RowDefinitionCollection smallRowDefinitions;
+
+        public ICommand longPressCommand { get; private set; }
+        public ICommand clearAllCommand { get; private set; }
+        public DialPad()
+        {
+            InitializeComponent();
+            CallService.Instance.componentCallsListener2 = _CallListView;
+            AeonixInfoService.Instance.uIInfoListener2 = _CallListView;
+            LoginService.Instance.loginRegistrationUiListener2 = _CallListView;
+            NavigationPage.SetHasNavigationBar(this, false);
+            longPressCommand = new Command<string>(onlongPressed);
+            clearAllCommand = new Command<string>(onClearAll);
+            zeroBtn.BindingContext = longPressCommand;
+            clearBtn.BindingContext = clearAllCommand;
+
+            search.CallCommand = new Command<string[]>(onCallPressed);
+            search.ScrollCommand = new Command<bool>(onScrolled);
+            search.ContactinfoCommand = new Command<string>(onContactInfoPressed);
+            search.MessageCommand = new Command<string[]>(onMessagePressed);
+            var smallRow = new RowDefinition();
+            smallRow.Height = 30;
+            var bigRow = new RowDefinition();
+            bigRow.Height = 55;
+            bigRowDefinitions = new RowDefinitionCollection();
+            bigRowDefinitions.Add(bigRow);
+            bigRowDefinitions.Add(bigRow);
+            bigRowDefinitions.Add(bigRow);
+            bigRowDefinitions.Add(bigRow);
+            bigRowDefinitions.Add(bigRow);
+            smallRowDefinitions = new RowDefinitionCollection();
+            bigRowDefinitions.Add(smallRow);
+            bigRowDefinitions.Add(smallRow);
+            bigRowDefinitions.Add(smallRow);
+            bigRowDefinitions.Add(smallRow);
+            bigRowDefinitions.Add(smallRow);
+            bigRowDefinitions.Add(smallRow);
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            addLog("OnAppearing");
+
+
+#if WINDOWS_UWP
+            windowSizechangedHandler(Windows.UI.Xaml.Window.Current.CoreWindow.Bounds.Height);
+            Windows.UI.Xaml.Window.Current.SizeChanged += onWindoSizeChanged;
+
+            Device.StartTimer(TimeSpan.FromMilliseconds(500), () =>
+        {
+            inumber.Focus();
+            return false;
+        });
+#endif
+
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            addLog("OnDisappearing");
+#if WINDOWS_UWP
+            Windows.UI.Xaml.Window.Current.SizeChanged -= onWindoSizeChanged;
+#else
+            onDialPadBtn(null, null);
+#endif
+        }
+
+#if WINDOWS_UWP
+
+        public void onWindoSizeChanged(Object sender, Windows.UI.Core.WindowSizeChangedEventArgs args)
+        {
+            addLog("SizeChanged(): " + args.Size.Width + " , " + args.Size.Height); ;
+            windowSizechangedHandler(args.Size.Height);
+        }
+
+        private void windowSizechangedHandler(double height)
+        {
+            if (height > 510)
+            {
+                dialPadBtn.IsVisible = false;
+                controlGrid.IsVisible = true;
+            }
+            else
+            {
+                dialPadBtn.IsVisible = true;
+                controlGrid.IsVisible = false;
+             }
+        }
+
+
+#endif
+
+        void onContactInfoPressed(string userName)
+        {
+            var page = (Page)new contactDetail(userName);
+            Navigation.PushAsync(page, false);
+        }
+
+        void onMessagePressed(string[] names)
+        {
+            var page = (Page)new Messages(names[0], names[1]);
+            Navigation.PushAsync(page, false);
+        }
+
+        void onlongPressed(string val)
+        {
+#if WINDOWS_UWP
+            Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+            {
+                doSetPhoneNumber(val.Equals("long") ? "+" : "0", true);
+            });
+#else
+            doSetPhoneNumber("+", true);
+#endif
+        }
+
+        void onCallPressed(string[] names)
+        {
+            CallService.Instance.callAsync(names[0], names[1], names[2].Equals("True") ? true : false, names[3]);
+        }
+
+        void onScrolled(bool val)
+        {
+            search.shuoldNotifyScrolling = controlGrid.IsVisible;
+            if (controlGrid.IsVisible)
+            {
+                dialPadBtn.IsVisible = true;
+                controlGrid.IsVisible = false;
+                clearBtn.IsVisible = false;
+                search.HeightRequest = stack_layout.Height;
+            }
+        }
+
+        private void onDialEntryClicked(object sender, TextChangedEventArgs e)
+        {
+            addLog("TextChangedEventArg: " + e.NewTextValue);
+            if (e.NewTextValue.Length > 0)
+                doSetPhoneNumber(e.NewTextValue, false);
+            else
+                onClearAll();
+        }
+
+        private void onDialPadBtn(object sender, EventArgs e)
+        {
+#if WINDOWS_UWP
+
+            bool result = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TryResizeView(new Windows.Foundation.Size(380, 600));
+#else
+            controlGrid.IsVisible = true;
+            dialPadBtn.IsVisible = false;
+            clearBtn.IsVisible = true;
+            search.HeightRequest = -1;
+            search.shuoldNotifyScrolling = true;
+
+#endif
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "DailPad");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        void onClearAll(string val = "")
+        {
+#if WINDOWS_UWP
+            if (val == "short")
+                return;
+#endif
+            Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+            {
+                this.phoneNumber.Clear();
+                search.alias = phoneNumber.ToString();
+                number.Text = phoneNumber.ToString();
+                inumber.Text = phoneNumber.ToString();
+                clearBtn.IsVisible = false;
+                CrossVibrate.Current.Vibration();
+            });
+        }
+
+        private void onDialPadClicked(object sender, EventArgs e)
+        {
+            Button btn = (Button)sender;
+#if WINDOWS_UWP
+            if (btn.Text.ToString() == "0")
+                return;
+#endif
+            doSetPhoneNumber(btn.Text, true);
+        }
+
+        private void onLabelClicked(object sender, EventArgs e)
+        {
+            Label lb = (Label)sender;
+#if WINDOWS_UWP
+            if (lb.TabIndex.ToString() == "0")
+                return;
+#endif
+            doSetPhoneNumber(lb.TabIndex.ToString(), true);
+        }
+
+
+        public void onBackClicked(object sender, EventArgs e)
+        {
+            Navigation.PopAsync();
+        }
+
+        public void OnEnterPressed(object sender, EventArgs e)
+        {
+            doCall(false);
+        }
+
+        private void doSetPhoneNumber(string val, bool isFromDialPad)
+        {
+
+            if (phoneNumber.Length == 0)
+            {
+                phoneNumber.Append(val);
+                clearBtn.IsVisible = true;
+            }
+            else
+            {
+                if (!isFromDialPad)
+                {
+                    phoneNumber.Clear();
+                    phoneNumber.Append(val);
+                }
+                else
+                    phoneNumber = phoneNumber.Insert(phoneNumber.Length, val);
+            }
+
+            search.alias = phoneNumber.ToString();
+            number.Text = phoneNumber.ToString();
+            inumber.Text = phoneNumber.ToString();
+        }
+
+
+        private void OnCallClicked(object sender, EventArgs e)
+        {
+            doCall(false);
+        }
+
+        private void OnVideoCallClicked(object sender, EventArgs e)
+        {
+            doCall(true);
+        }
+
+        private void doCall(bool isVideo)
+        {
+            if (phoneNumber.ToString().Length > 0)
+            {
+                var contact = ContactService.Instance.getContactByAlias(phoneNumber.ToString());
+                CallService.Instance.callAsync(phoneNumber.ToString(), contact != null ? contact.userName : "", isVideo, contact != null ? contact.displayName : "");
+                onClearAll();
+            }
+        }
+
+        private void clear(object sender, EventArgs e)
+        {
+            if (phoneNumber.Length > 1)
+            {
+                phoneNumber = phoneNumber.Remove(phoneNumber.Length - 1, 1);
+                search.alias = phoneNumber.ToString();
+                number.Text = phoneNumber.ToString();
+                inumber.Text = phoneNumber.ToString();
+            }
+            else
+            {
+                onClearAll();
+            }
+
+        }
+
+    }
+}

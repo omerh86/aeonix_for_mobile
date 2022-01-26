@@ -1,0 +1,2457 @@
+using System;
+using LinphoneXamarin.Entities;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Linphone;
+using LinphoneXamarin.Util;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+using Xamarin.Forms;
+using System.Text;
+using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Linq;
+using static LinphoneXamarin.Entities.LoginInfo;
+using System.Text.RegularExpressions;
+using LinphoneXamarin.components.userControllers;
+using System.Runtime.CompilerServices;
+using LinphoneXamarin.EsfUtil;
+
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class AeonixInfoService : MyInfoListener, MyInfoProcessListener
+    {
+
+        private static AeonixInfoService instance = null;
+        private static readonly object padlock = new object();
+        MySendRequestHelper mySendRequestHelper;
+        public MyInfoProcessState myCurrentState = MyInfoProcessState.Ready;
+        public InfoProcess infoProcess;
+        MyFileSystem fileSystem;
+        private bool isInfoStateProcessRunning = false;
+        private string pendingFavUserName;
+        private string pendingCollaborationSession;
+        public string pendingCollaborationToken { set; get; }
+
+        private string _pendingCollaborationLink;
+        private List<List<PhonebookContactInfo>> phoneBookContactsList;
+        public string pendingCollaborationLink
+        {
+            get
+            {
+                return _pendingCollaborationLink;
+            }
+            set
+            {
+                _pendingCollaborationLink = value + getCollaborationLinkSuffix();
+                addLog($"_pendingCollaborationLink: {_pendingCollaborationLink}");
+            }
+        }
+
+        private string pendingFeatureStatusInfoMessage;
+        public MyContanctVM myContactListener { set; get; }
+        public MySearchListener mySearchListener { set; get; }
+        public FavListener favListener { set; get; }
+        public CalllogListener calllogListener { set; get; }
+        public GroupListener groupListener { set; get; }
+        public MyImageListener myImageListener { set; get; }
+        public MyInfoProccessListener myInfoProccessListener { set; get; }
+        public MyCallIdListener myCallIdListener { set; get; }
+        public TransferEventListener transferEventListener { set; get; }
+        public MYImMessagesListener mYImMessagesListener { set; get; }
+        public SubscribeEventListener subscribeEventListener { set; get; }
+        public HeldEventListener heldEventListener { set; get; }
+        public IAlertListener alertListener { set; get; }
+        public CallListView uIInfoListener1 { set; get; }
+        public CallListView uIInfoListener2 { set; get; }
+        public IVMMessagesListener vMMessagesListener { set; get; }
+        public IExternalContactSyncListener externalContactSyncListener { set; get; }
+
+        AeonixInfoService()
+        {
+            mySendRequestHelper = MySendRequestHelper.Instance;
+            this.infoProcess = new InfoProcess();
+            this.infoProcess.myInfoListener = this;
+            fileSystem = MyFileSystem.Instance;
+        }
+
+        public static AeonixInfoService Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new AeonixInfoService();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public void subscribetr87()
+        {
+            addLog("subscribetr87()");
+            try
+            {
+                AeonixInfoRepository.Instance.subscribeTr87(this);
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        public void getVmMessageList(IVMMessagesListener vMMessagesListener, string filter, bool isInfoStateMachineOperation = false)
+        {
+            addLog("getVmMessageList()");
+            this.vMMessagesListener = vMMessagesListener;
+            if (isValidGettingInfo(isInfoStateMachineOperation))
+            {
+                myCurrentState = MyInfoProcessState.VmMessagesRequest;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                var pin = "1234";
+                var settings = MyFileSystem.Instance.loadSettings();
+                if (settings != null && settings.voiceMailPassword != null && settings.voiceMailPassword != "")
+                    pin = settings.voiceMailPassword;
+                string strToSend = mySendRequestHelper.getVMGetMessageListRequest(new VMGetMessageListObj(userName, pin, filter));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                if (vMMessagesListener != null)
+                    vMMessagesListener.onBusy(1);
+                handleSubscibe();
+            }
+        }
+
+        public void getVmAudioMessage(string messageID, string messageName)
+        {
+            if (isValidGettingInfo(false))
+            {
+                addLog("getVmAudioMessage()");
+                myCurrentState = MyInfoProcessState.VmMessagesAudioRequest;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                var pin = "1234";
+                var settings = MyFileSystem.Instance.loadSettings();
+                if (settings != null && settings.voiceMailPassword != null)
+                    pin = settings.voiceMailPassword;
+                string strToSend = mySendRequestHelper.getVMGetAudioMessageRequest(new VMGetVMAudioMessageObj(userName, pin, messageID, messageName));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                if (vMMessagesListener != null)
+                    vMMessagesListener.onBusy(2);
+                handleSubscibe();
+            }
+        }
+
+        public void sendVmMessageCommand(string messageID, string command)
+        {
+            if (isValidGettingInfo(false))
+            {
+                addLog("getVmMessageList()");
+                myCurrentState = MyInfoProcessState.VmMessagesCommand;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                var pin = "1234";
+                var settings = MyFileSystem.Instance.loadSettings();
+                if (settings != null && settings.voiceMailPassword != null)
+                    pin = settings.voiceMailPassword;
+                string strToSend = mySendRequestHelper.getVMGetMessageCommandRequest(new VMGetVMMessageCommandObj(userName, pin, messageID, command));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                if (vMMessagesListener != null)
+                    vMMessagesListener.onBusy(3);
+                handleSubscibe();
+            }
+        }
+
+        public void getProvisioning()
+        {
+            if (isValidGettingInfo(true))
+            {
+                myCurrentState = MyInfoProcessState.GetProvisioning;
+                var loginName = MyFileSystem.Instance.loadLoginCardential(CardentialState.TR87).loginName;
+                var deviceId = Plugin.DeviceInfo.CrossDeviceInfo.Current.Id;
+                string strToSend = "";
+                if (Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform.ToString().Equals("Windows"))
+                {
+                    Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+                    var trimedDeviceId = rgx.Replace(deviceId, "");
+                    strToSend = MySendRequestHelper.Instance.getCreateAccountRequest(new CreateAccountProp(loginName, "PC", true, loginName + trimedDeviceId, false));
+                }
+                else
+                {
+                    strToSend = MySendRequestHelper.Instance.getCreateAccountRequest(new CreateAccountProp(loginName, Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform.ToString().Equals("iOS") ? "iOS" : "Android", true, loginName + deviceId, true));
+                }
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+        }
+
+        public void getPic(string userName)
+        {
+
+            Console.WriteLine("omer60: getPic");
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.GetPicture;
+                string strToSend = mySendRequestHelper.GetPictureRequest(new UserNameProp(userName));
+                Console.WriteLine("omer60: getPic2");
+                Console.WriteLine("omer50: " + strToSend);
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void getCallLogs(int chunk = 0, bool isInfoStateMachineOperation = false)
+        {
+            addLog("getCallLogs()");
+            if (isValidGettingInfo(isInfoStateMachineOperation))
+            {
+                myCurrentState = MyInfoProcessState.GetCallLog;
+                if (chunk == 0)
+                    CallLogService.Instance.clearCallLogs();
+
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                //string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.TR87).loginName;
+                string strToSend = mySendRequestHelper.getCalllogRequest(new CalllogProp(userName, chunk));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+
+            else
+            {
+                addLog($"busy because Info process state is {myCurrentState}");
+                if (this.calllogListener != null)
+                    this.calllogListener.onCallLogRequestError(InfoErr.BUSY);
+
+                handleSubscibe();
+            }
+        }
+
+        public void getGroups(bool isInfoStateMachineOperation = false)
+        {
+            if (isValidGettingInfo(isInfoStateMachineOperation))
+            {
+                myCurrentState = MyInfoProcessState.GetGroups;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                string strToSend = mySendRequestHelper.GetGroupRequest(new UserNameProp(userName));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void onFeatureButtonAction(int id)
+        {
+            if (isValidGettingInfo(false))
+            {
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                string strToSend = mySendRequestHelper.getFeatureButtonsActionRequest(id, userName);
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void setfeatureButtons(List<SpeedDial> speedDials)
+        {
+            if (isValidGettingInfo(false))
+            {
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                string strToSend = mySendRequestHelper.setFeatureButtonsRequest(userName, speedDials);
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void getfeatureButtons(bool isInfoStateMachineOperation)
+        {
+            if (isValidGettingInfo(isInfoStateMachineOperation))
+            {
+                myCurrentState = MyInfoProcessState.GetFeatureButton;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                string strToSend = mySendRequestHelper.getFeatureButtonsRequest(new UserNameProp(userName));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void sendDismissMissedCalls()
+        {
+            try
+            {
+                if (isValidGettingInfo(false))
+                {
+                    myCurrentState = MyInfoProcessState.DismissMissedCalls;
+                    string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                    string strToSend = mySendRequestHelper.getDismissMissedCallsRequest(new UserNameProp(userName));
+
+                    AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+                }
+                else
+                {
+                    handleSubscibe();
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+
+        }
+
+        public void getSnapShotDeviceRequest()
+        {
+
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.SnapShotDeviceRequest;
+                MyFileSystem myFileSystem = MyFileSystem.Instance;
+                string userName = myFileSystem.loadLoginCardential(CardentialState.Aeonix).userName;
+                string endPoint = myFileSystem.loadEP();
+                string deviceObject = "N</" + endPoint + ">" + userName;
+                string strToSend = mySendRequestHelper.getSnapShotDeviceRequest(new SnapShotProp(deviceObject));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+
+        }
+
+        public void searchContacts(MySearchListener searchListener, string filter)
+        {
+
+            if (isValidGettingInfo(false))
+            {
+                addLog($"searchContacts, filter: {filter}");
+                myCurrentState = MyInfoProcessState.Search;
+                this.mySearchListener = searchListener;
+                string strToSend = mySendRequestHelper.getContactListRequest(new ContactListProp(0, 20, filter));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+
+        }
+
+        public void getContact(MySearchListener searchListener, string userName)
+        {
+
+            if (isValidGettingInfo(false))
+            {
+
+                myCurrentState = MyInfoProcessState.Search;
+                this.mySearchListener = searchListener;
+                string strToSend = mySendRequestHelper.getContactRequest(new UserNameProp(userName));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+
+        }
+
+        private void handleSubscibe()
+        {
+            if (!AeonixInfoRepository.Instance.isSubscribed())
+            {
+                addLog("handleSubscibe()");
+                subscribetr87();
+            }
+        }
+
+        public void setConference(string HeldCallId, string ActiveCallId)
+        {
+
+            if (isValidGettingInfo(false))
+            {
+                string deviceIdentifier = "N</sip:" + MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).loginName + "@aeonix.com>" + MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                MySendRequestHelper.ConferenceCallBase heldCall = new MySendRequestHelper.ConferenceCallBase(HeldCallId, deviceIdentifier);
+                MySendRequestHelper.ConferenceCallBase activeCall = new MySendRequestHelper.ConferenceCallBase(ActiveCallId, deviceIdentifier);
+                string strToSend = mySendRequestHelper.getConferenceRequest(new MySendRequestHelper._ConferenceCall(heldCall, activeCall));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void startMonitorInstantMessage()
+        {
+            if (isValidGettingInfo(true))
+            {
+                myCurrentState = MyInfoProcessState.StartMonitorInstantMessages;
+                this.mYImMessagesListener = MessagesService.Instance;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.TR87).loginName;
+
+                string strToSend = mySendRequestHelper.getStartMonitorInstantMessagesRequest(new UserNameProp(userName));
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void stopMonitor()
+        {
+            if (isValidGettingInfo(true))
+            {
+                myCurrentState = MyInfoProcessState.StopMonitorSelf;
+
+                string strToSend = mySendRequestHelper.getStopMonitorRequest();
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void startMonitor()
+        {
+
+            if (isValidGettingInfo(true))
+            {
+                myCurrentState = MyInfoProcessState.StartMonitorSelf;
+                MyFileSystem myFileSystem = MyFileSystem.Instance;
+                string userName = myFileSystem.loadLoginCardential(CardentialState.Aeonix).userName;
+                string endPoint = myFileSystem.loadEP();
+                string strToSend = mySendRequestHelper.getMonitorRequest(userName, endPoint);
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+
+        /* Unmerged change from project 'UWP'
+        Before:
+                public void startMonitorFavs()
+        After:
+                public void startMonitorFavsAsync()
+        */
+        public async Task startMonitorFavsAsync()
+        {
+
+            if (isValidGettingInfo(true))
+            {
+                myCurrentState = MyInfoProcessState.StartMonitorFavs;
+                List<UserNameProp> userNameProps = new List<UserNameProp>();
+                List<Entities.Contact> allFav = await ContactService.Instance.getAllFavAsync();
+                foreach (Entities.Contact c in allFav)
+                {
+                    if (c.type == ContactType.Aeonix)
+                        userNameProps.Add(new UserNameProp(c.userName));
+                }
+                string strToSend = mySendRequestHelper.getFavMonitorRequest(userNameProps);
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+
+        }
+
+        public void addMonitorFav()
+        {
+
+            if (isValidGettingInfo(false) && pendingFavUserName != null)
+            {
+                myCurrentState = MyInfoProcessState.AddMonitorFav;
+                List<UserNameProp> userNameProps = new List<UserNameProp>();
+                userNameProps.Add(new UserNameProp(pendingFavUserName));
+                string strToSend = mySendRequestHelper.getFavMonitorRequest(userNameProps);
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+        }
+
+        public void removeMonitorFav()
+        {
+
+            if (isValidGettingInfo(false) && pendingFavUserName != null)
+            {
+                myCurrentState = MyInfoProcessState.RemoveMonitorFav;
+                var c = ContactService.Instance.getContactByUserName(pendingFavUserName);
+                if (c != null && c.monitorCrossRefID != null && c.monitorCrossRefID != "")
+                {
+                    string strToSend = mySendRequestHelper.getStopMonitorRequest(c.monitorCrossRefID);
+                    AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+                }
+            }
+
+        }
+
+        public void getRsUser()
+        {
+            if (isValidGettingInfo(true))
+            {
+                myCurrentState = MyInfoProcessState.GetRsUser;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                string strToSend = mySendRequestHelper.GetRsUserRequest(new UserNameProp(userName));
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+
+
+
+        /* Unmerged change from project 'UWP'
+        Before:
+                public void getPresencelist(bool isInfoStateMachineOperation = false)
+        After:
+                public void getPresencelistAsync(bool isInfoStateMachineOperation = false)
+        */
+        public async Task getPresencelistAsync(bool isInfoStateMachineOperation = false)
+        {
+            if (isValidGettingInfo(isInfoStateMachineOperation))
+            {
+                addLog("getPresencelistAsync()");
+                myCurrentState = MyInfoProcessState.GetExplicitPresenceInfo;
+                string[] userNames;
+                var favList = await ContactService.Instance.getAllFavAsync();
+                userNames = new string[favList.Count + 1];
+                for (var i = 0; i < favList.Count; i++)
+                {
+                    userNames[i] = favList[i].userName;
+                }
+                userNames[userNames.Length - 1] = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                string strToSend = mySendRequestHelper.getPresenceListRequest(new PresenceProp(userNames));
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void SetPresenceStatusRequest(Entities.Presence p, Entities.Presence before)
+        {
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.SetExplicitPresenceInfo;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+
+                string strToSend = mySendRequestHelper.setPresenceStatusRequest(new PresenceStateChangeProp(userName, MyEnumHelper.Instance.getPresenceByType(p)));
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+
+            }
+            else
+            {
+                ContactService.Instance.myContact.presenceStatus = before;
+                addLog("presenceDialogSetPresenceStatusRequest failed status is: " + before);
+                if (!isInfoStateProcessRunning)
+                    fireContactListener(false);
+            }
+        }
+
+        private void fireContactListener(bool includeImage)
+        {
+            if (myContactListener != null)
+                myContactListener.onMyInfoChanged(includeImage);
+
+#if WINDOWS_UWP
+            if (CallLogService.Instance.missedCallcounter == 0 && LinphoneBase.Instance.linphoneCore.CallsNb == 0)
+            {
+                AlertHelper.Instance.updatePresenceBadge();
+            }
+#endif
+        }
+
+        private void fireInfoFinishListeners()
+        {
+            if (this.favListener != null)
+                this.favListener.onFavListChanged();
+        }
+
+        public void updateRedMessages(List<MyMessage> messages)
+        {
+
+            if (isValidGettingInfo(false))
+            {
+                MyFileSystem fs = MyFileSystem.Instance;
+                var epId = fs.loadEP();
+                string userName = fs.loadLoginCardential(CardentialState.Aeonix).userName;
+                foreach (var m in messages)
+                {
+                    string strToSend = mySendRequestHelper.getMarkInstantMessageRequest(userName, epId, m.messageId);
+
+                    AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+                }
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void sendMessage(string messageContent, string to)
+        {
+
+            if (isValidGettingInfo(false))
+            {
+                var epId = MyFileSystem.Instance.loadEP();
+
+                string strToSend = mySendRequestHelper.getSendMessageRequest(messageContent, ContactService.Instance.myContact.userName, epId, to);
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                if (mYImMessagesListener != null)
+                {
+                    mYImMessagesListener.onMessageSendErr(InfoErr.BUSY);
+                }
+                handleSubscibe();
+            }
+        }
+
+        public void startCollaboration(string option, string partner, string callID)
+        {
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.CollaborationRequest;
+                Random rnd = new Random();
+                var startCollaborationRequestObj = new StartCollaborationRequestObj();
+                startCollaborationRequestObj.option = option;
+                pendingCollaborationSession = rnd.Next(9999, 99999).ToString();
+                startCollaborationRequestObj.sessionId = pendingCollaborationSession;
+                if (partner != null)
+                    startCollaborationRequestObj.partner = partner;
+                if (callID != null)
+                    startCollaborationRequestObj.callId = callID;
+
+                string strToSend = mySendRequestHelper.getStartCollaborationRequest(startCollaborationRequestObj);
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+                if (uIInfoListener1 != null)
+                    uIInfoListener1.setCollaborationMessage((string)Application.Current.Resources["waiting_for_collaboration_connection"]);
+                if (uIInfoListener2 != null)
+                    uIInfoListener2.setCollaborationMessage((string)Application.Current.Resources["waiting_for_collaboration_connection"]);
+
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void sendCollaborationOfferStatus(string result)
+        {
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.CollaborationRequest;
+                var collaborationOfferStatusObj = new CollaborationOfferStatusObj();
+                collaborationOfferStatusObj.result = result;
+                collaborationOfferStatusObj.token = pendingCollaborationToken;
+                string strToSend = mySendRequestHelper.getCollaborationOfferStatus(collaborationOfferStatusObj);
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void sendCancelCollaborationRequest(string cause)
+        {
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.CollaborationRequest;
+                var cancelCollaborationRequestObj = new CancelCollaborationRequestObj();
+                cancelCollaborationRequestObj.cause = cause;
+                cancelCollaborationRequestObj.token = pendingCollaborationSession;
+                string strToSend = mySendRequestHelper.getCancelCollaborationRequest(cancelCollaborationRequestObj);
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+                fireUiMessage((string)Application.Current.Resources["cancelingRequest"], "", 3, false);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        private void removeExternalContacts(List<string> phonebookIDList)
+        {
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.updateExternalContact;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                var strToSend = mySendRequestHelper.getRemoveExternalContactsRequest(new RemoveExternalContacts(userName, phonebookIDList, Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform.ToString().Equals("iOS") ? "IOS" : "ANDROID"));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void removeAllExternalContacts()
+        {
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.updateExternalContact;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                var strToSend = mySendRequestHelper.getRemoveAllExternalContactsRequest(new RemoveAllExternalContacts(userName, Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform.ToString().Equals("iOS") ? "IOS" : "ANDROID"));
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                if (this.externalContactSyncListener != null)
+                    this.externalContactSyncListener.onFailExternalContatctUploaded();
+                handleSubscibe();
+            }
+
+        }
+
+        private void prepareUpdatedExternalContacts(List<Entities.Contact> externalContactsToUpload)
+        {
+            if (externalContactsToUpload != null && externalContactsToUpload.Count > 0)
+            {
+                var tempShouldUpdateExternalList = new List<PhonebookContactInfo>();
+                foreach (var i in externalContactsToUpload)
+                {
+                    var c = new PhonebookContactInfo();
+                    c.firstName = i.firstName;
+                    c.lastName = i.lastName;
+                    if (c.firstName == null && c.lastName == null)
+                        c.firstName = i.displayName;
+
+                    c.contactId = i.userName;
+                    c.phonebookId = i.userName;
+                    c.email = i.email;
+                    c.phonesList = new List<ExtNumber>();
+                    foreach (var k in i.allExternalAliases)
+                        c.phonesList.Add(new ExtNumber("OTHER", k.phoneNumber));
+
+                    if (c.phonesList.Count > 0 && c.phonesList[0] != null)
+                        c.phonesList[0].isMain = true;
+
+                    tempShouldUpdateExternalList.Add(c);
+                }
+                addLog($"prepareUpdatedExternalContacts, number of total contacts to upload: {tempShouldUpdateExternalList.Count}");
+                phoneBookContactsList = ChunkBy(tempShouldUpdateExternalList, 20);
+            }
+            else
+                phoneBookContactsList = null;
+        }
+
+        private void AddAllExternalContacts()
+        {
+            addLog($"AddAllExternalContacts()");
+            prepareUpdatedExternalContacts(ContactService.Instance.getAllPhoneBookContacts());
+            addLog("remove all contacts first!");
+            removeAllExternalContacts();
+        }
+
+        public void updateExternalContacts(bool shouldUploadAllcontacts)
+        {
+            if (isValidGettingInfo(false))
+            {
+                addLog($"updateExternalContacts(), should Upload All Contacts: {shouldUploadAllcontacts}");
+
+                if (shouldUploadAllcontacts)
+                {
+                    AddAllExternalContacts();
+                }
+                else
+                {
+
+                    var cs = ContactService.Instance;
+                    prepareUpdatedExternalContacts(cs.shouldUpdateExternalList);
+                    var shouldDeleteExternalList = cs.shouldDeleteExternalList;
+
+                    if (shouldDeleteExternalList != null && shouldDeleteExternalList.Count > 0)
+                    {
+                        addLog("remove contacts first!");
+                        addLog($"updateExternalContacts, number of total contacts to remove: {shouldDeleteExternalList.Count}");
+                        removeExternalContacts(shouldDeleteExternalList);
+                        return;
+                    }
+                    if (phoneBookContactsList != null)
+                    {
+                        doUpdateExternalContacts();
+                        return;
+                    }
+                    addLog("no contacts to add/remove !");
+                }
+            }
+            else
+            {
+                if (myCurrentState != MyInfoProcessState.updateExternalContact)
+                    this.externalContactSyncListener.onFailExternalContatctUploaded();
+
+                handleSubscibe();
+            }
+        }
+
+        private void doUpdateExternalContacts()
+        {
+            if (phoneBookContactsList != null && phoneBookContactsList.Count > 0)
+            {
+                if (this.externalContactSyncListener != null)
+                    this.externalContactSyncListener.onProgressExternalContatctUploaded(phoneBookContactsList.Count);
+
+                myCurrentState = MyInfoProcessState.updateExternalContact;
+                addLog($"doAddExternalContacts, number of contacts in chunk: {phoneBookContactsList[0].Count}");
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                var strToSend = mySendRequestHelper.getAddExternalContactsRequest(new AddExternalContacts(userName, phoneBookContactsList[0], Plugin.DeviceInfo.CrossDeviceInfo.Current.Platform.ToString().Equals("iOS") ? "IOS" : "ANDROID", phoneBookContactsList.Count == 1 ? true : false));
+                phoneBookContactsList.RemoveAt(0);
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend, true);
+            }
+            else
+            {
+                addLog("no more contacts to add!");
+                SharedData.Instance.shouldUploadAllcontacts = false;
+                var cs = ContactService.Instance;
+                cs.shouldUpdateExternalList = null;
+                cs.shouldDeleteExternalList = null;
+                if (this.externalContactSyncListener != null)
+                    this.externalContactSyncListener.onSuccessExternalContatctUploaded();
+            }
+        }
+
+        public List<List<T>> ChunkBy<T>(List<T> source, int chunkSize)
+        {
+            return source
+                .Select((x, i) => new { Index = i, Value = x })
+                .GroupBy(x => x.Index / chunkSize)
+                .Select(x => x.Select(v => v.Value).ToList())
+                .ToList();
+        }
+
+        public void addFav(string id, bool isGroup, bool isMonitorable)
+        {
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.AddFav;
+                if (isMonitorable)
+                    pendingFavUserName = id;
+                else
+                    pendingFavUserName = null;
+
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                string strToSend = "";
+                if (isGroup)
+                    strToSend = mySendRequestHelper.getAddGroupFavRequest(new AddGroupFavProp(userName, id));
+                else
+                    strToSend = mySendRequestHelper.getAddFavRequest(new AddFavProp(userName, id));
+
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void removeFav(string id, bool isGroup, bool isMonitorable)
+        {
+            if (isValidGettingInfo(false))
+            {
+                myCurrentState = MyInfoProcessState.RemoveFav;
+                if (isMonitorable)
+                    pendingFavUserName = id;
+                else
+                    pendingFavUserName = null;
+
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                string strToSend = "";
+                if (isGroup)
+                {
+                    strToSend = mySendRequestHelper.getRemoveGroupFavRequest(new RemoveGroupFavProp(userName, id));
+                }
+                else
+                {
+                    string[] s = { id };
+                    strToSend = mySendRequestHelper.getRemoveFavRequest(new RemoveFavProp(userName, s));
+                }
+
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+        }
+
+        public void getFavorites(bool isInfoStateMachineOperation = false)
+        {
+            if (isValidGettingInfo(isInfoStateMachineOperation))
+            {
+                myCurrentState = MyInfoProcessState.GetFavorites;
+                string userName = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName;
+                string strToSend = mySendRequestHelper.getFavoritesRequest(new UserNameProp(userName));
+
+                AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+            }
+            else
+            {
+                handleSubscibe();
+            }
+
+        }
+        private bool isValidGettingInfo(bool isInfoStateMachineOperation)
+        {
+            if (!isInfoStateMachineOperation && isInfoStateProcessRunning)
+            {
+                return false;
+            }
+            else
+            {
+                var b = (isInfoStateProcessRunning || myCurrentState == MyInfoProcessState.Ready) && AeonixInfoRepository.Instance.isSubscribed();
+                return (b);
+            }
+        }
+
+        public void sendFcm()
+        {
+            try
+            {
+                if (isValidGettingInfo(true))
+                {
+                    var fs = MyFileSystem.Instance;
+                    myCurrentState = MyInfoProcessState.FCM;
+                    string userName = fs.loadLoginCardential(CardentialState.Aeonix).userName;
+                    string lang = MyEnumHelper.Instance.getLanguageAsString(MyFileSystem.Instance.loadSettings().lang);
+                    NotificationTokens tokens = fs.loadNotificationTokens();
+                    if (tokens == null)
+                    {
+                        tokens = new NotificationTokens();
+                    }
+#if __IOS__
+                    var credentials = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+                    var isApns = false;
+                    if (credentials != null && credentials.aeonixVersion != null)
+                    {
+                        addLog($"sendFcm(), aeonix version is {credentials.aeonixVersion}");
+                        var s = credentials.aeonixVersion.Split(".");
+                        double major = Double.Parse(s[0]);
+                        double minor = Double.Parse(s[1]);
+                        double build = Double.Parse(s[2]);
+                        addLog($"sendFcm(), aeonix major is {major}, minor is {minor}, build is {build}");
+                        if (major > 6|| minor > 1 || (major == 6 && build > 60))
+                        {
+                            addLog($"sendFcm(),using apns");
+                            isApns = true;
+                        }
+                        else {
+
+                            addLog($"sendFcm(),using fcm");
+                        }
+                    }
+                    string strToSend = MySendRequestHelper.Instance.getFcmRequest(new FcmProp(userName,tokens.voipToken, isApns ? tokens.apnsToken:tokens.globalToken, lang,SharedData.Instance.customHub));
+#else
+                    string strToSend = MySendRequestHelper.Instance.getFcmRequest(new MySendRequestHelper.FcmProp(userName, tokens.globalToken, null, lang, SharedData.Instance.customHub));
+#endif
+                    AeonixInfoRepository.Instance.sendSubscribeInfo(strToSend);
+                }
+            }
+            catch (Exception e)
+            {
+                addLog("error: " + e);
+            }
+        }
+
+        public void onInfoResponse(InfoMessage info)
+        {
+
+        }
+
+        public void onInfoSubscribeMessage(string infoMessage)
+        {
+            addLog("message event: " + infoMessage);
+            InstantmessageRootobject instantmessageRootobject = MySendRequestHelper.Instance.getInstantmessageRootobject(infoMessage);
+            if (instantmessageRootobject != null &&
+                instantmessageRootobject.InstantMessage != null &&
+                instantmessageRootobject.InstantMessage.imEntity != null &&
+                instantmessageRootobject.InstantMessage.imEntity.destination != null &&
+                instantmessageRootobject.InstantMessage.imEntity.destination.value != null &&
+                instantmessageRootobject.InstantMessage.imEntity.destination.value != "" &&
+                instantmessageRootobject.InstantMessage.imEntity.sendingUser != null &&
+                instantmessageRootobject.InstantMessage.imEntity.sendingUser != "")
+            {
+                MyMessage m = new MyMessage(instantmessageRootobject.InstantMessage.messageId, instantmessageRootobject.InstantMessage.imEntity.message, instantmessageRootobject.InstantMessage.imEntity.time, instantmessageRootobject.InstantMessage.imEntity.sendingUser, instantmessageRootobject.InstantMessage.read);
+
+                if (mYImMessagesListener != null)
+                {
+                    mYImMessagesListener.onMessageRecieved(m, instantmessageRootobject.InstantMessage.imEntity.destination);
+                }
+            }
+            else
+            {
+                SendInstantmessageResponseRootobject sendInstantmessageResponseRootobject = MySendRequestHelper.Instance.getSendInstantmessageResponseRootobject(infoMessage);
+                if (sendInstantmessageResponseRootobject != null &&
+                    sendInstantmessageResponseRootobject.SendInstantMessageResponse != null &&
+                    sendInstantmessageResponseRootobject.SendInstantMessageResponse.messageID != null &&
+                    sendInstantmessageResponseRootobject.SendInstantMessageResponse.messageID.Length > 0 &&
+                    mYImMessagesListener != null)
+                {
+
+                    mYImMessagesListener.onMessageIdRecieved(sendInstantmessageResponseRootobject.SendInstantMessageResponse.messageID);
+
+                }
+            }
+        }
+
+        public void onInfoSubscribeEvent(string infoMessage)
+        {
+            addLog("monitoring event: " + infoMessage);
+            onInfoEvent(infoMessage);
+        }
+
+        public void onESFCommandEvent(string infoMessage)
+        {
+            addLog("onESFCommandEvent: " + infoMessage);
+            getESFCommandEvent(infoMessage);
+        }
+
+        public void onInfoFeatureButtonEvent(string infoMessage)
+        {
+            if (infoMessage.IndexOf("FeatureButtonsStatusEvent") > -1)
+            {
+                pendingFeatureStatusInfoMessage = infoMessage;
+                if (!isInfoStateProcessRunning)
+                    doSetFeatureButtonsStatus();
+            }
+            else if (infoMessage.IndexOf("FeatureButtonsUpdatedEvent") > -1)
+            {
+                var dialSpeedService = DialSpeedService.Instance;
+                if (dialSpeedService.shouldUploadGridGui)
+                    getfeatureButtons(false);
+                else
+                {
+                    addLog("shouldUploadGridGui set to true!");
+                    dialSpeedService.shouldUploadGridGui = true;
+                }
+            }
+            else if (infoMessage.IndexOf("FeatureButtonsDisplayEvent") > -1)
+            {
+                onFeatureButtonsDisplayEvent(infoMessage);
+            }
+        }
+
+        private Entities.FeatureButtonStatus getFeaturebuttonStatus(string color, string state)
+        {
+            switch (state)
+            {
+                case "off":
+                    return Entities.FeatureButtonStatus.None;
+                case "on":
+                    if (color.Equals("GREEN"))
+                        return Entities.FeatureButtonStatus.Idle;
+                    else if (color.Equals("RED"))
+                        return Entities.FeatureButtonStatus.Busy;
+                    break;
+                case "slowflash":
+                    if (color.Equals("GREEN"))
+                        return Entities.FeatureButtonStatus.IncomingA;
+                    else if (color.Equals("RED"))
+                        return Entities.FeatureButtonStatus.ConferenceA;
+                    break;
+                case "fastflash":
+                    if (color.Equals("GREEN"))
+                        return Entities.FeatureButtonStatus.ConferenceB;
+                    else if (color.Equals("RED"))
+                        return Entities.FeatureButtonStatus.IncomingB;
+                    break;
+            }
+
+            return Entities.FeatureButtonStatus.None;
+        }
+
+        public void onMyInfoStateChanged(MyInfoProcessState state)
+        {
+
+            this.isInfoStateProcessRunning = true;
+            switch (state)
+            {
+                case MyInfoProcessState.Ready:
+                    isInfoStateProcessRunning = false;
+                    break;
+                case MyInfoProcessState.VmMessagesRequest:
+                    this.getVmMessageList(null, "NEW", true);
+                    break;
+                case MyInfoProcessState.FCM:
+                    this.sendFcm();
+                    break;
+                case MyInfoProcessState.StopMonitorSelf:
+                    this.stopMonitor();
+                    break;
+                case MyInfoProcessState.StartMonitorSelf:
+                    this.startMonitor();
+                    break;
+                case MyInfoProcessState.StartMonitorInstantMessages:
+                    this.startMonitorInstantMessage();
+                    break;
+                case MyInfoProcessState.GetFavorites:
+                    this.getFavorites(true);
+                    break;
+                case MyInfoProcessState.GetExplicitPresenceInfo:
+                    this.getPresencelistAsync(true);
+                    break;
+                case MyInfoProcessState.GetCallLog:
+                    this.getCallLogs(0, true);
+                    break;
+                case MyInfoProcessState.GetGroups:
+                    this.getGroups(true);
+                    break;
+                case MyInfoProcessState.GetFeatureButton:
+                    this.getfeatureButtons(true);
+                    break;
+                case MyInfoProcessState.GetRsUser:
+                    this.getRsUser();
+                    break;
+                case MyInfoProcessState.StartMonitorFavs:
+                    this.startMonitorFavsAsync();
+                    break;
+                case MyInfoProcessState.GetProvisioning:
+                    this.getProvisioning();
+                    break;
+                case MyInfoProcessState.After:
+                    addLog("after process");
+                    this.infoProcess.MoveNext(MyInfoProcessCommands.Continue);
+                    ContactService.Instance.setMyVoiceMailGroup();
+                    var speedDialService = DialSpeedService.Instance;
+                    if (speedDialService.isFeatureGridAvailable)
+                    {
+                        if (ContactService.Instance.VoicMail == null)
+                        {
+                            //make sure to delete vm fearure button if exists
+                            speedDialService.removeVmFetureButton();
+                        }
+                        else
+                        {
+                            //make sure to add vm fearure button if feature gris is empty
+                            speedDialService.setVmFetureButton(ContactService.Instance.VoicMail.primaryAlias);
+                        }
+
+                    }
+                    else
+                    {
+                        addLog("Aeonix version doesnt support feature grid, clear feature buttons");
+                        speedDialService.SpeedDials.Clear();
+                    }
+
+
+                    CallLogService.Instance.setVMCounter(MyFileSystem.Instance.loadVMCounter());
+                    fireContactListener(true);
+                    fireInfoFinishListeners();
+                    MessagesService.Instance.fireOnMessageCounterchanged();
+                    if (this.myInfoProccessListener != null)
+                        this.myInfoProccessListener.onInfoProccessFinished();
+                    break;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public void onInfoSubscribeResponse(string infoMessage)
+        {
+            //for individual operations
+            var prevState = myCurrentState;
+            myCurrentState = MyInfoProcessState.Ready;
+            addLog("direct response of " + prevState);
+            //for process operations
+            this.infoProcess.MoveNext(MyInfoProcessCommands.Continue);
+
+            switch (prevState)
+            {
+                case MyInfoProcessState.updateExternalContact:
+                    doUpdateExternalContacts();
+                    break;
+                case MyInfoProcessState.SnapShotDeviceRequest:
+                    onSnapShotResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.SetExplicitPresenceInfo:
+                    fireContactListener(false);
+                    break;
+                case MyInfoProcessState.GetFavorites:
+                    onGetFavResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.Search:
+                    onSearchResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.VmMessagesRequest:
+                    onVmMessagesListResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.VmMessagesAudioRequest:
+                    onVmAudioMessagesResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.VmMessagesCommand:
+                    onVmMessagesCommandResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.GetCallLog:
+                    onGetCallLogResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.GetMissedCallLogCounter:
+                    onMissedCallCounterResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.GetGroups:
+                    onGetGroupResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.GetFeatureButton:
+                    onGetFeatureButtonResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.GetRsUser:
+                    onGetRSUserResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.StartMonitorSelf:
+                case MyInfoProcessState.StartMonitorFavs:
+                case MyInfoProcessState.AddMonitorFav:
+                    onMonitorStartResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.GetExplicitPresenceInfo:
+                    onPresencelistResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.GetPicture:
+                    onGetPicture(infoMessage);
+                    break;
+                case MyInfoProcessState.GetProvisioning:
+                    OnProvisioningResponse(infoMessage);
+                    break;
+                case MyInfoProcessState.AddFav:
+                    addMonitorFav();
+                    break;
+                case MyInfoProcessState.RemoveFav:
+                    removeMonitorFav();
+                    break;
+            }
+
+        }
+
+        public void onFavPresenceSubscribeEvent(string infoMessage)
+        {
+            onPresentstateEvent(infoMessage);
+        }
+
+        public void onMYContactPresenceChanged()
+        {
+            addLog("onMYContactPresenceChanged");
+            getPresencelistAsync();
+        }
+
+        private void onInfoEvent(string info)
+        {
+            try
+            {
+                if (info.IndexOf("FailedEvent") > -1)
+                {
+                    FailedeventRootobject failedeventRootobject = MySendRequestHelper.Instance.getFailedeventRootobject(info);
+                    if (failedeventRootobject != null &&
+                       failedeventRootobject.FailedEvent != null &&
+                       failedeventRootobject.FailedEvent.cause != null)
+                    {
+                        if (uIInfoListener1 != null)
+                            uIInfoListener1.onCallFailed(failedeventRootobject.FailedEvent.cause);
+                        if (uIInfoListener2 != null)
+                            uIInfoListener2.onCallFailed(failedeventRootobject.FailedEvent.cause);
+                    }
+                }
+                else if (info.IndexOf("DeliveredEvent") > -1)
+                {
+                    DeliveredeventRootobject deliveredeventRootobject = MySendRequestHelper.Instance.getDeliveredeventRootobject(info);
+                    if (deliveredeventRootobject != null &&
+                        deliveredeventRootobject.DeliveredEvent != null &&
+                        deliveredeventRootobject.DeliveredEvent.connection != null &&
+                        deliveredeventRootobject.DeliveredEvent.connection.callID != null &&
+                        deliveredeventRootobject.DeliveredEvent.connection.callID[0] != null &&
+                         deliveredeventRootobject.DeliveredEvent.callingDevice != null &&
+                        deliveredeventRootobject.DeliveredEvent.callingDevice.deviceIdentifier != null &&
+                        deliveredeventRootobject.DeliveredEvent.alertingDevice != null &&
+                        deliveredeventRootobject.DeliveredEvent.alertingDevice.deviceIdentifier != null
+                        )
+                    {
+                        if (myCallIdListener != null)
+                        {
+                            myCallIdListener.onNewCallId(deliveredeventRootobject.DeliveredEvent.connection.callID[0],
+                                deliveredeventRootobject.DeliveredEvent.callingDevice.deviceIdentifier,
+                                deliveredeventRootobject.DeliveredEvent.alertingDevice.deviceIdentifier,
+                                false);
+                        }
+                        return;
+                    }
+                }
+                else if (info.IndexOf("EstablishedEvent") > -1)
+                {
+                    EstablishedeventRootobject establishedeventRootobject = MySendRequestHelper.Instance.getEstablishedeventRootobject(info);
+                    if (establishedeventRootobject != null &&
+                        establishedeventRootobject.EstablishedEvent != null &&
+                        establishedeventRootobject.EstablishedEvent.establishedConnection != null &&
+                        establishedeventRootobject.EstablishedEvent.establishedConnection.callID != null &&
+                        establishedeventRootobject.EstablishedEvent.establishedConnection.callID[0] != null &&
+                        establishedeventRootobject.EstablishedEvent.callingDevice != null &&
+                        establishedeventRootobject.EstablishedEvent.callingDevice.deviceIdentifier != null &&
+                        establishedeventRootobject.EstablishedEvent.answeringDevice != null &&
+                        establishedeventRootobject.EstablishedEvent.answeringDevice.deviceIdentifier != null)
+                    {
+
+                        if (myCallIdListener != null)
+                        {
+                            myCallIdListener.onNewCallId(establishedeventRootobject.EstablishedEvent.establishedConnection.callID[0],
+                                 establishedeventRootobject.EstablishedEvent.callingDevice.deviceIdentifier,
+                                 establishedeventRootobject.EstablishedEvent.answeringDevice.deviceIdentifier,
+                                 true);
+                        }
+                        return;
+                    }
+                }
+                else if (info.IndexOf("ConferencedEvent") > -1)
+                {
+                    ConferencedeventRootobject conferencedeventRootobject = mySendRequestHelper.getConferencedeventRootobject(info);
+                    if (conferencedeventRootobject != null &&
+                        conferencedeventRootobject.ConferencedEvent != null)
+                    {
+
+                        var conferenceCallId = conferencedeventRootobject.ConferencedEvent.conferenceConnections.connectionListItem[0].newConnection.callID[0];
+
+                        var conferenceParticipates = new List<string>();
+                        var oldCallIds = new List<string>();
+                        char[] a = { '<', '/' };
+
+                        foreach (var i in conferencedeventRootobject.ConferencedEvent.conferenceConnections.connectionListItem)
+                        {
+                            var sArr = i.endpoint.deviceID.Split(a);
+                            if (sArr != null && sArr.Length > 1 && sArr[1] != null)
+                            {
+                                addLog($"add participate {sArr[1]}");
+                                conferenceParticipates.Add(sArr[1]);
+                            }
+                            oldCallIds.Add(i.oldConnection.callID[0]);
+                        }
+
+                        CallService.Instance.onConferenceEstablished(conferenceCallId, oldCallIds, conferenceParticipates);
+
+                        return;
+                    }
+                }
+                else if (info.IndexOf("ConnectionClearedEvent") > -1)
+                {
+                    ConnectionclearedeventRootobject connectionclearedeventRootobject = MySendRequestHelper.Instance.getConnectionclearedeventRootobject(info);
+                    if (connectionclearedeventRootobject != null &&
+                        connectionclearedeventRootobject.ConnectionClearedEvent != null &&
+                        connectionclearedeventRootobject.ConnectionClearedEvent.droppedConnection != null &&
+                        connectionclearedeventRootobject.ConnectionClearedEvent.droppedConnection.deviceID != null &&
+                        connectionclearedeventRootobject.ConnectionClearedEvent.droppedConnection.deviceID.Length > 0 &&
+                        connectionclearedeventRootobject.ConnectionClearedEvent.droppedConnection.deviceID[0] != null)
+                    {
+                        char[] a = { '<', '/' };
+                        var aliasArr = connectionclearedeventRootobject.ConnectionClearedEvent.droppedConnection.deviceID[0].Split(a);
+                        if (aliasArr != null && aliasArr.Length > 1 && aliasArr[1] != null)
+                            CallService.Instance.onParticipateDroped(connectionclearedeventRootobject.ConnectionClearedEvent.droppedConnection.callID[0], aliasArr[1]);
+
+                        return;
+                    }
+                }
+                else if (info.IndexOf("TransferedEvent") > -1)
+                {
+                    try
+                    {
+                        TransferedeventRootobject transferedeventRootobject = MySendRequestHelper.Instance.getTransferedeventRootobject(info);
+                        if (transferedeventRootobject != null &&
+                            transferedeventRootobject.TransferedEvent != null &&
+                            transferedeventRootobject.TransferedEvent.primaryOldCall != null &&
+                            transferedeventRootobject.TransferedEvent.primaryOldCall.callID != null &&
+                            transferedeventRootobject.TransferedEvent.primaryOldCall.callID[0] != null &&
+                             transferedeventRootobject.TransferedEvent.secondaryOldCall != null &&
+                            transferedeventRootobject.TransferedEvent.secondaryOldCall.callID != null &&
+                            transferedeventRootobject.TransferedEvent.secondaryOldCall.callID[0] != null &&
+                            transferedeventRootobject.TransferedEvent.transferredConnections != null &&
+                            transferedeventRootobject.TransferedEvent.transferredConnections.connectionListItem != null &&
+                            transferedeventRootobject.TransferedEvent.transferredConnections.connectionListItem.Length > 1)
+                        {
+                            var primaryOldCallId = transferedeventRootobject.TransferedEvent.primaryOldCall.callID[0];
+                            var secondaryOldCall = transferedeventRootobject.TransferedEvent.secondaryOldCall.callID[0];
+                            var newConnectionCallId = transferedeventRootobject.TransferedEvent.transferredConnections.connectionListItem[0].newConnection.callID[0];
+                            var deviceId1 = transferedeventRootobject.TransferedEvent.transferredConnections.connectionListItem[0].endpoint.deviceID;
+                            var deviceId2 = transferedeventRootobject.TransferedEvent.transferredConnections.connectionListItem[1].endpoint.deviceID;
+                            myTransfer myTransfer = new myTransfer(primaryOldCallId == null ? "" : primaryOldCallId, secondaryOldCall == null ? "" : secondaryOldCall,
+                            newConnectionCallId == null ? "" : newConnectionCallId, deviceId1, deviceId2);
+                            if (transferEventListener != null)
+                            {
+                                transferEventListener.onTransferEvent(myTransfer);
+                            }
+
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        addLog(e.ToString());
+                    }
+                }
+
+
+                else if (info.IndexOf("HeldEvent") > -1)
+                {
+                    HeldeventRootobject heldeventRootobject = MySendRequestHelper.Instance.getHeldeventRootobject(info);
+                    if (heldeventRootobject != null &&
+                       heldeventRootobject.HeldEvent != null &&
+                       heldeventRootobject.HeldEvent.heldConnection != null &&
+                       heldeventRootobject.HeldEvent.heldConnection.callID != null &&
+                       heldeventRootobject.HeldEvent.heldConnection.callID[0] != null &&
+                       heldEventListener != null)
+                    {
+                        var holdingDevice = heldeventRootobject.HeldEvent.holdingDevice.deviceIdentifier;
+                        var ep = MyFileSystem.Instance.loadEP();
+                        if (holdingDevice.IndexOf(ep) == -1)
+                        {
+                            heldEventListener.onHeld(heldeventRootobject.HeldEvent.heldConnection.callID[0]);
+                        }
+                    }
+                }
+
+                else if (info.IndexOf("RetrievedEvent") > -1)
+                {
+                    RetrievedeventRootobject retrievedeventRootobject = MySendRequestHelper.Instance.getRetrievedeventRootobject(info);
+                    if (retrievedeventRootobject != null &&
+                       retrievedeventRootobject.RetrievedEvent != null &&
+                       retrievedeventRootobject.RetrievedEvent.retrievedConnection != null &&
+                       retrievedeventRootobject.RetrievedEvent.retrievedConnection.callID != null &&
+                        retrievedeventRootobject.RetrievedEvent.retrievedConnection.callID[0] != null &&
+                       heldEventListener != null)
+                    {
+                        var retrievedDevice = retrievedeventRootobject.RetrievedEvent.retrievingDevice.deviceIdentifier;
+                        var ep = MyFileSystem.Instance.loadEP();
+                        if (retrievedDevice.IndexOf(ep) == -1)
+                        {
+                            heldEventListener.onRetrieve(retrievedeventRootobject.RetrievedEvent.retrievedConnection.callID[0]);
+                        }
+                    }
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                addLog("invalid info event: " + e.ToString());
+            }
+        }
+
+        private void onSnapShotResponse(string info)
+        {
+            try
+            {
+                CallService callService = CallService.Instance;
+                SnapShotRootobject snapShotRootobject = MySendRequestHelper.Instance.getSnapShotRootobject(info);
+                if (callService.myCalls != null &&
+                    snapShotRootobject != null &&
+                    snapShotRootobject.SnapshotDeviceResponse != null &&
+                    snapShotRootobject.SnapshotDeviceResponse.crossRefIDorSnapshotData != null &&
+                    snapShotRootobject.SnapshotDeviceResponse.crossRefIDorSnapshotData.snapshotData != null &&
+                    snapShotRootobject.SnapshotDeviceResponse.crossRefIDorSnapshotData.snapshotData.snapshotDeviceResponseInfo != null &&
+                    snapShotRootobject.SnapshotDeviceResponse.crossRefIDorSnapshotData.snapshotData.snapshotDeviceResponseInfo.Length > 0 &&
+                    snapShotRootobject.SnapshotDeviceResponse.crossRefIDorSnapshotData.snapshotData.snapshotDeviceResponseInfo != null
+                    )
+                {
+
+                    foreach (var t in snapShotRootobject.SnapshotDeviceResponse.crossRefIDorSnapshotData.snapshotData.snapshotDeviceResponseInfo)
+                    {
+                        if (t != null && t.connectionIdentifier != null && t.connectionIdentifier.callID != null && t.connectionIdentifier.callID.Length > 0)
+                        {
+                            foreach (var i in callService.myCalls)
+                            {
+                                if (i != null && i.callid.Equals("") && t.otherPartyDevice.deviceIdentifier.IndexOf(i.userName) > -1)
+                                {
+                                    i.callid = t.connectionIdentifier.callID[0];
+                                    addLog("call id is: " + i.callid);
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+
+        }
+
+        private void onMissedCallCounterResponse(string info)
+        {
+            CalllogcountersresponseRootobject calllogcountersresponseRootobject = MySendRequestHelper.Instance.getcalllogcountersresponseRootobject(info);
+            if (calllogcountersresponseRootobject != null && calllogcountersresponseRootobject.GetCallLogCountersResponse != null)
+            {
+                CallLogService.Instance.setMissedCounter(calllogcountersresponseRootobject.GetCallLogCountersResponse.newMissedCalls);
+            }
+        }
+
+        private void onPresencelistResponse(string info)
+        {
+            PresenceListRootobject presenceListRootobject = MySendRequestHelper.Instance.getPresenceListRootobject(info);
+
+            if (presenceListRootobject != null && presenceListRootobject.PresencesListResponse != null && presenceListRootobject.PresencesListResponse.presencesList != null)
+            {
+                foreach (var c in presenceListRootobject.PresencesListResponse.presencesList)
+                {
+                    ContactService.Instance.updateContactPresenceByUserId(c.device.deviceIdentifier, getPresence2(c.presenceState));
+                }
+                if (!isInfoStateProcessRunning)
+                {
+                    if (this.favListener != null)
+                        this.favListener.onPresenceListChanged();
+
+                    fireContactListener(false);
+                }
+            }
+        }
+
+        private void onMonitorStartResponse(string info)
+        {
+            MonitorStartResponseRootobject monitorStartResponseRootobject = MySendRequestHelper.Instance.getMonitorStartResponseRootobject(info);
+            if (monitorStartResponseRootobject != null && monitorStartResponseRootobject.MonitorStartResponse != null)
+            {
+                string[] arrayA = monitorStartResponseRootobject.MonitorStartResponse.monitorCrossRefID.Split(',');
+                if (arrayA != null)
+                {
+                    foreach (string b in arrayA)
+                    {
+                        string[] arrayB = b.Split('@');
+                        if (arrayB != null && arrayB.Length >= 2 && arrayB[1] != null && arrayB[1].Length > 3)
+                        {
+                            ContactService.Instance.setContactRefId(arrayB[1].Substring(3), arrayB[0]);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        private Entities.Presence getPresence2(Presencestate2 p)
+        {
+            Entities.Presence presence = Entities.Presence.NONE;
+            if (p != null)
+            {
+                if (p.offline)
+                {
+                    presence = Entities.Presence.OFFLINE;
+                    return presence;
+                }
+                if (p.available)
+                {
+                    presence = Entities.Presence.ONLINE;
+                }
+                if (p.meeting)
+                {
+                    presence = Entities.Presence.MEETING;
+                }
+                if (p.dnd)
+                {
+                    presence = Entities.Presence.DND;
+                }
+                if (p.busy)
+                {
+                    presence = Entities.Presence.BUSY;
+                }
+                if (p.unknown)
+                {
+                    presence = Entities.Presence.NONE;
+                }
+            }
+            return presence;
+        }
+
+
+        private void onPresentstateEvent(string info)
+        {
+            Console.WriteLine("omer55: onPresentstateEvent" + info);
+            PresencestateeventRootobject presencestateeventRootobject = MySendRequestHelper.Instance.onPresencestateEvent(info);
+            if (presencestateeventRootobject != null && presencestateeventRootobject.PresenceStateEvent != null)
+            {
+                ContactService.Instance.updateContactPresenceByRefId(presencestateeventRootobject.PresenceStateEvent.monitorCrossRefID, getPresence2(presencestateeventRootobject.PresenceStateEvent.presenceState));
+            }
+        }
+
+        private void onGetRSUserResponse(string info)
+        {
+            RsUserRootobjectResponse rsUserRootobjectResponse = MySendRequestHelper.Instance.getRSUserRootobjectResponse(info);
+            if (rsUserRootobjectResponse != null && rsUserRootobjectResponse.RsUserResponse != null && rsUserRootobjectResponse.RsUserResponse.rsUser != null)
+            {
+                ContactService cs = ContactService.Instance;
+                cs.myContact.displayName = rsUserRootobjectResponse.RsUserResponse.rsUser.genInfo.displayName;
+                cs.myContact.primaryAlias = rsUserRootobjectResponse.RsUserResponse.rsUser.rsUserInfo.aliases[0].completeAliasName;
+                cs.myContact.imageSignature = rsUserRootobjectResponse.RsUserResponse.rsUser.rsUserInfo.imageSignature;
+                if (rsUserRootobjectResponse.RsUserResponse.rsUser.rsUserInfo.vm != null)
+                {
+                    var vmId = MyFileSystem.Instance.loadVMID();
+                    if (vmId == null || !vmId.Equals(rsUserRootobjectResponse.RsUserResponse.rsUser.rsUserInfo.vm))
+                    {
+                        //new voiceMail
+                        MyFileSystem.Instance.saveVMID(rsUserRootobjectResponse.RsUserResponse.rsUser.rsUserInfo.vm);
+                    }
+                }
+                else
+                {
+                    //no voiceMail 
+                    MyFileSystem.Instance.saveVMID(null);
+                }
+
+                MyFileSystem.Instance.saveIsCollaborateAllowed(rsUserRootobjectResponse.RsUserResponse.rsUser.rsUserInfo.collaborationAllowed);
+                SharedData.Instance.isCollaborateAllowed = rsUserRootobjectResponse.RsUserResponse.rsUser.rsUserInfo.collaborationAllowed;
+
+                fireContactListener(true);
+
+            }
+        }
+
+        private void OnProvisioningResponse(string infoMessage)
+        {
+            ConnectionconfigurationRootobjectResponse connectionconfigurationRootobjectResponse = MySendRequestHelper.Instance.getServerConnectionconfigurationRootObject(infoMessage);
+            if (connectionconfigurationRootobjectResponse != null && connectionconfigurationRootobjectResponse.ConnectionConfiguration != null && connectionconfigurationRootobjectResponse.ConnectionConfiguration.serverList != null)
+            {
+                List<IPInfo> ipInfoList = new List<IPInfo>();
+                foreach (var s in connectionconfigurationRootobjectResponse.ConnectionConfiguration.serverList)
+                {
+                    ipInfoList.Add(getIpInfo(s));
+                }
+
+                var credentials = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+                if (credentials.sipAdresses.Count != ipInfoList.Count)
+                {
+                    credentials.favoriteSipAdressIndex = 0;
+                }
+                credentials.sipAdresses = ipInfoList;
+                if (connectionconfigurationRootobjectResponse.ConnectionConfiguration.versionInfo != null)
+                    credentials.aeonixVersion = connectionconfigurationRootobjectResponse.ConnectionConfiguration.versionInfo.aeonixVersion;
+
+                if (connectionconfigurationRootobjectResponse.ConnectionConfiguration.deviceConnectionConfiguration != null)
+                    credentials.tenantPrefix = connectionconfigurationRootobjectResponse.ConnectionConfiguration.deviceConnectionConfiguration.tenantPrefix;
+
+                MyFileSystem.Instance.saveLoginCardential(credentials, CardentialState.Aeonix);
+
+                var sd = SharedData.Instance;
+                sd.isSupportVoicemailSSO = connectionconfigurationRootobjectResponse.ConnectionConfiguration.supportVoicemailSSO;
+                if (!sd.isSupportVoicemailSSO)
+                    sd.canSendVoicemailViaEmail = true;
+                else
+                    sd.canSendVoicemailViaEmail = connectionconfigurationRootobjectResponse.ConnectionConfiguration.canSendVoicemailViaEmail;
+            }
+        }
+
+        private IPInfo getIpInfo(Serverlist serverlist)
+        {
+            char[] b = { ':' };
+            var ip = "";
+            var port = -1;
+            var proxyIp = "";
+            var proxyPort = -1;
+
+            var transport = serverlist.transport.ToLower().Equals("tcp") ? TransportType.Tcp : TransportType.Tls;
+            if (serverlist.server != null)
+            {
+                var domainParts = serverlist.server.Split(b);
+                ip = domainParts[0];
+                port = Int32.Parse(domainParts[1]);
+            }
+            if (serverlist.proxy != null)
+            {
+                var domainParts = serverlist.proxy.Split(b);
+                proxyIp = domainParts[0];
+                proxyPort = Int32.Parse(domainParts[1]);
+            }
+
+            return new IPInfo(ip, port, proxyIp, proxyPort, transport);
+        }
+
+        private void onGetGroupResponse(string info)
+        {
+            GroupRootobjectResponse groupRootobjectResponse = MySendRequestHelper.Instance.getGroupRootobjectResponse(info);
+
+            if (groupRootobjectResponse != null && groupRootobjectResponse.GetGroupsResponse != null && groupRootobjectResponse.GetGroupsResponse.listGroupInfo != null)
+            {
+                var contactService = ContactService.Instance;
+
+                foreach (var g in groupRootobjectResponse.GetGroupsResponse.listGroupInfo)
+                {
+                    if (g.alias != null && g.serviceName != null)
+                    {
+                        var group = new Entities.Contact(g.alias, g.serviceName, g.description, g.alias, new List<string>() { g.alias }, new List<ExtNumber>(), -1, ContactType.Group);
+                        group.description = g.description;
+                        contactService.updateContact(group);
+                    }
+                }
+
+                if (this.groupListener != null)
+                    this.groupListener.onGroupListChanged();
+            }
+        }
+
+        private void onGetFeatureButtonResponse(string info)
+        {
+            FeatureButtonsRootObj featureButtonsRootObj = MySendRequestHelper.Instance.getFeatureButtonsRootObject(info);
+
+            if (featureButtonsRootObj != null && featureButtonsRootObj.FeatureButtonsResponse != null && featureButtonsRootObj.FeatureButtonsResponse.buttons != null)
+            {
+                var speedDialService = DialSpeedService.Instance;
+                speedDialService.SpeedDials.Clear();
+                foreach (var g in featureButtonsRootObj.FeatureButtonsResponse.buttons)
+                    speedDialService.addSpeedDial(new SpeedDial(g.id, getSpeedDialTypeFromNumber(g.type), g.label, g.value));
+
+                speedDialService.onSpeedDialChanged();
+                speedDialService.saveGrid();
+            }
+            doSetFeatureButtonsStatus();
+        }
+
+        private SpeedDialType getSpeedDialTypeFromNumber(int number)
+        {
+            switch (number)
+            {
+                case 1:
+                    return SpeedDialType.VM;
+                case 2:
+                    return SpeedDialType.Emergency;
+                case 3:
+                    return SpeedDialType.GroupPickup;
+                case 4:
+                    return SpeedDialType.PageQ;
+                case 5:
+                    return SpeedDialType.Rod;
+                case 6:
+                    return SpeedDialType.Speedial;
+                case 7:
+                    return SpeedDialType.Url;
+                case 8:
+                    return SpeedDialType.Acc_EndWrapUP;
+                case 9:
+                    return SpeedDialType.Acc_ExtendWrapUp;
+                case 10:
+                    return SpeedDialType.Acc_GroupLog;
+                case 11:
+                    return SpeedDialType.Acc_GroupQInfo;
+                case 12:
+                    return SpeedDialType.Acc_LogPrimaryGroup;
+                case 13:
+                    return SpeedDialType.Acc_Release_Resume;
+                case 14:
+                    return SpeedDialType.Acc_Release_ResumeWithCode;
+                case 15:
+                    return SpeedDialType.Acc_WrapUpWithcode;
+                default:
+                    return SpeedDialType.None;
+            }
+        }
+
+        private void onGetFavResponse(string info)
+        {
+            FavRootobjectResponse favRootobjectResponse = MySendRequestHelper.Instance.getServerFavRootObject(info);
+            if (favRootobjectResponse != null && favRootobjectResponse.containerInfo != null && favRootobjectResponse.containerInfo.favorits != null)
+            {
+                ContactService contactService = ContactService.Instance;
+                contactService.clearAllFav();
+
+                foreach (var c in favRootobjectResponse.containerInfo.favorits)
+                {
+                    if (c != null)
+                    {
+                        Entities.Contact contact = CreateContact(c, null);
+                        if (contact != null)
+                        {
+                            contact.isFav = true;
+                            contactService.updateContact(contact, true);
+                        }
+                    }
+                }
+                if (this.favListener != null && !isInfoStateProcessRunning)
+                    this.favListener.onFavListChanged();
+            }
+        }
+
+        private void onGetPicture(string info)
+        {
+            long imageSignature = -1;
+            var imageContent = "";
+            PictuerResponseRootobject pictuerResponseRootobject = MySendRequestHelper.Instance.getPictureResponseRootobject(info);
+            addLog("onGetPicture()");
+            if (pictuerResponseRootobject != null && pictuerResponseRootobject.GetPictureResponse != null && pictuerResponseRootobject.GetPictureResponse.imageContent != null)
+            {
+                imageSignature = pictuerResponseRootobject.GetPictureResponse.imageSignature;
+                imageContent = pictuerResponseRootobject.GetPictureResponse.imageContent;
+            }
+            if (this.myImageListener != null)
+            {
+                this.myImageListener.onImageResponse(imageSignature, imageContent);
+            }
+        }
+
+        private void doSetFeatureButtonsStatus()
+        {
+            addLog("try doSetFeatureButtonsStatus()");
+            if (pendingFeatureStatusInfoMessage != null && pendingFeatureStatusInfoMessage != "")
+            {
+                addLog("doSetFeatureButtonsStatus");
+                FeatureButtonsStatusRootObj featureButtonsStatusRootObj = MySendRequestHelper.Instance.getFeatureButtonsStatusRootObject(pendingFeatureStatusInfoMessage);
+
+                if (featureButtonsStatusRootObj != null &&
+                    featureButtonsStatusRootObj.FeatureButtonsStatusEvent != null)
+                {
+                    var mySpeedDials = DialSpeedService.Instance.SpeedDials;
+                    var tempSpeedDials = new List<SpeedDial>();
+                    foreach (var i in featureButtonsStatusRootObj.FeatureButtonsStatusEvent.buttons)
+                    {
+                        var result = mySpeedDials.Find(k => k.position == i.id);
+                        if (result != null)
+                        {
+                            result.Status = getFeaturebuttonStatus(i.color, i.state);
+                            tempSpeedDials.Add(result);
+                        }
+                    }
+                    DialSpeedService.Instance.onSpeedDialStatusChanged(tempSpeedDials);
+                }
+                new Task(() =>
+                {
+                    Thread.Sleep(1000);
+                    addLog("reset pendingFeatureStatusInfoMessage");
+                    pendingFeatureStatusInfoMessage = null;
+                }).Start();
+            }
+        }
+
+        private void getESFCommandEvent(string info)
+        {
+            var ESFCommandEvent = MySendRequestHelper.Instance.getESFCommandEvent(info);
+            if (ESFCommandEvent != null &&
+                ESFCommandEvent.ESFCommand != null)
+            {
+                addLog("getESFCommandEvent, callID is " + ESFCommandEvent.ESFCommand.callId);
+                new EsfCommandHandler(ESFCommandEvent.ESFCommand).doAction();
+            }
+        }
+
+        private void onFeatureButtonsDisplayEvent(string info)
+        {
+            var featureButtonsDisplayEventRoot = MySendRequestHelper.Instance.getFeatureButtonsDisplayEvent(info);
+            if (featureButtonsDisplayEventRoot != null &&
+                featureButtonsDisplayEventRoot.FeatureButtonsDisplayEvent != null)
+            {
+                addLog("onFeatureButtonsDisplayEvent");
+                fireUiMessage(featureButtonsDisplayEventRoot.FeatureButtonsDisplayEvent.title, featureButtonsDisplayEventRoot.FeatureButtonsDisplayEvent.text, featureButtonsDisplayEventRoot.FeatureButtonsDisplayEvent.timeout, false);
+            }
+        }
+
+        private void fireCollaborationLink()
+        {
+            addLog("fireCollaborationLink");
+            fireUiMessage((string)Application.Current.Resources["connecting"], "", 3, false);
+            Xamarin.Essentials.Browser.OpenAsync(new Uri(pendingCollaborationLink), Xamarin.Essentials.BrowserLaunchMode.SystemPreferred);
+        }
+
+        private void fireDisplayCollabAlert(string title, string message, bool isYesNo, string link)
+        {
+            if (alertListener != null)
+                alertListener.DisplayCollabAlert(title, message, isYesNo, link);
+        }
+
+        private void onCollaborationOfferStatus(string info)
+        {
+            var _collaborationOfferStatus = MySendRequestHelper.Instance.getCollaborationOfferStatusRootObj(info);
+            if (_collaborationOfferStatus != null &&
+                _collaborationOfferStatus.OfferCollaborationStatus != null)
+            {
+                addLog("onCollaborationOfferStatus");
+                if (_collaborationOfferStatus.OfferCollaborationStatus.token.Equals(pendingCollaborationSession))
+                {
+                    if (_collaborationOfferStatus.OfferCollaborationStatus.result.Equals("ACCEPTED"))
+                    {
+                        fireCollaborationLink();
+                    }
+                    else
+                    {
+                        fireUiMessage($"{(string)Application.Current.Resources["collaboration_offer_status"]} {MyEnumHelper.Instance.getCollaborationError(_collaborationOfferStatus.OfferCollaborationStatus.result)}", "", 5, false);
+                    }
+                }
+                else
+                {
+                    addLog("onCollaborationOfferStatus received but token doesn't match sessionID");
+                }
+            }
+        }
+
+        private void onCollaborationOfferRequest(string info)
+        {
+            var offerCollaborationRequestRootObj = MySendRequestHelper.Instance.getOfferCollaborationRequestRootObj(info);
+            if (offerCollaborationRequestRootObj != null &&
+                offerCollaborationRequestRootObj.OfferCollaborationRequest != null)
+            {
+                addLog("onCollaborationOfferRequest");
+                pendingCollaborationLink = offerCollaborationRequestRootObj.OfferCollaborationRequest.link;
+                if (offerCollaborationRequestRootObj.OfferCollaborationRequest.role.Equals("MODERATOR"))
+                {
+                    if (offerCollaborationRequestRootObj.OfferCollaborationRequest.token.Equals(pendingCollaborationSession))
+                    {
+                        if (offerCollaborationRequestRootObj.OfferCollaborationRequest.autoStart)
+                        {
+                            fireCollaborationLink();
+                        }
+                        else
+                        {
+                            fireUiMessage((string)Application.Current.Resources["waiting_for_partner_response"], "", 60, true);
+                        }
+                    }
+                    else
+                    {
+                        addLog("onCollaborationOfferRequest received but token doesn't match sessionID");
+                    }
+                }
+                else
+                {
+                    pendingCollaborationToken = offerCollaborationRequestRootObj.OfferCollaborationRequest.token;
+                    fireDisplayCollabAlert(offerCollaborationRequestRootObj.OfferCollaborationRequest.conferenceName, (string)Application.Current.Resources["new_collaboration_offer"], true, pendingCollaborationLink);
+                }
+
+            }
+        }
+
+        private string getCollaborationLinkSuffix()
+        {
+            var result = "";
+            try
+            {
+                var contact = MyFileSystem.Instance.loadMyContact();
+                if (contact != null && contact.displayName != null && contact.displayName != "")
+                {
+                    addLog($"(1)getCollaborationLinkSuffix, display name is {contact.displayName}");
+                    result += $"?name={contact.displayName.Replace(" ", "%20")}";
+                }
+                else
+                {
+
+                    var name = ContactService.Instance.myContact.displayName;
+                    if (name != "")
+                    {
+                        addLog($"(2)getCollaborationLinkSuffix, display name is {name}");
+                        result += $"?name={name.Replace(" ", "%20")}";
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+            return result;
+        }
+
+        private void onCollaborationCancled(string info)
+        {
+            var CollaborationCancelRequestRootObj = MySendRequestHelper.Instance.getCancelCollaborationRequestRootObj(info);
+            if (CollaborationCancelRequestRootObj != null &&
+                CollaborationCancelRequestRootObj.CancelCollaborationRequest != null)
+            {
+                if (CollaborationCancelRequestRootObj.CancelCollaborationRequest.token.Equals(pendingCollaborationToken))
+                {
+                    fireDisplayCollabAlert("", $"{(string)Application.Current.Resources["collaboration_offer_status"]} {MyEnumHelper.Instance.getCollaborationError(CollaborationCancelRequestRootObj.CancelCollaborationRequest.cause)}", false, null);
+                    //fireUiMessage($"{(string)Application.Current.Resources["collaboration_offer_status"]} {MyEnumHelper.Instance.getCollaborationError(CollaborationCancelRequestRootObj.CancelCollaborationRequest.cause)}", "", 5, false);
+                }
+                else
+                {
+                    addLog("onCollaborationCancled received but token doesn't match CollaborationToken");
+                }
+            }
+        }
+
+        private void onstartCollaborationError(string info)
+        {
+            var startCollaborationErrorRootObj = MySendRequestHelper.Instance.getStartCollaborationErrorRootObj(info);
+            if (startCollaborationErrorRootObj != null &&
+                startCollaborationErrorRootObj.StartCollaborationError != null)
+            {
+                addLog($"onstartCollaborationError: {startCollaborationErrorRootObj.StartCollaborationError.cause}");
+                if (pendingCollaborationSession.Equals(startCollaborationErrorRootObj.StartCollaborationError.sessionId))
+                {
+                    var reason = MyEnumHelper.Instance.getStartCollaborationError(startCollaborationErrorRootObj.StartCollaborationError.cause);
+                    fireUiMessage($"{(string)Application.Current.Resources["collaboration_connection_failed"]} {reason}", "", 3, false);
+                }
+                else
+                {
+                    addLog("onstartCollaborationError received but token doesn't match sessionID");
+                }
+            }
+        }
+
+
+        public void fireUiMessage(string title, string body, int duration, bool isCollab)
+        {
+            if (uIInfoListener1 != null)
+                uIInfoListener1.onInfoEvent(title, body, duration, isCollab);
+            if (uIInfoListener2 != null)
+                uIInfoListener2.onInfoEvent(title, body, duration, isCollab);
+
+        }
+
+        private void onGetCallLogResponse(string info)
+        {
+            new Task(() =>
+            {
+                CallLogRootobjectResponse callLogRootobjectResponse = MySendRequestHelper.Instance.getServerCallLogRootObject(info);
+
+                if (callLogRootobjectResponse != null &&
+                        callLogRootobjectResponse.CallLogRecords != null &&
+                        callLogRootobjectResponse.CallLogRecords.recentRecordInfo != null &&
+                        callLogRootobjectResponse.CallLogRecords.recentRecordInfo.Length > 0)
+                {
+                    CallLogService callLogService = CallLogService.Instance;
+                    ContactService contactService = ContactService.Instance;
+                    callLogService.setMissedCounter(callLogRootobjectResponse.CallLogRecords.newMissedCalls);
+
+                    foreach (var c in callLogRootobjectResponse.CallLogRecords.recentRecordInfo)
+                    {
+                        var alias2dial = "";
+                        var id = "";
+                        var name = "";
+                        var isExternal = false;
+                        var isRestricted = false;
+                        var callInfoArr = new List<CallInfo>();
+                        foreach (var v in c.callLogList)
+                        {
+                            var callinfo = new CallInfo(MyEnumHelper.Instance.getCallDirectionByString(v.callType, v.callDuration), (v.callDuration / 1000).ToString(), v.startTime);
+                            callInfoArr.Add(callinfo);
+                            alias2dial = v.alias2Dial;
+                            id += ";" + v.callLogID;
+                            name = v.remoteName;
+                            isExternal = v.isExternal;
+                            isRestricted = v.isRestricted;
+                        }
+                        if (isRestricted)
+                        {
+                            alias2dial = "";
+                            name = (string)Application.Current.Resources["anonymous"];
+                        }
+                        Entities.Contact contact;
+                        if (c.contact != null)
+                        {
+                            contact = contactService.updateContact(CreateContact(c.contact, c.presenceState));
+                            if (contact != null)
+                                callLogService.addCallLogs(contact, id, alias2dial, callInfoArr);
+                        }
+                        else
+                        {
+                            contact = contactService.getContactByAlias(alias2dial);
+                            if (contact != null)
+                                callLogService.addCallLogs(contact, id, alias2dial, callInfoArr);
+                            else
+                            {
+                                var internalNumbers = new List<string>();
+                                var externalNumbers = new List<ExtNumber>();
+                                if (isExternal)
+                                    externalNumbers.Add(new ExtNumber("EXTERNAL", alias2dial));
+                                else
+                                    internalNumbers.Add(alias2dial);
+
+                                contact = contactService.updateContact(new Entities.Contact(alias2dial, name, "", alias2dial, internalNumbers, externalNumbers, -1, ContactType.Unknown));
+                                callLogService.addCallLogs(contact, id, alias2dial, callInfoArr);
+
+                            }
+                        }
+                    }
+                    addLog($"calllogListener: {calllogListener}");
+                    if (this.calllogListener != null)
+                        this.calllogListener.onCallLogListChanged();
+
+                    if (!isInfoStateProcessRunning)
+                    {
+                        if (this.favListener != null)
+                            this.favListener.onPresenceListChanged();
+                    }
+                }
+                else
+                {
+                    if (this.calllogListener != null)
+                        this.calllogListener.onCallLogRequestError(InfoErr.NO_DATA);
+                }
+            }).Start();
+
+        }
+
+        private void onVmMessagesCommandResponse(string info)
+        {
+            try
+            {
+                addLog("onVmMessagesCommandResponse");
+                BaseContainerInfoRootObjResponse vmMessageListResponseRootObj = MySendRequestHelper.Instance.getBaseContainerInfoRootObjResponse(info);
+                if (vmMessageListResponseRootObj != null &&
+                    vmMessageListResponseRootObj.containerInfo != null)
+                {
+                    addLog($"err code: {vmMessageListResponseRootObj.containerInfo.errCode}");
+                    if (vMMessagesListener != null)
+                        vMMessagesListener.onCommandResponed(vmMessageListResponseRootObj.containerInfo.errCode);
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        private void onVmAudioMessagesResponse(string info)
+        {
+            try
+            {
+                addLog("onVmAudioMessagesResponse");
+                VMMessageAudioResponseRootObj vMMessageAudioResponseRootObj = MySendRequestHelper.Instance.getVMMessageAudioResponseRootObj(info);
+                if (vMMessageAudioResponseRootObj != null &&
+                    vMMessageAudioResponseRootObj.VMMessageAudioResponse != null &&
+                     vMMessageAudioResponseRootObj.VMMessageAudioResponse.massageContent != null)
+                {
+
+                    if (vMMessagesListener != null)
+                        vMMessagesListener.onVMAudioMessageResponed(vMMessageAudioResponseRootObj.VMMessageAudioResponse.errCode, vMMessageAudioResponseRootObj.VMMessageAudioResponse.messageId, vMMessageAudioResponseRootObj.VMMessageAudioResponse.massageContent);
+                }
+                else
+                {
+                    if (vMMessagesListener != null)
+                        vMMessagesListener.onVMAudioMessageResponed(vMMessageAudioResponseRootObj.VMMessageAudioResponse.errCode, null, null);
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+        }
+
+        private void onVmMessagesListResponse(string info)
+        {
+            try
+            {
+                addLog("onVmMessagesListResponse");
+                var messageList = new List<MyVmMessage>();
+                VMMessageListResponseRootObj vmMessageListResponseRootObj = MySendRequestHelper.Instance.getVMMessageListResponseRootObj(info);
+                if (vmMessageListResponseRootObj.VMMessageListResponse != null)
+                {
+                    SharedData.Instance.isVMMessagesAllowed = true;
+                    if (vmMessageListResponseRootObj.VMMessageListResponse.messageList != null)
+                    {
+                        foreach (var c in vmMessageListResponseRootObj.VMMessageListResponse.messageList)
+                            messageList.Add(c);
+                    }
+                }
+                else
+                {
+                    SharedData.Instance.isVMMessagesAllowed = false;
+                }
+                if (vMMessagesListener != null)
+                    vMMessagesListener.onVmMessageListChanged(messageList);
+            }
+            catch (Exception e)
+            {
+                SharedData.Instance.isVMMessagesAllowed = false;
+                addLog(e.ToString());
+            }
+        }
+
+
+        private void onSearchResponse(string info)
+        {
+            try
+            {
+                ContactlistRootobjectResponse contactlistRootobjectResponse = MySendRequestHelper.Instance.getServerContactListRootObject(info);
+                if (contactlistRootobjectResponse.ContactListResponse != null && contactlistRootobjectResponse.ContactListResponse.contactsPresence != null)
+                {
+                    ContactService contactService = ContactService.Instance;
+                    var contacts = new List<Entities.Contact>();
+                    foreach (var c in contactlistRootobjectResponse.ContactListResponse.contactsPresence)
+                    {
+                        var contact = contactService.updateContact(CreateContact(c.contact, c.presense));
+                        if (contact != null)
+                            contacts.Add(contact);
+                    }
+
+                    this.mySearchListener.onSearchResponse(contacts);
+                }
+                else
+                {
+                    ContactRootobjectResponse contactRootobjectResponse = MySendRequestHelper.Instance.getServerContactRootObject(info);
+                    if (contactRootobjectResponse.ContactResponse != null && contactRootobjectResponse.ContactResponse.contact != null)
+                    {
+                        var contact = ContactService.Instance.updateContact(CreateContact(contactRootobjectResponse.ContactResponse.contact, null));
+                        this.mySearchListener.onSearchResponse(contact);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+
+        }
+
+        private Entities.Contact CreateContact(MySendRequestHelper.Contact c, Presense presense)
+        {
+            Entities.Contact myContact = null;
+            try
+            {
+                if (c != null)
+                {
+                    if (c.serviceType.Equals("PHONEBOOK") || c.serviceType.Equals("NOT_EXIST"))
+                    {
+                        return myContact;
+                    }
+
+                    if (c.serviceType.Equals("USR") || c.serviceType.Equals("EXTERNAL"))
+                    {
+                        List<string> allAliases = new List<string>();
+                        List<ExtNumber> allExtAliases = new List<ExtNumber>();
+                        if (c.aliases != null)
+                        {
+                            foreach (var a in c.aliases)
+                            {
+                                if (a != null && a.completeAliasName != null && a.completeAliasName.Length > 0)
+                                {
+                                    allAliases.Add(a.completeAliasName);
+                                }
+                            }
+                        }
+                        if (c.extNumbers != null)
+                        {
+                            foreach (ExtNumber e in c.extNumbers)
+                            {
+                                if (e != null && e.phoneNumber.Length > 0)
+                                {
+                                    allExtAliases.Add(e);
+                                }
+                            }
+                        }
+                        else if (c.extAliases != null)
+                        {
+                            foreach (string e in c.extAliases)
+                            {
+                                if (e != null && e.Length > 0)
+                                {
+                                    allExtAliases.Add(new ExtNumber("EXTERNAL", e));
+                                }
+                            }
+                        }
+                        if (c.serviceType.Equals("USR"))
+                            myContact = new Entities.Contact(c.userName, c.displayName, c.firstName, c.primaryNumber != null ? c.primaryNumber : allAliases[0], allAliases, allExtAliases, c.imageSignature, ContactType.Aeonix);
+                        else
+                            myContact = new Entities.Contact(c.userName, c.displayName, c.firstName, c.primaryNumber, allAliases, allExtAliases, c.imageSignature, ContactType.External);
+
+                        if (presense != null && presense.presence != null)
+                        {
+                            myContact.presenceStatus = MyEnumHelper.Instance.getPresenceTypeByString(presense.presence.explicitPresence, presense.presence.implicitPresence);
+                        }
+
+                        myContact.homeAddress = c.homeAddress;
+                        myContact.phonebook = c.phonebook;
+                        myContact.description = c.description;
+                        myContact.department = c.department;
+                        myContact.company = c.company;
+                        myContact.email = c.emailAddress;
+                    }
+                    else
+                    {
+                        myContact = new Entities.Contact(c.aliases[0].completeAliasName.ToString(), c.serviceType, c.firstName, c.aliases[0].completeAliasName.ToString(), null, null, c.imageSignature, ContactType.Group);
+                        myContact.description = c.firstName;
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+                return myContact;
+            }
+
+            return myContact;
+        }
+
+        public void onTr87subscribed()
+        {
+            addLog("tr87Subscribtion was subscribed!");
+
+            if (subscribeEventListener != null)
+            {
+                subscribeEventListener.onSubscribeStatechanged(true);
+            }
+            if (SharedData.Instance.launchAction == LaunchAction.COLLAB)
+            {
+                AeonixInfoService.Instance.sendCollaborationOfferStatus("ACCEPTED");
+                Xamarin.Forms.Device.StartTimer(TimeSpan.FromMilliseconds(10000), () =>
+                     {
+#if ANDROID
+                         Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity.FinishAndRemoveTask();
+#endif
+                         return false;
+                     });
+
+            }
+            else
+                restartInfoProccess();
+
+        }
+
+        private void restartInfoProccess()
+        {
+            addLog("restartInfoProccess");
+            myCurrentState = MyInfoProcessState.Ready;
+            this.infoProcess.MoveNext(MyInfoProcessCommands.Clear);
+            this.infoProcess.MoveNext(MyInfoProcessCommands.StartAll);
+        }
+
+        public void onTr87terminated()
+        {
+
+            addLog("tr87Subscribtion was terminated!");
+
+            if (subscribeEventListener != null)
+            {
+                subscribeEventListener.onSubscribeStatechanged(false);
+            }
+
+            this.infoProcess.MoveNext(MyInfoProcessCommands.Clear);
+
+        }
+
+        private void addLog(string message)
+        {
+            Console.WriteLine("omer40: " + message);
+            fileSystem.writeDebug(message, "AeonixInfoService");
+        }
+
+        public void onStartCollaborationErr(string infoMessage)
+        {
+            onstartCollaborationError(infoMessage);
+        }
+
+        public void onCollaborationCancledResponse(string infoMessage)
+        {
+            onCollaborationCancled(infoMessage);
+        }
+
+        public void onOffercollaborationRequest(string infoMessage)
+        {
+            this.onCollaborationOfferRequest(infoMessage);
+        }
+
+        public void onOffercollaborationStatus(string infoMessage)
+        {
+            this.onCollaborationOfferStatus(infoMessage);
+        }
+
+        public class InfoProcess
+
+        {
+            class StateTransition
+            {
+                readonly MyInfoProcessState CurrentState;
+                readonly MyInfoProcessCommands Command;
+
+
+                public StateTransition(MyInfoProcessState currentState, MyInfoProcessCommands command)
+                {
+                    CurrentState = currentState;
+                    Command = command;
+                }
+
+                public override int GetHashCode()
+                {
+                    return 17 + 31 * CurrentState.GetHashCode() + 31 * Command.GetHashCode();
+                }
+
+                public override bool Equals(object obj)
+                {
+                    StateTransition other = obj as StateTransition;
+                    return other != null && this.CurrentState == other.CurrentState && this.Command == other.Command;
+                }
+            }
+
+            Dictionary<StateTransition, MyInfoProcessState> transitions;
+            public MyInfoProcessListener myInfoListener { get; set; }
+            private MyInfoProcessState InfoCurrentState;
+            public InfoProcess()
+            {
+                InfoCurrentState = MyInfoProcessState.Ready;
+                transitions = new Dictionary<StateTransition, MyInfoProcessState>
+            {
+                { new StateTransition(MyInfoProcessState.Ready, MyInfoProcessCommands.Continue), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.Ready, MyInfoProcessCommands.StartAll), MyInfoProcessState.GetProvisioning},
+                { new StateTransition(MyInfoProcessState.GetProvisioning, MyInfoProcessCommands.Continue), MyInfoProcessState.StopMonitorSelf},
+                { new StateTransition(MyInfoProcessState.StopMonitorSelf, MyInfoProcessCommands.Continue), MyInfoProcessState.StartMonitorSelf},
+                { new StateTransition(MyInfoProcessState.StartMonitorSelf, MyInfoProcessCommands.Continue), MyInfoProcessState.StartMonitorInstantMessages},
+                { new StateTransition(MyInfoProcessState.StartMonitorInstantMessages, MyInfoProcessCommands.Continue), MyInfoProcessState.GetRsUser},
+                { new StateTransition(MyInfoProcessState.GetRsUser, MyInfoProcessCommands.Continue), MyInfoProcessState.GetFavorites},
+                { new StateTransition(MyInfoProcessState.GetFavorites, MyInfoProcessCommands.Continue), MyInfoProcessState.GetCallLog},
+                { new StateTransition(MyInfoProcessState.GetCallLog, MyInfoProcessCommands.Continue), MyInfoProcessState.GetExplicitPresenceInfo},
+                { new StateTransition(MyInfoProcessState.GetExplicitPresenceInfo, MyInfoProcessCommands.Continue), MyInfoProcessState.GetGroups},
+                { new StateTransition(MyInfoProcessState.GetGroups, MyInfoProcessCommands.Continue), MyInfoProcessState.StartMonitorFavs},
+                { new StateTransition(MyInfoProcessState.StartMonitorFavs, MyInfoProcessCommands.Continue), MyInfoProcessState.GetFeatureButton},
+                { new StateTransition(MyInfoProcessState.GetFeatureButton, MyInfoProcessCommands.Continue), MyInfoProcessState.VmMessagesRequest},
+                { new StateTransition(MyInfoProcessState.VmMessagesRequest, MyInfoProcessCommands.Continue), MyInfoProcessState.FCM},
+                { new StateTransition(MyInfoProcessState.FCM, MyInfoProcessCommands.Continue), MyInfoProcessState.After},
+                { new StateTransition(MyInfoProcessState.After, MyInfoProcessCommands.Continue), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.Ready, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.FCM, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.GetFavorites, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.GetCallLog, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.GetGroups, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.GetFeatureButton, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.GetRsUser, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.GetExplicitPresenceInfo, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.GetMissedCallLogCounter, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.StartMonitorInstantMessages, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.StartMonitorSelf, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.StopMonitorSelf, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.GetProvisioning, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.After, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                { new StateTransition(MyInfoProcessState.StartMonitorFavs, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                 { new StateTransition(MyInfoProcessState.VmMessagesRequest, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready},
+                      { new StateTransition(MyInfoProcessState.updateExternalContact, MyInfoProcessCommands.Clear), MyInfoProcessState.Ready}
+            };
+            }
+
+            public MyInfoProcessState GetNext(MyInfoProcessCommands command)
+            {
+                StateTransition transition = new StateTransition(InfoCurrentState, command);
+                MyInfoProcessState nextState;
+                if (!transitions.TryGetValue(transition, out nextState))
+                    throw new Exception("Invalid transition: " + InfoCurrentState + " -> " + command);
+                return nextState;
+            }
+
+            public void MoveNext(MyInfoProcessCommands command)
+            {
+                MyInfoProcessState previewState = InfoCurrentState;
+                InfoCurrentState = GetNext(command);
+                if (this.myInfoListener != null)
+                {
+                    myInfoListener.onMyInfoStateChanged(InfoCurrentState);
+                }
+            }
+        }
+
+    }
+}

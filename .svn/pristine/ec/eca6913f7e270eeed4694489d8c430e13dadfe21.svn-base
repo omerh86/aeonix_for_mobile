@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.MorePage"
+               xmlns:controls="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+             xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers"
+             xmlns:Helpers="clr-namespace:LinphoneXamarin.Util"
+             FlowDirection="{StaticResource FlowDirection}">
+    <ContentPage.Content>
+
+        <StackLayout>
+            <Frame CornerRadius="25" Margin="0,-20,0,0" Padding="0" HasShadow="False">
+                <StackLayout x:Name="myContactContainer" FlowDirection="LeftToRight"  HorizontalOptions="FillAndExpand"  Padding="7">
+                    <StackLayout.Background>
+                        <LinearGradientBrush  EndPoint="0,1">
+                            <GradientStop Color="#BAE9FF" Offset=".01" />
+                            <GradientStop Color="#0091D3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </StackLayout.Background>
+                    <Button Clicked="onBackClicked" HorizontalOptions="Start"  Margin="0,15,0,0" Text="&#xf053;" BorderColor="Transparent" BackgroundColor="Transparent" TextColor="White" FontSize="Large" >
+                        <Button.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Button.FontFamily>
+                    </Button>
+
+                    <!--<Image Source="{Binding myImage}" AbsoluteLayout.LayoutFlags="All"  AbsoluteLayout.LayoutBounds=".4,.4,.6,.6"/>-->
+                    <controls:CircleImage Source="{Binding myImage}"   WidthRequest="80" HeightRequest="80">
+                    </controls:CircleImage>
+
+                    <StackLayout Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="Center" Margin="5" >
+                        <Label Margin="1" Text="{Binding myName}" VerticalOptions="Center" FontSize="Large" TextColor="White"></Label>
+                        <Label Margin="1" Text="{Binding myAlias}" VerticalOptions="End" FontSize="Large" TextColor="White"></Label>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Margin="5">
+                        <BoxView x:Name="presenceLabel"  WidthRequest="15" HeightRequest="15" 
+            BackgroundColor="{Binding myStatuscolor}" CornerRadius="8" VerticalOptions="Center"/>
+                        <Label Margin="2" Text="{Binding myStatusText}" VerticalOptions="Center" FontSize="Medium" TextColor="White">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer
+      Tapped="OnImageTapped"
+      NumberOfTapsRequired="1"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+            <AbsoluteLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                <ListView ItemsSource="{Binding moreItems}" HasUnevenRows="True" ItemTapped="OnItemTappedAsync">
+                    <ListView.ItemTemplate>
+                        <DataTemplate >
+                            <ViewCell>
+                                <StackLayout  Orientation="Horizontal" HorizontalOptions="FillAndExpand"  Padding="15">
+                                    <Image WidthRequest="35" HeightRequest="35" VerticalOptions="Center" Source="{x:Binding icon}" Margin="5"  />
+                                    <Label VerticalOptions="Center" FontSize="Large" Text="{x:Binding label}" TextColor="Black" />
+                                    <Image Source="settingsarrow.png" Rotation="{x:Binding label, Converter={Helpers:ArrowDirectionConverter}}" HorizontalOptions="EndAndExpand" VerticalOptions="Center" HeightRequest="20" WidthRequest="20" Opacity="0.5"/>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <control:MyPresenceComponent  x:Name="myPresenceComponent" IsVisible="False" HorizontalOptions="Center" AbsoluteLayout.LayoutBounds=".5,0" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+            </AbsoluteLayout>
+        </StackLayout>
+
+    </ContentPage.Content>
+</ContentPage>

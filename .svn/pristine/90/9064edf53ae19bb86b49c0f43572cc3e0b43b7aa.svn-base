@@ -1,0 +1,36 @@
+﻿using LinphoneXamarin.Entities;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.Util
+{
+
+    public class VMMessageTextConverter : IValueConverter, IMarkupExtension
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var str = (string)value;
+            if (String.IsNullOrEmpty(str) || str.Equals(""))
+                return "";
+
+            if (str?.EndsWith("\n") == true)
+                str = str.Remove(str.Length - 2);
+            return $"\"{str}\"";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+            //throw new NotImplementedException();
+        }
+
+        public object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+    }
+}

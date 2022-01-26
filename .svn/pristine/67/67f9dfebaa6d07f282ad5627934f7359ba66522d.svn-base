@@ -1,0 +1,96 @@
+﻿using System;
+using System.Collections.Generic;
+using Linphone;
+using LinphoneXamarin.Util;
+using Xamarin.Forms;
+
+namespace LinphoneXamarin.Entities
+{
+    public class MyCall
+    {
+        public int pendingPriority { set; get; }
+        public string userName { set; get; }
+        public string name { set; get; }
+        public string remoteAddress { set; get; }
+        public CallState state { set; get; }
+        public bool isCurrentCall { set; get; }
+        public bool isInConference { set; get; }
+        public bool isHeld { set; get; }
+        public bool isVideo { set; get; }
+        public bool isRemotePendingVideo { set; get; }
+        public bool isSelfPendingVideo { set; get; }
+
+        public bool isMute { set; get; }
+        public List<string> conferenceParticipates { set; get; }
+        public string callid { set; get; }
+        public bool isPendingIncoming { set; get; }
+        private string _alias;
+        public string alias
+        {
+            get
+            {
+                return _alias;
+            }
+            set
+            {
+                _alias = getTrimedAlias(value);
+            }
+        }
+        private string tenantPrefix;
+
+#if __IOS__
+        public Foundation.NSUuid uuid { set; get; }
+#endif
+
+        public ImageSource image
+        {
+            get
+            {
+                var x = MyFileSystem.Instance.loadUserIdImage(userName);
+                if (x == null)
+                {
+                    return "user.png";
+                }
+                else
+                {
+                    return x;
+                }
+            }
+        }
+
+        public long connectedTime { set; get; }
+
+        public MyCall(string userName, string name, string alias, string remoteAddress, CallState state)
+        {
+            isPendingIncoming = false;
+            this.userName = userName;
+            this.name = name;
+            this.alias = alias;
+            this.remoteAddress = remoteAddress;
+            this.state = state;
+            this.isCurrentCall = false;
+            this.isInConference = false;
+            this.callid = "";
+            this.connectedTime = -1;
+            var credentials = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+            if (credentials != null)
+                tenantPrefix = credentials.tenantPrefix;
+        }
+        public override string ToString()
+        {
+            return this.alias + " , " + state.ToString();
+        }
+
+        private string getTrimedAlias(string alias)
+        {
+            Console.WriteLine("omer3232: " + "getTrimedAlias(): " + alias);
+            if (alias.Length == 7 && alias.Substring(0, 4).Equals(tenantPrefix))
+            {
+                return alias.Substring(4);
+            }
+            return alias;
+        }
+
+
+    }
+}

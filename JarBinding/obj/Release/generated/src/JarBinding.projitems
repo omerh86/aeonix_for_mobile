@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);ANDROID_1;ANDROID_2;ANDROID_3;ANDROID_4;ANDROID_5;ANDROID_6;ANDROID_7;ANDROID_8;ANDROID_9;ANDROID_10;ANDROID_11;ANDROID_12;ANDROID_13;ANDROID_14;ANDROID_15;ANDROID_16;ANDROID_17;ANDROID_18;ANDROID_19;ANDROID_20;ANDROID_21;ANDROID_22;ANDROID_23;ANDROID_24;ANDROID_25;ANDROID_26;ANDROID_27;ANDROID_28</DefineConstants>
+  </PropertyGroup>
+  <!-- Classes -->
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.BasicPushNotificationBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.CommandService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.CustomPushNotificationBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.Hwproxy.HwNotifyActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.Jni.BaiduAppSSOJni.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.Jni.PushSocket.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.Job.PushJobService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.Message.CrossPushMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.Message.PublicMsg.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.Mzproxy.MzNotifyActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.Opproxy.OpNotifyActivity.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.PushConstants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.PushInfoProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.PushManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.PushMessageReceiver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.PushNotificationBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.PushService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.PushServiceReceiver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.PushSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Android.Pushservice.RegistrationReceiver.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Com.Baidu.Pushservice.PushService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Java.Interop.__TypeRegistrations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)__NamespaceMapping__.cs" />
+  </ItemGroup>
+  <!-- Enums -->
+  <ItemGroup />
+</Project>

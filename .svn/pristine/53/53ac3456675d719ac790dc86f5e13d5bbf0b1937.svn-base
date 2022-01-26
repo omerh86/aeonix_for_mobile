@@ -1,0 +1,278 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Linphone;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Util;
+using Xamarin.Essentials;
+
+namespace LinphoneXamarin.Services
+{
+    class LinphoneBase
+    {
+
+        public Core linphoneCore { get; set; }
+        public CoreListener coreListener { get; set; }
+        public int iterationPeriodMilli { get; set; }
+
+        Thread iterateforground;
+
+        private static LinphoneBase instance = null;
+#if ANDROID
+        global::Android.App.Activity activity;
+#endif
+
+        private SharedData sharedData;
+        private static readonly object padlock = new object();
+
+        public static LinphoneBase Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new LinphoneBase();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public object AndroidContext { get; private set; }
+
+        public LinphoneBase()
+        {
+
+            coreListener = Factory.Instance.CreateCoreListener();
+            iterationPeriodMilli = 50;
+            var fs = MyFileSystem.Instance;
+#if ANDROID
+            activity = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity;
+            string config = null;
+            string factoryConfig = null;
+            if (activity != null)
+            {
+                config = ((configGenerator)Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity).onConfigNeeded();
+                factoryConfig = fs.getInitFilePath();
+                if (factoryConfig == null)
+                {
+                    addLog("first use of factoryConfig file");
+                    factoryConfig = ((configGenerator)Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity).onConfigFactoryNeeded();
+                    string text = System.IO.File.ReadAllText(factoryConfig);
+                    text = text.Replace("uuid=-1", $"uuid={new Random().Next(10000)}");
+                    fs.saveInitFile(text);
+                    factoryConfig = fs.getInitFilePath();
+                }
+            }
+
+            linphoneCore = Factory.Instance.CreateCore(coreListener, config, factoryConfig, IntPtr.Zero, LinphoneAndroid.AndroidContext);
+
+#endif
+#if __IOS__
+
+            var factoryConfig = fs.getInitFilePath();
+            if (factoryConfig == null)
+            {
+                addLog("first use of factoryConfig file");
+                factoryConfig = AppDelegate.getFileUri("linphonerc_default");
+
+                string text = System.IO.File.ReadAllText(factoryConfig);
+                text = text.Replace("uuid=-1", $"uuid={new Random().Next(10000)}");
+                addLog($"first use of factoryConfig file: {text}");
+                fs.saveInitFile(text);
+
+                factoryConfig = fs.getInitFilePath();
+            }
+
+            //var factoryConfig = AppDelegate.getFileUri("linphonerc_default");
+            linphoneCore = Factory.Instance.CreateCore(coreListener, factoryConfig, factoryConfig);
+            addLog($"misc uuid is: {linphoneCore.Config.GetString("misc", "uuid", "-1")}");
+           
+#endif
+#if WINDOWS_UWP
+
+            linphoneCore = Factory.Instance.CreateCore(coreListener, "Assets/linphonerc_default", "Assets/linphonerc_default");
+
+#endif
+
+#if WINDOWS_UWP
+            linphoneCore.UsePreviewWindow(true);
+#endif
+            linphoneCore.VerifyServerCertificates(false);
+            linphoneCore.VerifyServerCn(false);
+            linphoneCore.NetworkReachable = true;
+
+            logger();
+            NatPolicy linphoneNatPolicy = linphoneCore.NatPolicy;
+            linphoneNatPolicy.IceEnabled = false;
+            linphoneNatPolicy.StunEnabled = false;
+            linphoneNatPolicy.TurnEnabled = false;
+            linphoneNatPolicy.UpnpEnabled = false;
+            linphoneCore.Ipv6Enabled = false;
+            linphoneCore.UseRfc2833ForDtmf = true;
+            linphoneCore.UseInfoForDtmf = false;
+            linphoneCore.VideoDisplayEnabled = true;
+            linphoneCore.VideoCaptureEnabled = true;
+            linphoneCore.RingDuringIncomingEarlyMedia = false;
+            linphoneCore.NatPolicy = linphoneNatPolicy;
+            linphoneCore.IncTimeout = 120;
+            linphoneCore.AvpfMode = AVPFMode.Disabled;
+
+            //Bug 45936 - 201802120146071 - Touch (Local) one way audio on the call after many DTMFs
+            linphoneCore.AdaptiveRateControlEnabled = false;
+            linphoneCore.VideoActivationPolicy.AutomaticallyInitiate = true;
+            linphoneCore.VideoActivationPolicy.AutomaticallyAccept = true;
+
+            var videoPayloadTypes = linphoneCore.VideoPayloadTypes;
+
+#if __IOS__
+          
+            linphoneCore.setSipTransports();
+#endif
+
+#if ANDROID
+            try
+            {
+                IEnumerable<string> devices = linphoneCore.VideoDevices;
+                if (devices != null && devices.Count() > 0 && devices.ElementAt(1) != null)
+                {
+                    linphoneCore.VideoDevice = devices.ElementAt(1);
+                }
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+#endif
+
+            setDefaultCodecs();
+
+            linphoneCore.Config.SetInt("net", "enable_nat_helper", 0);
+            linphoneCore.Config.SetInt("sip", "use_rport", 0);
+            linphoneCore.Config.SetInt("sip", "only_one_codec", 1);
+            linphoneCore.Config.SetInt("sip", "store_ha1_passwd", 0);
+            linphoneCore.Config.SetInt("sip", "refresh_generic_subscribe", 1);
+            linphoneCore.Config.SetInt("sip", "keep_srtp_keys", 1);
+            linphoneCore.Config.SetInt("rtp", "rtp_no_xmit_on_audio_mute", 0);
+            addLog($"avpf: {linphoneCore.Config.GetInt("rtp", "avpf", -1).ToString()}");
+            linphoneCore.NortpTimeout = 3600;
+        }
+
+        private void setDefaultCodecs()
+        {
+#if __IOS__
+          linphoneCore.VideoPayloadTypes = linphoneCore.VideoPayloadTypes.Reverse();
+#endif
+            foreach (var i in linphoneCore.VideoPayloadTypes)
+                addLog("video codec2: " + i.Description);
+
+            var codecs = linphoneCore.AudioPayloadTypes.GetEnumerator();
+            var codecA = "PCMU/8000/1";
+            var codecB = "PCMA/8000/1";
+            var codecC = "G729/8000/1";
+
+            var defaultCodecs = $"{codecA};{codecB};{codecC};";
+            while (codecs.MoveNext())
+            {
+                if (defaultCodecs.IndexOf(codecs.Current.Description) > -1)
+                    codecs.Current.Enable(true);
+                else
+                    codecs.Current.Enable(false);
+
+                addLog("codec: " + codecs.Current.Description + " is enabled: " + codecs.Current.Enabled());
+            }
+        }
+
+        public void logger()
+        {
+            // Core.SetLogLevelMask(0xFF);
+
+            Core.ResetLogCollection();
+            Core.SetLogCollectionPath(MyFileSystem.Instance.ANX_LOG_PATH);
+            Core.EnableLogCollection(LogCollectionState.Enabled);
+            LoggingService l = LoggingService.Instance;
+            var x = Core.LogLevelMask;
+            l.LogLevel = LogLevel.Debug;
+            var y = l.LogLevelMask;
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "Linphone_Base");
+            Console.WriteLine("omer:252 " + message);
+        }
+
+
+        public void startForgroundItreation()
+        {
+
+            addLog("startForgroundItreation1");
+            if (iterateforground == null || !iterateforground.IsAlive)
+            {
+                addLog("startForgroundItreation2");
+                iterateforground = new Thread(doForgroundLinphoneIteration);
+                iterateforground.Start();
+                iterateforground.IsBackground = false;
+            }
+
+
+            //#if WINDOWS_UWP
+            //            TimeSpan period = TimeSpan.FromSeconds(1);
+            //            Windows.System.Threading.ThreadPoolTimer.CreatePeriodicTimer(doUWPForgroundLinphoneIteration, TimeSpan.FromSeconds(1));
+            //#else
+            //            Console.WriteLine("omer50: foreground state1:" + iterateforground);
+            //            if (iterateforground == null || !iterateforground.IsAlive)
+            //            {
+            //                Console.WriteLine("omer50: foreground state2");
+            //                iterateforground = new Thread(doForgroundLinphoneIteration);
+            //                iterateforground.Start();
+            //                iterateforground.IsBackground = false;
+            //            }
+            //#endif
+        }
+
+        private void doForgroundLinphoneIteration()
+        {
+            while (true)
+            {
+                try
+                {
+
+#if ANDROID
+                    activity.RunOnUiThread(() => linphoneCore.Iterate());
+
+#elif WINDOWS_UWP
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        linphoneCore.Iterate();
+                    });
+#else
+                     Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+                    {
+                        linphoneCore.Iterate();
+                    });
+#endif
+                }
+                catch (Exception e)
+                {
+                    addLog("err:" + e);
+                }
+                finally
+                {
+                    Thread.Sleep(iterationPeriodMilli);
+                }
+
+
+            }
+        }
+
+    }
+
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StackLayout VerticalOptions="Fill" xmlns="http://xamarin.com/schemas/2014/forms" 
+      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+     x:Class="LinphoneXamarin.components.userControllers.MySearch"
+        xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers"
+       x:Name="SearchView">
+
+    <StackLayout x:Name="stack_layout"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Orientation="Vertical" >
+        <StackLayout x:Name="inputComponent" Orientation="Horizontal" Margin="15">
+            <Label x:Name="backLbl"  VerticalOptions="Center" Text="&#xf053;" BackgroundColor="Transparent" TextColor="Black" FontSize="Large">
+                <Label.Effects>
+                    <control:LongPressedEffect />
+                </Label.Effects>
+                <Label.FontFamily>
+                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                </Label.FontFamily>
+            </Label>
+            <Frame  BackgroundColor="#eee" HorizontalOptions="FillAndExpand" Padding="0" Margin="5,0,0,0" CornerRadius="20">
+                <StackLayout Orientation="Horizontal" >
+                    <Image Source="logofortoolbar.png" Margin="5" HeightRequest="22" WidthRequest="23" VerticalOptions="Center"></Image>
+                    <Entry  HorizontalOptions="FillAndExpand" FontSize="Small" TextChanged="onSearchedClicked" BackgroundColor="Transparent" Text="{Binding}" x:Name="searchInput" Placeholder="{StaticResource search}" />
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+
+
+
+        <ListView  HasUnevenRows="True"
+                  
+                   SeparatorVisibility="None"
+                   VerticalOptions="FillAndExpand"
+                   x:Name="searchList" 
+                   HeightRequest="{Binding Path=Height, Source={x:Reference stack_layout}}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <control:ContactCell CallCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.CallCommand}"
+                                         ContactInfoCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.ContactinfoCommand}"
+                                         MessageCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.MessageCommand}"
+                                         ActionPressedCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.actionPressedCommand}"
+                                         actionType="{Binding Source={x:Reference SearchView} , Path=BindingContext.actionType}" 
+                                         contactType="{Binding type}"  isFav="{Binding isFav}"
+                                         userName="{Binding userName}"
+                                         displayName="{Binding displayName}"
+                                         primaryAlias="{Binding primaryAlias}"
+                                         presence="{Binding presenceStatus}" />
+
+                    <!--<control:ContactCell CallCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.CallCommand}"
+                                         ContactInfoCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.ContactinfoCommand}"
+                                        contactType="{Binding type}"  isFav="{Binding isFav}"
+                                         userName="{Binding userName}"
+                                         displayName="{Binding displayName}"
+                                         primaryAlias="{Binding primaryAlias}"
+                                         presence="{Binding presenceStatus}" />-->
+
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </StackLayout>
+</StackLayout>

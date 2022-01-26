@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage  xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            x:Class="LinphoneXamarin.components.Login"
+            FlowDirection="{StaticResource FlowDirection}" BackgroundColor="White">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem  Icon="bug.png" Priority="1"  Clicked="bugReport_Clicked" />
+       </ContentPage.ToolbarItems>
+
+    <StackLayout  x:Name="stack_layout" VerticalOptions="Center"
+                 HorizontalOptions="FillAndExpand" Orientation="Vertical"  Spacing="15">
+        <ScrollView >
+            <StackLayout>
+                <StackLayout x:Name="load" IsVisible="False" Orientation="Vertical">
+                    <Label Margin="10" Text="{StaticResource loading}" FontSize="Large" TextColor="Black" HorizontalOptions="Center" />
+                    <Label x:Name="progressLabel" Margin="10"   FontSize="Large" TextColor="Black" HorizontalOptions="Center" />
+                    <Label x:Name="progressStateLabel" Margin="10"   FontSize="Small" TextColor="DimGray" HorizontalOptions="Center" />
+                    <Button BackgroundColor="Transparent" TextColor="Red" FontSize="Small" FontAttributes="Bold"  Text="{StaticResource cancel}" Clicked="onCancelLogin" HorizontalOptions="Center" />
+                </StackLayout>
+                <StackLayout Margin="7" VerticalOptions="Center" x:Name="stack_registrar">
+                    <Label Margin="10" HorizontalOptions="Center" FontAttributes="Bold" Text="{StaticResource welcome}" FontSize="Medium" TextColor="Black"  />
+                    <Label Margin="1"  Text="{StaticResource userName}" FontSize="Small" TextColor="Black" FontAttributes="Bold"  />
+                    <Entry Margin="1"  x:Name="username"/>
+
+                    <Label Margin="1" Text="{StaticResource password}" FontSize="Small" TextColor="Black" FontAttributes="Bold" />
+                    <Entry Margin="1"  x:Name="password" IsPassword="true" />
+
+                    <Label Margin="1" Text="{StaticResource domain}" FontSize="Small" TextColor="Black" FontAttributes="Bold" />
+                    <Entry Margin="1"  x:Name="domain"  />
+
+                    <Label Margin="1" Text="{StaticResource port}" FontSize="Small" TextColor="Black" FontAttributes="Bold" />
+                    <Entry Margin="1"  x:Name="port" Keyboard="Numeric" TextChanged="Handle_TextChanged" />
+
+                    <Label Margin="1" Text="{StaticResource proxy}" FontSize="Small" TextColor="Black" FontAttributes="Bold" />
+                    <Entry Margin="1"  Text="" x:Name="proxy"/>
+
+                    <Label Margin="1" Text="{StaticResource proxyPort}" FontSize="Small" TextColor="Black" FontAttributes="Bold" />
+                    <Entry Margin="1" x:Name="proxyPort" Keyboard="Numeric" TextChanged="Handle_TextChanged"/>
+
+                    <!--<Button x:Name="register" Text="Register" Clicked="OnRegisterClicked" HorizontalOptions="Center" />-->
+                    <Button BackgroundColor="#00688f" TextColor="White" BorderRadius="5"  x:Name="register2" Text="{StaticResource login}" Clicked="OnRegisterClicked" HorizontalOptions="Center" />
+                    <Label x:Name="registration_status" TextColor="Red" HorizontalOptions="Center" />
+                    <Label x:Name="versionLbl"  TextColor="DimGray" HorizontalOptions="End" Margin="15" FontAttributes="Italic" FontSize="Micro"/>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+    </StackLayout>
+</ContentPage>

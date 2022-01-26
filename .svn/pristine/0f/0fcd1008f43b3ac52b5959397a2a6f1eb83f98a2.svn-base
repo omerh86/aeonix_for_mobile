@@ -1,0 +1,114 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Text;
+
+namespace LinphoneXamarin.Entities
+{
+    public class MyVmMessage : INotifyPropertyChanged
+    {
+        public string messageID { set; get; }
+        public string messageName { set; get; }
+        public string messageText { set; get; }
+        public long dateTime { set; get; }
+        public long durationSec { set; get; }
+
+        public bool load { set; get; }
+        public bool pendingSend { set; get; }
+        public VmMessageStatus status { set; get; }
+        public string from { set; get; }
+
+        private bool _isloading;
+
+        public bool isloading
+        {
+            get
+            {
+                return _isloading;
+            }
+            set
+            {
+                _isloading = value;
+                OnPropertyChanged("isloading");
+            }
+        }
+
+        private bool _heard;
+
+        public bool heard
+        {
+            get
+            {
+                return _heard;
+            }
+            set
+            {
+                _heard = value;
+                OnPropertyChanged("heard");
+            }
+        }
+
+        public bool isDeleteEnabled
+        {
+            get
+            {
+                return !status.Equals(VmMessageStatus.DELETED); ;
+            }
+        }
+
+        public bool isRestoredEnabled
+        {
+            get
+            {
+                return status.Equals(VmMessageStatus.DELETED);
+            }
+
+        }
+
+        public bool isSaveEnabled
+        {
+            get
+            {
+                return status.Equals(VmMessageStatus.NEW);
+            }
+
+        }
+
+        private bool _isPlaying;
+
+        public bool isPlaying
+        {
+            get
+            {
+                return _isPlaying;
+            }
+            set
+            {
+                _isPlaying = value;
+                OnPropertyChanged("isPlaying");
+            }
+        }
+
+        private float _progress;
+        public float progress
+        {
+            get
+            {
+                return _progress;
+            }
+            set
+            {
+                _progress = value;
+                OnPropertyChanged("progress");
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string nameOfProperty)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameOfProperty));
+        }
+    }
+}

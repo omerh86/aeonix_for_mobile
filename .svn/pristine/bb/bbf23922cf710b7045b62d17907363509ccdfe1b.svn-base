@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace LinphoneXamarin.Entities
+{
+    public class NotificationTokens
+    {
+        public string globalToken { set; get; }
+        public string apnsToken { set; get; }
+        public string voipToken { set; get; }
+    }
+}

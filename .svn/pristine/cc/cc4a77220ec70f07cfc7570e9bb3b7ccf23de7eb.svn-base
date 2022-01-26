@@ -1,0 +1,284 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace LinphoneXamarin.Entities
+{
+
+    public enum CardentialState
+    {
+        TR87,
+        Aeonix
+    }
+
+    public enum LoginError
+    {
+        TimeOut,
+        RestartLogin,
+        RegistrationFailed,
+        RequestTerminated,
+        InfoFailed,
+        InvalidCardentials,
+        InvalidDomain,
+        ForcedStop,
+        Reconnect,
+        Unknown
+
+    }
+    public enum MyRegistrationState
+    {
+        BeforeTR87,
+        ConnectingTR87,
+        InviteTr87,
+        gettingLoginInfo,
+        DisconnectingTR87,
+        ConnectingAeonix,
+        ReConnectingAeonix,
+        AfterAeonix
+
+    }
+
+    public enum RegisterCommands
+    {
+        StartAll,
+        StartAeonix,
+        ReRegister,
+        Continue,
+        Repeat,
+        Clear,
+        End
+    }
+
+    public enum MyInfoProcessState
+    {
+        Ready,
+        FCM,
+        GetRsUser,
+        Search,
+        GetPicture,
+        GetConnection,
+        GetCallTargetDevices,
+        GetAITSettings,
+        GetExplicitPresenceInfo,
+        StopMonitorSelf,
+        StartMonitorSelf,
+        StartMonitorFavs,
+        GetFavorites,
+        GetGroups,
+        GetDialPlanFeatures,
+        StartMonitorInstantMessages,
+        GetCallLog,
+        SetExplicitPresenceInfo,
+        GetMissedCallLogCounter,
+        SendMessage,
+        UpdateMessage,
+        AddFav,
+        RemoveFav,
+        DismissMissedCalls,
+        GetProvisioning,
+        SnapShotDeviceRequest,
+        AddMonitorFav,
+        RemoveMonitorFav,
+        GetFeatureButton,
+        CollaborationRequest,
+        VmMessagesRequest,
+        VmMessagesAudioRequest,
+        VmMessagesCommand,
+        updateExternalContact,
+        StartMonitorFeatureButtonStatus,
+        After
+    }
+
+    public enum MyInfoProcessCommands
+    {
+        StartAll,
+        Continue,
+        Repeat,
+        Clear
+
+    }
+
+    public enum ContactType
+    {
+        Unknown = 0,
+        Aeonix = 1,
+        External = 2,
+        PhoneBook = 4,
+        Group = 8,
+        None = 16
+    }
+
+    public enum CallDirection
+    {
+        Missed,
+        Incoming,
+        OutGoingMissed,
+        OutGoing
+    }
+
+    public enum Presence
+    {
+        ONLINE,
+        OFFLINE,
+        BUSY,
+        DND,
+        MEETING,
+        NONE
+    }
+
+    public enum InfoRecivedType
+    {
+        INFO,
+        EVENT,
+        IMMESSAGE,
+        FAV_PRESENCE,
+        MY_CONTACT_PRESENCE,
+        FEATUREBUTTONS,
+        ESFCommand,
+        COLLABORATION_ERR,
+        OFFER_COLLAB_REQUEST,
+        OFFER_COLLAB_STATUS,
+        COLLAB_CANCELD
+    }
+
+    public enum ChatType
+    {
+        SINGLE,
+        GROUP,
+        OTHER
+    }
+
+    public enum ContactCellAction
+    {
+        Message,
+        Call,
+        Info,
+        Default
+    }
+
+    public enum Language
+    {
+        HEBREW,
+        ENGLISH,
+        SPANISH,
+        PORTUGUESE,
+        CHINESE
+    }
+
+    public enum InfoErr
+    {
+        BUSY,
+        NO_DATA
+    }
+
+    public enum AudioMode
+    {
+        VOIP,
+        RINGTONE,
+        DEFAULT
+    }
+
+    public enum MYAudioState
+    {
+        HEARPEACE,
+        SPEAKER,
+        BT,
+        PENDING,
+        DEFAULT
+    }
+
+    public enum LaunchAction
+    {
+        REGISTRATION_LOST,
+        INCOMING_CALL,
+        NEW_IM,
+        ISSUE_MWI,
+        COLLAB,
+        DEFAULT
+    }
+
+    [Flags]
+    public enum SpeedDialType
+    {
+        None = 0,
+        Rod = 1,
+        Emergency = 2,
+        Speedial = 4,
+        Url = 8,
+        PageQ = 16,
+        GroupPickup = 32,
+        Acc = 64,
+        Acc_EndWrapUP = 128,
+        Acc_ExtendWrapUp = 256,
+        Acc_GroupLog = 512,
+        Acc_GroupQInfo = 1024,
+        Acc_LogPrimaryGroup = 2048,
+        Acc_Release_Resume = 4096,
+        Acc_Release_ResumeWithCode = 8192,
+        Acc_WrapUpWithcode = 16384,
+        VM = 32768
+    }
+
+    public enum HotKey
+    {
+        CtrlQ,
+        CtrlW,
+        Ctrlf7,
+        AltQ,
+        AltW,
+        Altf7,
+        Enter
+    }
+
+    public enum DragDirectionType
+    {
+        All,
+        Vertical,
+        Horizontal
+    }
+
+    public enum DragMode
+    {
+        Touch,
+        LongPress,
+        None
+    }
+
+    public enum FeatureButtonStatus
+    {
+        None,
+        Inactive,
+        Idle,
+        Busy,
+        IncomingA,
+        IncomingB,
+        ConferenceA,
+        ConferenceB
+    }
+
+    public enum ESFCommandRequest
+    {
+        None,
+        MakeCall,
+        Answer,
+        Hold,
+        Retrieve,
+        Mute,
+        DialDigits,
+        MicStatus,
+        Clear,
+        ConferenceCall,
+        AlternateCall,
+        ConsultationCall
+    }
+    public enum VmMessageStatus
+    {
+        NEW,
+        FAX,
+        SAVED,
+        DELETED,
+        FUTURE
+    }
+
+}
+

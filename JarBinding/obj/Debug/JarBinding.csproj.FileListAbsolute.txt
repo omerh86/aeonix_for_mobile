@@ -1,0 +1,16 @@
+C:\Xamarin\JarBinding\bin\Debug\JarBinding.dll
+C:\Xamarin\JarBinding\bin\Debug\JarBinding.pdb
+C:\Xamarin\JarBinding\obj\Debug\MonoAndroid,Version=v9.0.AssemblyAttributes.cs
+C:\Xamarin\JarBinding\obj\Debug\JarBinding.csprojAssemblyReference.cache
+C:\Xamarin\JarBinding\obj\Debug\stamp\_BuildLibraryImportsCache.stamp
+C:\Xamarin\JarBinding\obj\Debug\JarBinding.csproj.CoreCompileInputs.cache
+C:\Xamarin\JarBinding\obj\Debug\JarBinding.dll
+C:\Xamarin\JarBinding\obj\Debug\JarBinding.pdb
+C:\Atouch\JarBinding\bin\Debug\JarBinding.dll
+C:\Atouch\JarBinding\bin\Debug\JarBinding.pdb
+C:\Atouch\JarBinding\obj\Debug\MonoAndroid,Version=v9.0.AssemblyAttributes.cs
+C:\Atouch\JarBinding\obj\Debug\JarBinding.csprojAssemblyReference.cache
+C:\Atouch\JarBinding\obj\Debug\stamp\_BuildLibraryImportsCache.stamp
+C:\Atouch\JarBinding\obj\Debug\JarBinding.csproj.CoreCompileInputs.cache
+C:\Atouch\JarBinding\obj\Debug\JarBinding.dll
+C:\Atouch\JarBinding\obj\Debug\JarBinding.pdb

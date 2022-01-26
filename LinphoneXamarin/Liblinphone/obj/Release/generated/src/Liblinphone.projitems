@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);ANDROID_1;ANDROID_2;ANDROID_3;ANDROID_4;ANDROID_5;ANDROID_6;ANDROID_7;ANDROID_8;ANDROID_9;ANDROID_10;ANDROID_11;ANDROID_12;ANDROID_13;ANDROID_14;ANDROID_15;ANDROID_16;ANDROID_17;ANDROID_18;ANDROID_19;ANDROID_20;ANDROID_21;ANDROID_22;ANDROID_23;ANDROID_24;ANDROID_25;ANDROID_26;ANDROID_27</DefineConstants>
+  </PropertyGroup>
+  <!-- Classes -->
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Java.Interop.__TypeRegistrations.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Core.Tutorials.TutorialBuddyStatus.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Core.Tutorials.TutorialChatRoom.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Core.Tutorials.TutorialHelloWorld.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Core.Tutorials.TutorialNotifier.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Core.Tutorials.TutorialRegistration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Core.Util.AndroidPlatformHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.AACFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Factory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Log.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.MediastreamerAndroidContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.MediastreamException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Version.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Video.AndroidVideoWindowImpl.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Video.Capture.AndroidVideoApi5JniWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Video.Capture.AndroidVideoApi8JniWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Video.Capture.AndroidVideoApi9JniWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Video.Capture.Hwconf.AndroidCameraConfiguration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Video.Capture.Hwconf.AndroidCameraConfigurationReader21.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Video.Capture.Hwconf.Hacks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Video.Display.GL2JNIView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Mediastream.Video.Display.OpenGLESDisplay.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Tools.H264Helper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Tools.Lpc2Xml.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Tools.OpenH264DownloadHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Org.Linphone.Tools.Xml2Lpc.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)__NamespaceMapping__.cs" />
+  </ItemGroup>
+  <!-- Enums -->
+  <ItemGroup />
+</Project>

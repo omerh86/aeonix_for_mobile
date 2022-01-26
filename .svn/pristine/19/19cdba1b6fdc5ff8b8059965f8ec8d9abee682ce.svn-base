@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             x:Class="LinphoneXamarin.components.DialPad"
+            xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="plainButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="BorderColor" Value="White" />
+                <Setter Property="TextColor" Value="Black" />
+                <Setter Property="BorderRadius" Value="5" />
+                <Setter Property="FontSize" Value="Medium" />
+                <Setter Property="Padding" Value="5" />
+
+            </Style>
+            <Style x:Key="AeonixButton" TargetType="Button">
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="BorderRadius" Value="25" />
+                <Setter Property="FontSize" Value="Medium" />
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+
+        <StackLayout x:Name="stack_layout" Orientation="Vertical" BackgroundColor="White" VerticalOptions="FillAndExpand" >
+
+            <AbsoluteLayout  HeightRequest="180" >
+                <AbsoluteLayout.Background>
+                    <LinearGradientBrush  EndPoint="0,1">
+                        <GradientStop Color="#BAE9FF" Offset="0.1" />
+                        <GradientStop Color="#0091D3" Offset="1.0" />
+                    </LinearGradientBrush>
+                </AbsoluteLayout.Background>
+                <OnPlatform x:TypeArguments="View">
+                    <On Platform="UWP">
+                        <Entry x:Name="inumber" TextChanged="onDialEntryClicked" Completed="OnEnterPressed"  HorizontalOptions="FillAndExpand" FontAttributes="Bold" FontSize="Large" TextColor="White" AbsoluteLayout.LayoutBounds=".01,.99,1,1" AbsoluteLayout.LayoutFlags="All"/>
+                    </On>
+                    <On Platform="iOS, Android">
+                        <Label x:Name="number" Margin="5" Padding="15" HorizontalOptions="FillAndExpand" FontAttributes="Bold" FontSize="Large" VerticalTextAlignment="End" TextColor="White" AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All"/>
+                    </On>
+                </OnPlatform>
+
+                <Button x:Name="clearBtn" Clicked="clear" Text="&#xf55a;" BorderColor="Transparent" BackgroundColor="Transparent" TextColor="White" FontSize="Large" AbsoluteLayout.LayoutBounds=".99,.9" AbsoluteLayout.LayoutFlags="PositionProportional" control:LongPressedEffect.Command="{x:Binding}" control:LongPressedEffect.CommandParameter="{x:Binding .}">
+                    <Button.Effects>
+                        <control:LongPressedEffect />
+                    </Button.Effects>
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+
+                <Button Clicked="onBackClicked" Margin="-2"  Text="&#xf053;" BorderColor="Transparent" BackgroundColor="Transparent" TextColor="White" FontSize="Medium">
+                    <Button.Effects>
+                        <control:LongPressedEffect />
+                    </Button.Effects>
+                    <Button.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Button.FontFamily>
+                </Button>
+            </AbsoluteLayout>
+            <control:CallListView x:Name="_CallListView" HorizontalOptions="End"></control:CallListView>
+            <control:MySearch x:Name="search" actionType="Call" VerticalOptions="FillAndExpand"/>
+            <StackLayout Orientation="Vertical" VerticalOptions="End" >
+                <Grid   BackgroundColor="#eee" x:Name="controlGrid" RowSpacing="1" ColumnSpacing="1" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="55" />
+                        <RowDefinition Height="55" />
+                        <RowDefinition Height="55" />
+                        <RowDefinition Height="55" />
+                    </Grid.RowDefinitions>
+
+                    <Button  Clicked="onDialPadClicked" FontAttributes="Bold" Text="1" Grid.Row="0" Grid.Column="0" Style="{StaticResource plainButton}" />
+                    <Button Clicked="onDialPadClicked" FontAttributes="Bold" Text="2" Grid.Row="0" Grid.Column="1" Style="{StaticResource plainButton}" />
+                    <Button Clicked="onDialPadClicked" FontAttributes="Bold" Text="3" Grid.Row="0" Grid.Column="2" Style="{StaticResource plainButton}" />
+                    <Button Clicked="onDialPadClicked" FontAttributes="Bold" Text="4" Grid.Row="1" Grid.Column="0" Style="{StaticResource plainButton}" />
+                    <Button Clicked="onDialPadClicked" FontAttributes="Bold" Text="5" Grid.Row="1" Grid.Column="1" Style="{StaticResource plainButton}" />
+                    <Button Clicked="onDialPadClicked" FontAttributes="Bold" Text="6" Grid.Row="1" Grid.Column="2" Style="{StaticResource plainButton}" />
+                    <Button Clicked="onDialPadClicked" FontAttributes="Bold" Text="7" Grid.Row="2" Grid.Column="0" Style="{StaticResource plainButton}" />
+                    <Button Clicked="onDialPadClicked" FontAttributes="Bold" Text="8" Grid.Row="2" Grid.Column="1" Style="{StaticResource plainButton}" />
+                    <Button Clicked="onDialPadClicked" FontAttributes="Bold" Text="9" Grid.Row="2" Grid.Column="2" Style="{StaticResource plainButton}" />
+                    <Button Clicked="onDialPadClicked" FontAttributes="Bold" Text="*" Grid.Row="3" Grid.Column="0" Style="{StaticResource plainButton}" />
+                    <Button x:Name="zeroBtn" control:LongPressedEffect.Command="{x:Binding}" control:LongPressedEffect.CommandParameter="{x:Binding .}"  Clicked="onDialPadClicked" FontAttributes="Bold" Text="0" Grid.Row="3" Grid.Column="1" Style="{StaticResource plainButton}">
+                        <Button.Effects>
+                            <control:LongPressedEffect />
+                        </Button.Effects>
+                    </Button>
+                    <Button Clicked="onDialPadClicked"  FontAttributes="Bold" Text="#" Grid.Row="3" Grid.Column="2" Style="{StaticResource plainButton}" />
+
+                    <Label  VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="2" Text="ABC" Grid.Row="0" Grid.Column="1"  >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="onLabelClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="3" Text="DEF" Grid.Row="0" Grid.Column="2"  >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="onLabelClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="4" Text="GHI" Grid.Row="1" Grid.Column="0"  >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="onLabelClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="5" Text="JKL" Grid.Row="1" Grid.Column="1"  >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="onLabelClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="6" Text="MNO" Grid.Row="1" Grid.Column="2"  >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="onLabelClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="7" Text="PQRS" Grid.Row="2" Grid.Column="0"  >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="onLabelClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="8" Text="TUV" Grid.Row="2" Grid.Column="1"  >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="onLabelClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="9" Text="WXYZ" Grid.Row="2" Grid.Column="2"  >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="onLabelClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                    <Label  VerticalOptions="End" HorizontalOptions="Center" FontSize="Micro" TabIndex="0" Text="+" Grid.Row="3" Grid.Column="1"  >
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="onLabelClicked"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+                <AbsoluteLayout  HorizontalOptions="FillAndExpand">
+                    <Button  Clicked="OnVideoCallClicked"  WidthRequest="50" HeightRequest="50" CornerRadius="25" AbsoluteLayout.LayoutBounds=".1,.5" AbsoluteLayout.LayoutFlags="PositionProportional" Text="&#xf03d;" Style="{StaticResource AeonixButton}" Margin="5" >
+                        <Button.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Button.FontFamily>
+                        <Button.Background>
+                            <LinearGradientBrush  EndPoint="0,1">
+                                <GradientStop Color="#BAE9FF" Offset="0.1" />
+                                <GradientStop Color="#0091D3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <Button Clicked="OnCallClicked" Text="&#xf095;" HorizontalOptions="CenterAndExpand" WidthRequest="150"   Style="{StaticResource AeonixButton}" Margin="5" AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional"  >
+                        <Button.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid" />
+                        </Button.FontFamily>
+                        <Button.Background>
+                            <LinearGradientBrush  EndPoint="0,1">
+                                <GradientStop Color="#BAE9FF" Offset="0.1" />
+                                <GradientStop Color="#0091D3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <Button x:Name="dialPadBtn" IsVisible="False" Clicked="onDialPadBtn" Text="&#xf1e4;" BorderRadius="35" HeightRequest="70" WidthRequest="70"
+                            BorderColor="Transparent"
+                           TextColor="White" FontSize="Medium" 
+                            AbsoluteLayout.LayoutBounds=".99,.95" Margin="2" AbsoluteLayout.LayoutFlags="PositionProportional">
+                        <Button.Effects>
+                            <control:LongPressedEffect />
+                        </Button.Effects>
+                        <Button.FontFamily>
+                            <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                        </Button.FontFamily>
+                        <Button.Background>
+                            <LinearGradientBrush  EndPoint="0,1">
+                                <GradientStop Color="#BAE9FF" Offset="0.1" />
+                                <GradientStop Color="#0091D3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                </AbsoluteLayout>
+
+            </StackLayout>
+        </StackLayout>
+
+    </ContentPage.Content>
+</ContentPage>

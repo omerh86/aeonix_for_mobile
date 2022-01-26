@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PriInfo>
+	<ResourceMap name="Plugin.Badge.UWP" version="1.0" primary="true">
+		<Qualifiers/>
+		<ResourceMapSubtree name="Files">
+			<ResourceMapSubtree name="Plugin.Badge.UWP">
+				<NamedResource name="HeaderTemplate.xbf" uri="ms-resource://Plugin.Badge.UWP/Files/Plugin.Badge.UWP/HeaderTemplate.xbf">
+					<Candidate type="EmbeddedData">
+						<Base64Value>[Embedded Binary Data]</Base64Value>
+					</Candidate>
+				</NamedResource>
+				<NamedResource name="Plugin.Badge.UWP.xr.xml" uri="ms-resource://Plugin.Badge.UWP/Files/Plugin.Badge.UWP/Plugin.Badge.UWP.xr.xml">
+					<Candidate type="Path">
+						<Value>Plugin.Badge.UWP\Plugin.Badge.UWP.xr.xml</Value>
+					</Candidate>
+				</NamedResource>
+			</ResourceMapSubtree>
+		</ResourceMapSubtree>
+	</ResourceMap>
+</PriInfo>

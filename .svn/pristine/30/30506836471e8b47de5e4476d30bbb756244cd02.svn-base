@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net.Http;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using LinphoneXamarin.Entities;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class About : ContentPage
+    {
+        public About()
+        {
+            InitializeComponent();
+            versionlbl.Text = "Aeonix Touch Version: " + SharedData.Instance.TouchVersion;
+            var credentials = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+            if (credentials != null && credentials.aeonixVersion != null)
+                AeonixVersionlbl.Text = "Aeonix Version: " + credentials.aeonixVersion;
+
+            aboutTxt.Text = "This program is a free software: you can redistribute it and/or modify it under the terms of the GNU General Public License.Type https://www.gnu.org/licenses for details. To get the code contact us info@tadirantele.com This program comes with ABSOLUTELY NO WARRANTY. All Rights Reserved.Aeonix Touch does not provide exact location services needed for calls to emergency personnel and should not be used for these types of calls.";
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+        }
+
+      
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+        }
+
+        private void onGetVmMessages(object sender, EventArgs e)
+        {
+            //  AeonixInfoService.Instance.getVmMessageList();
+        }
+
+        private void onGetVmAudioMessages(object sender, EventArgs e)
+        {
+            AeonixInfoService.Instance.getVmAudioMessage("1427982199", "5FA80558.0");
+        }
+    }
+}

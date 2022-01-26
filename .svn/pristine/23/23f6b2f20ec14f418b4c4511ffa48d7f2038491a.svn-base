@@ -1,0 +1,31 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Xamarin.Forms;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    public class MyListView : ListView
+    {
+        public static readonly BindableProperty
+            LastScrollDirectionProperty =
+                BindableProperty.Create(nameof(LastScrollDirection),
+                typeof(string), typeof(MyListView), null);
+        public static readonly BindableProperty
+            AtStartOfListProperty =
+                BindableProperty.Create(nameof(AtStartOfList),
+                typeof(bool), typeof(MyListView), false);
+
+        public string LastScrollDirection
+        {
+            get { return (string)GetValue(LastScrollDirectionProperty); }
+            set { SetValue(LastScrollDirectionProperty, value); }
+        }
+
+        public bool AtStartOfList
+        {
+            get { return (bool)GetValue(AtStartOfListProperty); }
+            set { SetValue(AtStartOfListProperty, value); }
+        }
+    }
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage BackgroundColor="White" xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.BugReport"
+             FlowDirection="{StaticResource FlowDirection}"
+             Title="Problem Report">
+
+
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout Spacing="15" Margin="15">
+
+                <StackLayout Margin="5">
+                    <StackLayout BackgroundColor="#eee" Padding="5" Margin="10">
+                        <Label TextColor="#0091D3" FontSize="Small" Text="{StaticResource title}"/>
+                        <Entry x:Name="titleEnrty"  />
+                    </StackLayout>
+
+                    <StackLayout BackgroundColor="#eee" Padding="5" Margin="10">
+                        <Label TextColor="#0091D3" FontSize="Small" Text="{StaticResource description}"/>
+                        <Editor x:Name="descriptionEntry"  HeightRequest="200" FontSize="Small" />
+                    </StackLayout>
+
+                    <Button Margin="20" Text="{StaticResource send}" CornerRadius="25" TextColor="White" WidthRequest="120" Clicked="sendReport" HorizontalOptions="End">
+                        <Button.Background>
+                            <LinearGradientBrush  EndPoint="0,1">
+                                <GradientStop Color="#BAE9FF" Offset="0.1" />
+                                <GradientStop Color="#0091D3" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <Label x:Name="errLbl" HorizontalOptions="Center" Text="" Margin="10" FontSize="Small"/>
+                    <Button Margin="20" Text="{StaticResource openLogDirectory}"   TextColor="#00688f" Clicked="openLogFolder" HorizontalOptions="Center">
+                        <Button.IsVisible>
+                            <OnPlatform x:TypeArguments="x:Boolean" WinPhone="True" Android="False" iOS="False"  />
+                        </Button.IsVisible>
+                    </Button>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

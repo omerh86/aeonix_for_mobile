@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>10.0</string>
+	<key>CFBundleDisplayName</key>
+	<string>Aeonix</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string> For voip calls, no other usage is been made</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.tadiran.aeonixtouch.ios</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>fa-brands-400.ttf</string>
+		<string>fa-regular-400.ttf</string>
+		<string>fa-solid-900.ttf</string>
+	</array>
+	<key>NSContactsUsageDescription</key>
+	<string>To enable voip calls to phone book contacts, no other usage is been made with this information</string>
+	<key>CFBundleName</key>
+	<string>Aeonix(V2)</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>NSExtensionAttributes</key>
+	<dict>
+		<key>UNNotificationExtensionCategory</key>
+		<array>
+			<string>red-category</string>
+			<string>green-category</string>
+		</array>
+		<key>UNNotificationExtensionUserInteractionEnabled</key>
+		<true/>
+		<key>UNNotificationExtensionDefaultContentHidden</key>
+		<true/>
+		<key>UNNotificationExtensionInitialContentSizeRatio</key>
+		<real>0.6</real>
+	</dict>
+	<key>NSExtensionMainStoryboard</key>
+	<string>MainInterface</string>
+	<key>NSExtensionPointIdentifier</key>
+	<string>com.apple.usernotifications.content-extension</string>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>NSCameraUsageDescription</key>
+	<string>$(PRODUCT_NAME) user your Camera. no other usage then voip calls is been made with this permission.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>$(PRODUCT_NAME) user your calendar. no other usage then voip calls is been made with this permission.</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>$(PRODUCT_NAME) user your Media library. no other usage then voip calls is been made with this permission.</string>
+	<key>NSSiriUsageDescription</key>
+	<string>$(PRODUCT_NAME) user Siri.</string>
+	<key>XSAppIconAssets</key>
+	<string>Assets.xcassets/AppIcon.appiconset</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ar</string>
+	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>voip</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UIMainStoryboardFile</key>
+	<string>LaunchScreen</string>
+	<key>XSLaunchImageAssets</key>
+	<string>Assets.xcassets/LaunchImage.launchimage</string>
+	<key>CFBundleShortVersionString</key>
+	<string>6.1.7</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>For voip calls, no other usage is been made </string>
+	<key>CFBundleVersion</key>
+	<string>71</string>
+</dict>
+</plist>

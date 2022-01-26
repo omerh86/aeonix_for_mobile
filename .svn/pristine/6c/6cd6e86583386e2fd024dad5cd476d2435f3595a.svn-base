@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.Util
+{
+
+    public class TrimmedDisplayNameConverter : IValueConverter, IMarkupExtension
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return getAbbreviation(((string)value));
+            if (value != null && ((string)value).Length > 0)
+                return ((string)value).Substring(0, 1);
+            else
+                return value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
+            //throw new NotImplementedException();
+        }
+
+        public object ProvideValue(IServiceProvider serviceProvider)
+        {
+            return this;
+        }
+
+        private string getAbbreviation(string displayName)
+        {
+            var result = "";
+            try
+            {
+                if (displayName != null && displayName.Length > 0)
+                {
+                    var s = displayName.Split(' ');
+                    if (s != null)
+                    {
+                        result = $"{s[0].Substring(0, 1)}";
+                        if (s.Length > 1)
+                        {
+                            result += s[1].Substring(0, 1);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                //TODO
+            }
+            return result;
+        }
+    }
+}

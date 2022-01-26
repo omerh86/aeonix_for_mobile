@@ -1,0 +1,108 @@
+﻿using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+using Device = Xamarin.Forms.Device;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class ChatComponent : ContentView, MYImMessagesListener
+    {
+        public ObservableCollection<MyChat> allChats;
+        public ICommand searchFieldNotEmptyCommand { get; private set; }
+        public ChatComponent()
+        {
+            InitializeComponent();
+            searchFieldNotEmptyCommand = new Command<bool>(onSearchFieldChanged);
+            updateChatList();
+            MessagesService.Instance.mYImMessagesListener = this;
+        }
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "MyChatsPage");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+
+        private void updateChatList()
+        {
+            allChats = MessagesService.Instance.getAllChats();
+            TimeHelper th = TimeHelper.Instance;
+            foreach (MyChat c in allChats)
+            {
+                if (c.lastMessageText == null)
+                    c.lastMessageText = "";
+
+                c.formattedTime = getChatFormattedDate(th, c.lastMessageTime);
+                if (c.lastMessageText.Length > 12)
+                    c.lastMessageText = c.lastMessageText.Substring(0, 12) + "...";
+                c.isUnRedMessagesVisible = c.unRedMessages > 0 ? true : false;
+            }
+            chatList.BindingContext = allChats;
+            chatList.ItemsSource = allChats;
+        }
+
+        private string getChatFormattedDate(TimeHelper th, long lastMessageTime)
+        {
+
+            DateTime messageTime = th.FromUnixTime(lastMessageTime).ToLocalTime(); ;
+
+            if (th.isSameDay(messageTime, DateTime.Now))
+            {
+                return messageTime.ToString(th.timeFormat);
+            }
+            else
+            {
+                return messageTime.ToLocalTime().ToShortDateString();
+            }
+        }
+
+        private void enterChat(object sender, ItemTappedEventArgs e)
+        {
+            MyChat selected = e.Item as MyChat;
+            var page = (Page)new Messages(selected.chatId, selected.chatName);
+            Navigation.PushAsync(page, false);
+        }
+
+        void onSearchFieldChanged(bool isEmpty)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                chatList.IsVisible = isEmpty;
+            });
+        }
+
+        public void onMessageRecieved(MyMessage myMessage, Destination d)
+        {
+            updateChatList();
+        }
+
+        public void onMessageIdRecieved(string messageId)
+        {
+            updateChatList();
+        }
+
+        public void onAddChatClicked(object sender, EventArgs e)
+        {
+           // ((App)App.Current).doSearch();
+        }
+
+        public void onMessageSendErr(InfoErr err)
+        {
+
+        }
+
+        public void onMessageRead(string myMessageId, bool isRead)
+        {
+            updateChatList();
+        }
+    }
+}

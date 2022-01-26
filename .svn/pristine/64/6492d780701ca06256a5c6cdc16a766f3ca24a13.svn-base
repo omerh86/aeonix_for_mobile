@@ -1,0 +1,121 @@
+﻿using LinphoneXamarin.Services;
+using System.ComponentModel;
+
+namespace LinphoneXamarin.Entities
+{
+    public class SpeedDial : INotifyPropertyChanged, ISpeedDialAction
+    {
+        public int position { set; get; }
+        private string _label;
+
+        public string Label
+        {
+            get
+            {
+                return _label;
+            }
+            set
+            {
+                _label = value;
+                OnPropertyChanged("Label");
+            }
+        }
+
+        private string _number;
+        public string Number
+        {
+            get
+            {
+                return _number;
+            }
+            set
+            {
+                _number = value;
+                OnPropertyChanged("Number");
+            }
+        }
+
+
+        private SpeedDialType _type;
+        public SpeedDialType Type
+        {
+            get
+            {
+                return _type;
+            }
+            set
+            {
+                _type = value;
+                OnPropertyChanged("Type");
+            }
+        }
+
+        private FeatureButtonStatus _status;
+        public FeatureButtonStatus Status
+        {
+            get
+            {
+                return _status;
+            }
+            set
+            {
+                _status = value;
+                OnPropertyChanged("Status");
+            }
+        }
+
+        public SpeedDial(int pos, SpeedDialType type, string label, string number)
+        {
+            this.Type = type;
+            this.Label = label;
+            this.Number = number;
+            this.position = pos;
+            this.Status = FeatureButtonStatus.Inactive;
+
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged(string nameOfProperty)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameOfProperty));
+        }
+
+        public void onSpeedActionPressed()
+        {
+
+            var isDirectCallType = (Type & (SpeedDialType.Emergency | SpeedDialType.Speedial | SpeedDialType.VM)) != 0;
+
+            if (isDirectCallType)
+            {
+                if (Type == SpeedDialType.VM)
+                {
+                    if (SharedData.Instance.isVMMessagesAllowed)
+                    {
+                        ((App)App.Current).goVMPage();
+                    }
+                    else
+                    {
+                        var VoicMail = ContactService.Instance.VoicMail;
+                        if (VoicMail != null)
+                        {
+                            var cs = CallService.Instance;
+                            cs.isVMPressed = true;
+                            CallService.Instance.callAsync(VoicMail.primaryAlias, this.Label, false, this.Label);
+                        }
+                    }
+                }
+                else
+                {
+                    CallService.Instance.callAsync(this.Number, this.Label, false, this.Label, Type == SpeedDialType.Emergency);
+                }
+
+            }
+            else if (Type == SpeedDialType.Url)
+                AeonixInfoService.Instance.startCollaboration("IDLE", null, null);
+            else
+                AeonixInfoService.Instance.onFeatureButtonAction(position);
+
+        }
+    }
+}

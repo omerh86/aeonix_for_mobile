@@ -1,0 +1,182 @@
+﻿using System;
+using Xamarin.Forms;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System.Collections.Generic;
+using static LinphoneXamarin.Entities.LoginInfo;
+using Xamarin.Forms.Xaml;
+using System.Threading.Tasks;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class Login : ContentPage, LoginRegistrationListener
+    {
+
+        LoginService loginService;
+        private int progress = 0;
+
+        public Login()
+        {
+
+            loginService = LoginService.Instance;
+            InitializeComponent();
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            updateProgressLabel(0);
+
+            load.IsVisible = false;
+            stack_registrar.IsVisible = true;
+            loginService.loginRegistrationListener = this;
+            this.populateLoginFields();
+            versionLbl.Text = "Version: " + SharedData.Instance.TouchVersion;
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            Console.WriteLine("omer40: " + "on logind Disappearing");
+        }
+
+        private void bugReport_Clicked(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(new BugReport());
+        }
+
+        private void populateLoginFields()
+        {
+            LoginInfo loginInfo = loginService.getTr87Cardential();
+
+            if (loginInfo != null)
+            {
+                username.Text = loginInfo.loginName;
+                //  password.Text = loginInfo.password;
+                domain.Text = loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].ip;
+                port.Text = loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].port.ToString();
+                proxy.Text = loginInfo.sipAdresses[loginInfo.favoriteSipAdressIndex].proxyIp;
+            }
+        }
+
+
+
+
+        private void OnRegisterClicked(object sender, EventArgs e)
+        {
+            addLog("OnRegisterClicked");
+            if (validateRegistration())
+            {
+                List<IPInfo> ipInfoList = new List<IPInfo>();
+                if (proxy.Text == null)
+                {
+                    proxy.Text = "";
+                }
+                var i = new IPInfo(domain.Text.Replace(" ", string.Empty),
+                (port.Text != null && port.Text.Length > 0) ? Int32.Parse(port.Text) : 5061,
+                proxy.Text.Replace(" ", string.Empty),
+                (proxyPort.Text != null && proxyPort.Text.Length > 0) ? Int32.Parse(port.Text) : 5061,
+                Linphone.TransportType.Tls);
+                ipInfoList.Add(i);
+
+                LoginInfo loginInfo = new LoginInfo(username.Text.Replace(" ", string.Empty), null, password.Text.Replace(" ", string.Empty), ipInfoList);
+                loginService.saveTr87Cardential(loginInfo);
+                doLogin(RegisterCommands.StartAll);
+            }
+            else
+            {
+                registration_status.Text = MyEnumHelper.Instance.getLoginErrorAsString(LoginError.InvalidCardentials);
+            }
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "LOGIN_PAGE");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        void Handle_TextChanged(object sender, Xamarin.Forms.TextChangedEventArgs e)
+        {
+            if (e.OldTextValue != null && e.NewTextValue != null && e.OldTextValue.Length < e.NewTextValue.Length && e.NewTextValue.Length == 5)
+            {
+                View s = (View)sender;
+                s.Unfocus();
+            }
+
+        }
+
+        private bool validateRegistration()
+        {
+            return username.Text != null &&
+                username.Text.Length > 0 &&
+                password.Text != null &&
+                password.Text.Length > 0 &&
+                domain.Text != null &&
+                domain.Text.Length > 0;
+        }
+
+        private void doLogin(RegisterCommands command)
+        {
+            stack_registrar.IsVisible = false;
+            load.IsVisible = true;
+
+            loginService.register(command);
+        }
+
+
+        private void onCancelLogin(object sender, EventArgs e)
+        {
+            loginService.resetLoginProccesss(LoginError.ForcedStop);
+        }
+
+        public async Task onLoginFailedAsync(LoginError loginError)
+        {
+            MyFileSystem.Instance.saveLoginCardential(null, CardentialState.Aeonix);
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                load.IsVisible = false;
+                stack_registrar.IsVisible = true;
+                updateProgressLabel(0);
+
+                registration_status.Text = MyEnumHelper.Instance.getLoginErrorAsString(loginError);
+                this.populateLoginFields();
+
+            });
+
+        }
+
+        public void onLoginSuccsses()
+        {
+            AeonixInfoService.Instance.subscribetr87();
+            ((App)App.Current).goToNavBar();
+        }
+
+        private void updateProgressLabel(int precent)
+        {
+            if (precent == 0)
+            {
+                progress = precent;
+            }
+            else
+            {
+                progress += precent;
+            }
+            progressLabel.Text = progress.ToString() + " %";
+
+        }
+
+        public void onLoginLevelUp(int precent, MyRegistrationState myRegistrationState)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                updateProgressLabel(precent);
+                progressStateLabel.Text = Util.MyEnumHelper.Instance.getMyRegistrationStateAsString(myRegistrationState);
+            });
+
+        }
+
+
+    }
+}

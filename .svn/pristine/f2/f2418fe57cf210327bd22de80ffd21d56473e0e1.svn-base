@@ -1,0 +1,278 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class CallLogCell : ViewCell
+    {
+        ContactService contactService;
+        CallService callService;
+
+
+        public static readonly BindableProperty ContactInfoCommandProperty =
+  BindableProperty.Create("ContactInfoCommand", typeof(ICommand), typeof(ContactCell), null);
+
+        public ICommand ContactInfoCommand
+        {
+            get { return (ICommand)GetValue(ContactInfoCommandProperty); }
+            set { SetValue(ContactInfoCommandProperty, value); }
+        }
+
+        // Helper method for invoking commands savely
+        public static void Execute(ICommand ContactInfoCommand, string val)
+        {
+            if (ContactInfoCommand == null) return;
+            if (ContactInfoCommand.CanExecute(null))
+            {
+                ContactInfoCommand.Execute(val);
+            }
+        }
+
+        public CallLogCell()
+        {
+            InitializeComponent();
+            contactService = ContactService.Instance;
+            callService = CallService.Instance;
+            favBtn.GestureRecognizers.Add(
+         new TapGestureRecognizer()
+         {
+             Command = new Command(() =>
+             {
+                 onToggleContactFavStatus();
+             })
+         });
+        }
+
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            favBtn.IsVisible = (contactType & (ContactType.Aeonix | ContactType.External | ContactType.Group)) != 0;
+        }
+        
+        public static void Execute(ICommand command, object val)
+        {
+            if (command == null) return;
+            if (command.CanExecute(null))
+            {
+                command.Execute(val);
+            }
+        }
+
+        public static readonly BindableProperty MessageCommandProperty =
+BindableProperty.Create("MessageCommand", typeof(ICommand), typeof(CallLogCell), null);
+        public ICommand MessageCommand
+        {
+            get { return (ICommand)GetValue(MessageCommandProperty); }
+            set { SetValue(MessageCommandProperty, value); }
+        }
+
+
+        public static readonly BindableProperty contactTypeProperty =
+BindableProperty.Create("contactType", typeof(ContactType), typeof(ContactCell), ContactType.Unknown);
+
+        public ContactType contactType
+        {
+            get
+            {
+                ContactType contactType = (ContactType)GetValue(contactTypeProperty);
+                return contactType;
+            }
+            set
+            {
+                SetValue(contactTypeProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty presenceProperty =
+BindableProperty.Create("presence", typeof(Presence), typeof(CallLogCell), Presence.NONE);
+
+        public Presence presence
+        {
+            get
+            {
+                Presence presence = (Presence)GetValue(presenceProperty);
+                return presence;
+            }
+            set
+            {
+                SetValue(presenceProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty hasImageProperty =
+   BindableProperty.Create("hasImage", typeof(bool), typeof(ContactCell), true);
+
+        public bool hasImage
+        {
+            get { return (bool)GetValue(hasImageProperty); }
+            set
+            {
+                SetValue(hasImageProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty isFavProperty =
+BindableProperty.Create("isFav", typeof(bool), typeof(CallLogCell), false);
+
+        public bool isFav
+        {
+            get
+            {
+                bool isFav = (bool)GetValue(isFavProperty);
+                return isFav;
+            }
+            set
+            {
+                SetValue(isFavProperty, value);
+            }
+        }
+
+        public void onMessageClicked(object sender, EventArgs args)
+        {
+            doMessage();
+        }
+
+        private void doMessage()
+        {
+            var s = new string[2] { userName, displayName };
+            Execute(MessageCommand, s);
+        }
+
+        protected override void OnPropertyChanged(string propertyName)
+        {
+            base.OnPropertyChanged(propertyName);
+
+            switch (propertyName)
+            {
+                case nameof(presence):
+                    updatePresenceLabel();
+                    break;
+                case nameof(isFav):
+                    UpdateFavLbl();
+                    break;
+            }
+        }
+
+        private void UpdateFavLbl()
+        {
+            if (isFav)
+                favBtn.TextColor = Color.IndianRed;
+            else
+            {
+                favBtn.TextColor = Color.DimGray;
+            }
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "CalllogCell");
+            Console.WriteLine("omer222: " + message);
+        }
+
+
+        public static readonly BindableProperty imageProperty =
+ BindableProperty.Create("image", typeof(string), typeof(ContactCell), "");
+
+        public ImageSource image
+        {
+            get { return (ImageSource)GetValue(imageProperty); }
+            set
+            {
+                SetValue(imageProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty displayNameProperty =
+       BindableProperty.Create("displayName", typeof(string), typeof(CallLogCell), "aaa");
+
+        public string displayName
+        {
+            get
+            {
+                return (string)GetValue(displayNameProperty);
+            }
+            set
+            {
+                SetValue(displayNameProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty userNameProperty =
+BindableProperty.Create("userName", typeof(string), typeof(CallLogCell), "");
+
+        public string userName
+        {
+
+            get { return (string)GetValue(userNameProperty); }
+            set { SetValue(userNameProperty, value); }
+        }
+
+
+        public static readonly BindableProperty aliasProperty =
+          BindableProperty.Create("alias", typeof(string), typeof(CallLogCell), "");
+
+        public string alias
+        {
+            get { return (string)GetValue(aliasProperty); }
+            set { SetValue(aliasProperty, value); }
+        }
+
+        public void onToggleContactFavStatus()
+        {
+            if (contactType == ContactType.Group)
+                contactService.toggleContactFavStatus(alias.ToString(), true);
+            else
+                contactService.toggleContactFavStatus(userName, false);
+        }
+
+        public void onCallClicked(object sender, EventArgs e)
+        {
+            callService.callAsync(alias.ToString(), userName, false, displayName);
+        }
+
+        private void updatePresenceLabel()
+        {
+            presenceBusyLabel.IsVisible = false;
+            presenceLabel.BorderColor = Color.White;
+            presenceLabel.BorderWidth = 2;
+
+            switch (presence)
+            {
+                case Presence.ONLINE:
+                    presenceLabel.BackgroundColor = Color.LightGreen;
+                    break;
+                case Presence.OFFLINE:
+                    presenceLabel.BackgroundColor = Color.DarkGray;
+                    break;
+                case Presence.BUSY:
+                    presenceBusyLabel.IsVisible = true;
+                    presenceLabel.BackgroundColor = Color.Orange;
+                    break;
+                case Presence.MEETING:
+                    presenceLabel.BackgroundColor = Color.Orange;
+                    break;
+                case Presence.DND:
+                    presenceLabel.BackgroundColor = Color.Red;
+                    break;
+                case Presence.NONE:
+                    presenceLabel.BackgroundColor = Color.Transparent;
+                    presenceLabel.BorderColor = Color.Transparent;
+                    break;
+            }
+        }
+
+    }
+}

@@ -1,0 +1,193 @@
+﻿using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using Plugin.Messaging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class contactDetail : ContentPage, MySearchListener
+    {
+
+        public Contact contact { set; get; }
+        List<PhoneNumber> phoneNumbers { set; get; }
+        public string userName { set; get; }
+        public ICommand CallClickedCommand { get; private set; }
+        public ICommand VideoCallClickedCommand { get; private set; }
+
+        public contactDetail(string userName, Contact contact = null)
+        {
+            InitializeComponent();
+            NavigationPage.SetHasNavigationBar(this, false);
+            try
+            {
+                addLog("contactDetail() " + userName);
+                this.userName = userName;
+                if (contact == null)
+                {
+                    this.contact = ContactService.Instance.getContactByUserName(userName);
+                    if (this.contact == null)
+                    {
+                        this.contact = new Contact("", userName, "", userName, new List<string>(), new List<MySendRequestHelper.ExtNumber>() { new MySendRequestHelper.ExtNumber(userName, "EXTERNAL") }, 0, ContactType.Unknown);
+                        AeonixInfoService.Instance.getContact(this, userName);
+                    }
+                }
+                else
+                {
+                    this.contact = contact;
+                }
+                phoneNumbers = new List<PhoneNumber>();
+                foreach (var i in this.contact.allAliases)
+                    phoneNumbers.Add(new PhoneNumber("INTERNAL", i, true));
+
+                foreach (var e in this.contact.allExternalAliases)
+                    phoneNumbers.Add(new PhoneNumber(e.phoneNumberType == null ? "" : e.phoneNumberType, e.phoneNumber, false));
+
+                phoneNumbers = phoneNumbers
+  .GroupBy(p => p.number)
+  .Select(g => g.First())
+  .ToList();
+
+                CallClickedCommand = new Command<string>(onCallClicked);
+                VideoCallClickedCommand = new Command<string>(onVideoCallClicked);
+                this.BindingContext = this;
+                this.allAliases.BindingContext = phoneNumbers;
+                this.allAliases.ItemsSource = phoneNumbers;
+                this.allAliases.HeightRequest = 60 * phoneNumbers.Count;
+#if WINDOWS_UWP
+                allAliases.VerticalScrollBarVisibility = ScrollBarVisibility.Never;
+#endif
+                onContactUpdated();
+            }
+            catch (Exception err)
+            {
+                addLog(err.ToString());
+            }
+
+        }
+        public void onBackClicked(object sender, EventArgs e)
+        {
+            Navigation.PopAsync();
+        }
+
+        private void onContactUpdated()
+        {
+
+            info_layout.BindingContext = contact;
+            allAliases.IsVisible = phoneNumbers.Count > 0;
+            favBtn.IsVisible = (contact.type & (ContactType.Aeonix | ContactType.External | ContactType.Group)) != 0;
+            messageBtn.IsVisible = contact.type == ContactType.Aeonix;
+            setFavColor();
+
+            emailBtn.IsVisible = contact.email != null && contact.email.Length > 0;
+        }
+
+        private void setFavColor()
+        {
+            favBtn.TextColor = contact.isFav ? Color.IndianRed : Color.White;
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            SharedData.Instance.isOverideBackBtn = false;
+        }
+
+        public void onToggleContactFavStatus(object sender, EventArgs args)
+        {
+            if (contact.type == ContactType.Group)
+                contact.isFav = ContactService.Instance.toggleContactFavStatus(contact.primaryAlias, true);
+            else
+                contact.isFav = ContactService.Instance.toggleContactFavStatus(contact.userName, false);
+
+            setFavColor();
+        }
+
+        public void onMessageClicked(object sender, EventArgs args)
+        {
+            var page = (Page)new Messages(contact.userName, contact.displayName);
+            Navigation.PushAsync(page);
+        }
+
+        public void onEmailpressed(object sender, EventArgs args)
+        {
+#if WINDOWS_UWP
+            Windows.ApplicationModel.Email.EmailMessage emailMessage = new Windows.ApplicationModel.Email.EmailMessage();
+            emailMessage.To.Add(new Windows.ApplicationModel.Email.EmailRecipient(contact.email));
+            Windows.ApplicationModel.Email.EmailManager.ShowComposeNewEmailAsync(emailMessage);
+#else
+            var emailTask = CrossMessaging.Current.EmailMessenger;
+            if (emailTask.CanSendEmail)
+            {
+                var email = new EmailMessageBuilder()
+                         .To(contact.email).Build();
+                emailTask.SendEmail(email);
+            }
+#endif
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "contactDetail");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            SharedData.Instance.isOverideBackBtn = true;
+        }
+
+        public void onCallClicked(string alias)
+        {
+            CallService.Instance.callAsync(alias, contact.userName, false, contact.displayName);
+        }
+
+        public void onVideoCallClicked(string alias)
+        {
+            CallService.Instance.callAsync(alias, contact.userName, true, contact.displayName);
+        }
+
+        public void onSearchResponse(List<Contact> contacts)
+        {
+            if (contacts != null && contacts.Count > 0 && contacts[0] != null)
+            {
+                this.contact = contacts[0];
+                onContactUpdated();
+            }
+        }
+
+        public void onSearchResponse(Contact contact)
+        {
+            if (contact != null)
+            {
+                this.contact = contact;
+                addLog("onSearchResponse(), current user is: " + this.contact.userName);
+                onContactUpdated();
+            }
+        }
+
+        private class PhoneNumber
+        {
+            public string number { get; set; }
+            public string type { get; set; }
+            public bool isVideo { get; set; }
+
+            public PhoneNumber(string type, string number, bool isVideo)
+            {
+                this.type = type;
+                this.number = number;
+                this.isVideo = isVideo;
+            }
+        }
+    }
+}

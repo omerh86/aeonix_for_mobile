@@ -1,0 +1,355 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class ContactCell : ViewCell
+    {
+
+        ContactService contactService;
+
+
+        public static readonly BindableProperty ContactInfoCommandProperty =
+    BindableProperty.Create("ContactInfoCommand", typeof(ICommand), typeof(ContactCell), null);
+
+        public ICommand ContactInfoCommand
+        {
+            get { return (ICommand)GetValue(ContactInfoCommandProperty); }
+            set { SetValue(ContactInfoCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty ActionPressedCommandProperty =
+BindableProperty.Create("ActionPressedCommand", typeof(ICommand), typeof(ContactCell), null);
+        public ICommand ActionPressedCommand
+        {
+            get { return (ICommand)GetValue(ActionPressedCommandProperty); }
+            set { SetValue(ActionPressedCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty MessageCommandProperty =
+ BindableProperty.Create("MessageCommand", typeof(ICommand), typeof(ContactCell), null);
+        public ICommand MessageCommand
+        {
+            get { return (ICommand)GetValue(MessageCommandProperty); }
+            set { SetValue(MessageCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty CallCommandProperty =
+BindableProperty.Create("CallCommand", typeof(ICommand), typeof(ContactCell), null);
+        public ICommand CallCommand
+        {
+            get { return (ICommand)GetValue(CallCommandProperty); }
+            set { SetValue(CallCommandProperty, value); }
+        }
+
+        // Helper method for invoking commands savely
+        public static void Execute(ICommand command, object val)
+        {
+            if (command == null) return;
+            if (command.CanExecute(null))
+            {
+                command.Execute(val);
+            }
+        }
+
+        public ContactCell()
+        {
+            contactService = ContactService.Instance;
+            InitializeComponent();
+            ifavBtn.GestureRecognizers.Add(
+          new TapGestureRecognizer()
+          {
+              Command = new Command(() =>
+              {
+                  onToggleContactFavStatus();
+              })
+          });
+            item.GestureRecognizers.Add(
+         new TapGestureRecognizer()
+         {
+             Command = new Command(() =>
+             {
+                 onInfoClicked();
+             })
+         });
+
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            ifavBtn.IsVisible = (contactType & (ContactType.Aeonix | ContactType.External | ContactType.Group)) != 0;
+            //  iinfoBtn.IsVisible = contactType != ContactType.Group;
+            imessageBtn.IsVisible = contactType == ContactType.Aeonix;
+            ivideoCallBtn.IsVisible = contactType == ContactType.Aeonix;
+            icollaborationBtn.IsVisible = contactType == ContactType.Aeonix && SharedData.Instance.isCollaborateAllowed;
+            descriptionLbl.IsVisible = contactType == ContactType.Group;
+            descriptionLbl.Text = description;
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            RemoveBinding(ContactInfoCommandProperty);
+            RemoveBinding(ActionPressedCommandProperty);
+            RemoveBinding(MessageCommandProperty);
+            RemoveBinding(CallCommandProperty);
+            RemoveBinding(displayNameProperty);
+            RemoveBinding(contactTypeProperty);
+            // RemoveBinding(presenceProperty);
+            // RemoveBinding(isFavProperty);
+            RemoveBinding(imageProperty);
+            RemoveBinding(displayNameProperty);
+            RemoveBinding(primaryAliasProperty);
+
+        }
+
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "ContactCell");
+            Console.WriteLine("omer222: " + message);
+        }
+
+        public static readonly BindableProperty contactTypeProperty =
+BindableProperty.Create("contactType", typeof(ContactType), typeof(ContactCell), ContactType.Unknown);
+
+        public ContactType contactType
+        {
+            get
+            {
+                ContactType contactType = (ContactType)GetValue(contactTypeProperty);
+                return contactType;
+            }
+            set
+            {
+                SetValue(contactTypeProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty presenceProperty =
+BindableProperty.Create("presence", typeof(Presence), typeof(ContactCell), Presence.NONE);
+
+        public Presence presence
+        {
+            get
+            {
+                Presence presence = (Presence)GetValue(presenceProperty);
+                return presence;
+            }
+            set
+            {
+                SetValue(presenceProperty, value);
+
+            }
+        }
+
+
+        public static readonly BindableProperty isFavProperty =
+BindableProperty.Create("isFav", typeof(bool), typeof(ContactCell), false);
+
+        public bool isFav
+        {
+            get
+            {
+                bool isFav = (bool)GetValue(isFavProperty);
+                return isFav;
+            }
+            set
+            {
+                SetValue(isFavProperty, value);
+
+            }
+        }
+
+        public static readonly BindableProperty actionTypeProperty =
+BindableProperty.Create("actionType", typeof(ContactCellAction), typeof(ContactCell), ContactCellAction.Default);
+
+        public ContactCellAction actionType
+        {
+            get
+            {
+                ContactCellAction actionType = (ContactCellAction)GetValue(actionTypeProperty);
+                return actionType;
+            }
+            set
+            {
+                SetValue(actionTypeProperty, value);
+
+            }
+        }
+
+        protected override void OnPropertyChanged(string propertyName)
+        {
+            base.OnPropertyChanged(propertyName);
+            switch (propertyName)
+            {
+                case nameof(presence):
+                    updatePresenceLabel();
+                    break;
+
+            }
+        }
+
+        private void updatePresenceLabel()
+        {
+
+            presenceBusyLabel.IsVisible = false;
+            presenceLabel.BorderColor = Color.White;
+            presenceLabel.BorderWidth = 2;
+            switch (presence)
+            {
+                case Presence.ONLINE:
+                    presenceLabel.BackgroundColor = Color.LightGreen;
+                    break;
+                case Presence.OFFLINE:
+                    presenceLabel.BackgroundColor = Color.DarkGray;
+                    break;
+                case Presence.BUSY:
+                    presenceBusyLabel.IsVisible = true;
+                    presenceLabel.BackgroundColor = Color.Orange;
+                    break;
+                case Presence.MEETING:
+                    presenceLabel.BackgroundColor = Color.Orange;
+                    break;
+                case Presence.DND:
+                    presenceLabel.BackgroundColor = Color.Red;
+                    break;
+                case Presence.NONE:
+                    presenceLabel.BackgroundColor = Color.Transparent;
+                    presenceLabel.BorderColor = Color.Transparent;
+                    break;
+            }
+        }
+
+
+        public static readonly BindableProperty imageProperty =
+    BindableProperty.Create("image", typeof(string), typeof(ContactCell), "");
+
+        public ImageSource image
+        {
+            get { return (ImageSource)GetValue(imageProperty); }
+            set
+            {
+                SetValue(imageProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty hasImageProperty =
+   BindableProperty.Create("hasImage", typeof(bool), typeof(ContactCell), true);
+
+        public bool hasImage
+        {
+            get { return (bool)GetValue(hasImageProperty); }
+            set
+            {
+                SetValue(hasImageProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty displayNameProperty =
+       BindableProperty.Create("displayName", typeof(string), typeof(ContactCell), "");
+
+        public string displayName
+        {
+            get { return (string)GetValue(displayNameProperty); }
+            set
+            {
+                SetValue(displayNameProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty descriptionProperty =
+      BindableProperty.Create("description", typeof(string), typeof(ContactCell), "");
+
+        public string description
+        {
+            get { return (string)GetValue(descriptionProperty); }
+            set
+            {
+                SetValue(descriptionProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty userNameProperty =
+BindableProperty.Create("userName", typeof(string), typeof(ContactCell), "");
+
+        public string userName
+        {
+            get { return (string)GetValue(userNameProperty); }
+            set { SetValue(userNameProperty, value); }
+        }
+
+
+        public static readonly BindableProperty primaryAliasProperty =
+          BindableProperty.Create("primaryAlias", typeof(string), typeof(ContactCell), "aaa");
+
+        public string primaryAlias
+        {
+            get { return (string)GetValue(primaryAliasProperty); }
+            set { SetValue(primaryAliasProperty, value); }
+        }
+
+        public void onToggleContactFavStatus()
+        {
+            if (contactType == ContactType.Group)
+                this.isFav = contactService.toggleContactFavStatus(primaryAlias, true);
+            else
+                this.isFav = contactService.toggleContactFavStatus(userName, false);
+        }
+
+
+
+        public void onVideoCallClicked(object sender, EventArgs e)
+        {
+            doCall(true);
+        }
+
+        public void onCallClicked(object sender, EventArgs e)
+        {
+
+            doCall(false);
+        }
+
+        private void doCall(bool isVideo)
+        {
+            var s = new string[4] { primaryAlias.ToString(), userName, isVideo.ToString(), displayName };
+            Execute(CallCommand, s);
+            Execute(ActionPressedCommand, null);
+        }
+
+        public void onInfoClicked()
+        {
+            Execute(ContactInfoCommand, userName);
+            Execute(ActionPressedCommand, null);
+        }
+
+        public void onCollaborationClicked(object sender, EventArgs e)
+        {
+            AeonixInfoService.Instance.startCollaboration("PARTNER", userName, null);
+        }
+
+        public void onMessageClicked(object sender, EventArgs e)
+        {
+            var s = new string[2] { userName, displayName };
+            Execute(MessageCommand, s);
+            Execute(ActionPressedCommand, null);
+        }
+
+
+    }
+
+}

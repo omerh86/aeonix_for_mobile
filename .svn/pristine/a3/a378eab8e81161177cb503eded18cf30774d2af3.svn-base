@@ -1,0 +1,104 @@
+﻿using System;
+using LinphoneXamarin.Entities;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Linphone;
+using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
+using LinphoneXamarin.Util;
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class CallLogService
+    {
+        public int missedCallcounter { set; get; }
+
+        public List<MyCallLog> allCallsLog { set; get; }
+        private static CallLogService instance = null;
+        private static readonly object padlock = new object();
+
+        public IMissedCounterListener missedCounterListener { set; get; }
+        public IMissedCounterListener missedCounterListener2 { set; get; }
+        public List<IMissedCounterListener> featureMissedCounterListeners { set; get; }
+
+        CallLogService()
+        {
+            missedCallcounter = 0;
+            allCallsLog = new List<MyCallLog>();
+            featureMissedCounterListeners = new List<IMissedCounterListener>();
+        }
+
+
+        public static CallLogService Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new CallLogService();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+
+        public void setMissedCounter(int counter)
+        {
+            addLog("setMissedCounter, counter is:  " + counter);
+            missedCallcounter = counter;
+            if (missedCounterListener != null)
+            {
+                missedCounterListener.onCallCounterchanged(counter);
+            }
+            if (missedCounterListener2 != null)
+            {
+                missedCounterListener2.onCallCounterchanged(counter);
+            }
+#if WINDOWS_UWP
+            if (counter > 0)
+                AlertHelper.Instance.updateCallLogBadge(counter.ToString());
+            else
+                AlertHelper.Instance.updatePresenceBadge();
+#endif
+           
+        }
+
+        public void setVMCounter(int counter)
+        {
+            addLog("setVMCounter, counter is:  " + counter);
+            addLog("featureMissedCounterListeners count is " + featureMissedCounterListeners.Count);
+            if (missedCounterListener != null)
+            {
+                missedCounterListener.onVMCounterChanged(counter);
+            }
+           
+            foreach (var i in featureMissedCounterListeners)
+            {
+                i.onVMCounterChanged(counter);
+            }
+
+        }
+
+        public void clearCallLogs()
+        {
+            allCallsLog.Clear();
+        }
+
+
+
+        public void addCallLogs(Contact c, string id, string alias, List<CallInfo> callsInfo)
+        {
+            allCallsLog.Add(new MyCallLog(id, alias, callsInfo, c));
+        }
+
+        private void addLog(string message)
+        {
+            Console.WriteLine("omer3232: " + message);
+            MyFileSystem.Instance.writeDebug(message, "calllog_service");
+        }
+
+    }
+}

@@ -1,0 +1,229 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class speedDialEditorPage : ContentPage
+    {
+        public SpeedDial OrigSpeedDial { set; get; }
+        public SpeedDial tempSpeedDial { set; get; }
+        public List<SpeedDialType> typeList { set; get; }
+        public List<SpeedDialType> typeListAcc { set; get; }
+
+        private DialSpeedService dialSpeedService;
+
+        public speedDialEditorPage(SpeedDial speedDial = null)
+        {
+            InitializeComponent();
+            dialSpeedService = DialSpeedService.Instance;
+            this.OrigSpeedDial = speedDial;
+            if (OrigSpeedDial == null)
+                tempSpeedDial = new SpeedDial(dialSpeedService.getSpeedDialDefaultPosition(), SpeedDialType.Speedial, "", "");
+            else
+            {
+                tempSpeedDial = new SpeedDial(OrigSpeedDial.position, OrigSpeedDial.Type, OrigSpeedDial.Label, OrigSpeedDial.Number);
+                deleteBtn.IsVisible = true;
+            }
+
+            typeList = new List<SpeedDialType>();
+            typeList.Add(SpeedDialType.Speedial);
+            if (ContactService.Instance.VoicMail != null)
+                typeList.Add(SpeedDialType.VM);
+
+            typeList.Add(SpeedDialType.Rod);
+            typeList.Add(SpeedDialType.Emergency);
+            if (SharedData.Instance.isCollaborateAllowed)
+                typeList.Add(SpeedDialType.Url);
+
+            // typeList.Add(SpeedDialType.GroupPickup);
+            typeList.Add(SpeedDialType.Acc);
+
+            typeListAcc = new List<SpeedDialType>();
+            typeListAcc.Add(SpeedDialType.Acc_EndWrapUP);
+            typeListAcc.Add(SpeedDialType.Acc_ExtendWrapUp);
+            typeListAcc.Add(SpeedDialType.Acc_GroupLog);
+            typeListAcc.Add(SpeedDialType.Acc_GroupQInfo);
+            typeListAcc.Add(SpeedDialType.Acc_LogPrimaryGroup);
+            typeListAcc.Add(SpeedDialType.Acc_Release_Resume);
+            typeListAcc.Add(SpeedDialType.Acc_Release_ResumeWithCode);
+            typeListAcc.Add(SpeedDialType.Acc_WrapUpWithcode);
+
+            typePicker.ItemsSource = typeList;
+            typePickerAcc.ItemsSource = typeListAcc;
+
+            NumberVisiblityHandler(tempSpeedDial.Type);
+            subTypeVisiblityHandler(tempSpeedDial.Type);
+            if (subTypeLayout.IsVisible)
+            {
+                var tempType = tempSpeedDial.Type;
+                typePicker.SelectedItem = SpeedDialType.Acc;
+                typePickerAcc.SelectedItem = tempType;
+            }
+            else
+            {
+                typePicker.SelectedItem = tempSpeedDial.Type;
+            }
+
+            lbl.BindingContext = tempSpeedDial;
+            numberLayout.BindingContext = tempSpeedDial;
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+        }
+
+        private void addLog(string s)
+        {
+            Console.WriteLine($"omer56: {s}");
+            MyFileSystem.Instance.writeDebug(s, "speedDialEditorPage");
+        }
+
+        private void onTypeSelected(object sender, EventArgs e)
+        {
+            var picker = sender as Picker;
+            SpeedDialType speedDialType = (SpeedDialType)picker.SelectedItem;
+            tempSpeedDial.Type = speedDialType;
+            subTypeVisiblityHandler(speedDialType);
+            onTypedChanged(speedDialType);
+        }
+        private void onTypeSelectedAcc(object sender, EventArgs e)
+        {
+            var picker = sender as Picker;
+            SpeedDialType speedDialType = (SpeedDialType)picker.SelectedItem;
+            tempSpeedDial.Type = speedDialType;
+            onTypedChanged(speedDialType);
+        }
+
+        private void onTypedChanged(SpeedDialType speedDialType)
+        {
+            NumberVisiblityHandler(speedDialType);
+            // tempSpeedDial.Label = "";
+            // tempSpeedDial.Number = "";
+        }
+
+        private void NumberVisiblityHandler(SpeedDialType speedDialType)
+        {
+            var hasNumber = SpeedDialType.Acc_GroupQInfo |
+                SpeedDialType.Acc_WrapUpWithcode |
+                SpeedDialType.Acc_Release_ResumeWithCode |
+                SpeedDialType.Acc_GroupLog |
+                SpeedDialType.Speedial |
+               SpeedDialType.Emergency |
+                SpeedDialType.PageQ;
+            numberLayout.IsVisible = ((speedDialType & hasNumber) != 0);
+            if (numberLayout.IsVisible)
+            {
+                switch (speedDialType)
+                {
+                    case SpeedDialType.Acc_GroupQInfo:
+                    case SpeedDialType.Acc_GroupLog:
+                        numberLbl.Text = (string)Application.Current.Resources["groupNumber"];
+                        break;
+                    case SpeedDialType.Acc_WrapUpWithcode:
+                    case SpeedDialType.Acc_Release_ResumeWithCode:
+                        numberLbl.Text = (string)Application.Current.Resources["code"];
+                        break;
+                    default:
+                        numberLbl.Text = (string)Application.Current.Resources["number"];
+                        break;
+                }
+
+            }
+        }
+
+        private void subTypeVisiblityHandler(SpeedDialType speedDialType)
+        {
+            var hasSubType = SpeedDialType.Acc |
+                SpeedDialType.Acc_EndWrapUP |
+                SpeedDialType.Acc_ExtendWrapUp |
+                SpeedDialType.Acc_GroupLog |
+                SpeedDialType.Acc_GroupQInfo |
+                SpeedDialType.Acc_LogPrimaryGroup |
+                SpeedDialType.Acc_Release_Resume |
+                SpeedDialType.Acc_Release_ResumeWithCode |
+                SpeedDialType.Acc_WrapUpWithcode;
+
+            var s = speedDialType.HasFlag(hasSubType);
+            subTypeLayout.IsVisible = ((speedDialType & hasSubType) != 0);
+        }
+
+        public void onSaveClicked(object sender, EventArgs e)
+        {
+
+            if (OrigSpeedDial == null && tempSpeedDial.position == -1)
+            {
+                ErrLbl.Text = (string)Application.Current.Resources["maximum_capacity"];
+                ErrLbl.IsVisible = true;
+                return;
+            }
+
+            if (tempSpeedDial.Type == SpeedDialType.Acc)
+            {
+                ErrLbl.Text = (string)Application.Current.Resources["select_sub_type"];
+                ErrLbl.IsVisible = true;
+                return;
+            }
+            if (numberLayout.IsVisible && (tempSpeedDial.Number == null || tempSpeedDial.Number.Equals("")))
+            {
+                ErrLbl.Text = $"{(string)Application.Current.Resources["please_add"]} {numberLbl.Text}";
+                ErrLbl.IsVisible = true;
+                return;
+            }
+            if (!numberLayout.IsVisible)
+                tempSpeedDial.Number = "";
+
+            if (tempSpeedDial.Label == "")
+            {
+                var speedDialTextConverter = new SpeedDialTextConverter();
+                tempSpeedDial.Label = $"{(string)speedDialTextConverter.Convert(tempSpeedDial.Type, null, null, null)} {tempSpeedDial.Number}";
+            }
+
+            dialSpeedService.setSpeedDial(tempSpeedDial);
+
+            dialSpeedService.uploadGrid();
+            Navigation.PopAsync(false);
+        }
+
+        public void onCancelClicked(object sender, EventArgs e)
+        {
+            Navigation.PopAsync(false);
+        }
+        public void onDeleteClicked(object sender, EventArgs e)
+        {
+            alertDeleteMessage();
+            //dialSpeedService.removeSpeedDial(OrigSpeedDial);
+            //dialSpeedService.uploadGrid();
+            //Navigation.PopToRootAsync(false);
+        }
+
+        async void alertDeleteMessage()
+        {
+
+            bool answer = await DisplayAlert("", (string)Application.Current.Resources["want_to_delete"], (string)Application.Current.Resources["yes"], (string)Application.Current.Resources["no"]);
+            addLog("alertDeleteMessage: " + answer);
+            if (answer)
+            {
+                dialSpeedService.removeSpeedDial(OrigSpeedDial);
+                dialSpeedService.uploadGrid();
+                Navigation.PopAsync(false);
+            }
+        }
+    }
+}

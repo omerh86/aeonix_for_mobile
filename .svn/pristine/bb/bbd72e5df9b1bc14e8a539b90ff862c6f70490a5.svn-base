@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.userControllers.FavotireComponent"
+             xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers">
+    <ContentView.Content>
+        <StackLayout>
+            <Frame BackgroundColor="White" Padding="7"  CornerRadius="10">
+                <StackLayout>
+                    <Label Text="Favorites" HorizontalOptions="FillAndExpand" FontSize="Medium" TextColor="Black" FontAttributes="Bold"></Label>
+                    <ListView  VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" IsPullToRefreshEnabled="True" 
+        RefreshCommand="{x:Binding RefreshCommand}"
+        IsRefreshing="{x:Binding IsRefreshing}"
+        HasUnevenRows="True"
+        SeparatorVisibility="None"
+     x:Name="favList" >
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <control:ContactCell  contactType="{x:Binding type}" 
+                                          MessageCommand="{x:Binding Source={x:Reference favList} , Path=BindingContext.MessageCommand}" 
+                                          ContactInfoCommand="{x:Binding Source={x:Reference favList} , Path=BindingContext.ContactinfoCommand}"
+                                          CallCommand="{x:Binding Source={x:Reference favList} , Path=BindingContext.CallCommand}"
+                                          image="{x:Binding image}"  isFav="{x:Binding isFav}" userName="{x:Binding userName}"
+                                          displayName="{x:Binding displayName}" primaryAlias="{x:Binding primaryAlias}" 
+                                          presence="{x:Binding presenceStatus}" />
+
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+
+                    </ListView>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

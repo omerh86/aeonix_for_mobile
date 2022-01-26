@@ -1,0 +1,663 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+
+using System.Threading.Tasks;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+#if __IOS__
+using LinphoneXamarin.MyCallKit;
+#elif WINDOWS_UWP
+using Windows.Media.Render;
+using Windows.Media.Audio;
+#endif 
+
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class Settings : ContentPage, SubscribeEventListener, IExternalContactSyncListener
+    {
+        public MySettings settings { set; get; }
+        List<string> langList;
+        List<string> ringList;
+        float micGainVal;
+        int iterationVal;
+        private double syncProgressVal;
+
+#if WINDOWS_UWP
+        List<string> ringDeviceList;
+        List<string> inAcallDeviceList;
+        List<string> MicDeviceList;
+        List<string> VideoDeviceList;
+
+        List<HotKey> HotkeyList;
+        List<HotKey> HotkeyList2;
+        AudioGraph audioGraph;
+        AudioDeviceInputNode deviceInputNode;
+        AudioDeviceOutputNode deviceOutputNode;
+#endif
+
+        public Settings()
+        {
+            InitializeComponent();
+            try
+            {
+#if WINDOWS_UWP
+                if (LoginService.Instance.registrationProcess.CurrentState != MyRegistrationState.AfterAeonix)
+                    localControlBtn.IsVisible = false;
+#endif
+                settings = MyFileSystem.Instance.loadSettings();
+                langList = new List<string>();
+                langList.Add(Language.ENGLISH.ToString());
+                langList.Add(Language.HEBREW.ToString());
+                langList.Add(Language.SPANISH.ToString());
+                langList.Add(Language.PORTUGUESE.ToString());
+                langList.Add(Language.CHINESE.ToString());
+                langPicker.ItemsSource = langList;
+                switch (settings.lang)
+                {
+                    case Language.ENGLISH:
+                        langPicker.SelectedIndex = 0;
+                        break;
+                    case Language.HEBREW:
+                        langPicker.SelectedIndex = 1;
+                        break;
+                    case Language.SPANISH:
+                        langPicker.SelectedIndex = 2;
+                        break;
+                    case Language.PORTUGUESE:
+                        langPicker.SelectedIndex = 3;
+                        break;
+                    case Language.CHINESE:
+                        langPicker.SelectedIndex = 4;
+                        break;
+                }
+
+                ringList = new List<string>();
+                for (int i = 1; i < 10; i++)
+                {
+                    ringList.Add($"ring{i}");
+                }
+                ringPicker.ItemsSource = ringList;
+                ringPicker.SelectedIndex = Int32.Parse(settings.ringFile.Substring(4, 1)) - 1;
+                var vm = ContactService.Instance.VoicMail;
+                if (vm != null)
+                {
+                    vmLayout.IsVisible = true;
+                    vmPassword.Text = settings.voiceMailPassword;
+                }
+                micGainVal = LinphoneBase.Instance.linphoneCore.MicGainDb;
+                micGainLbl.Text = (micGainVal / 3).ToString();
+                var credentials = MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix);
+                messageVibrateSwitch.IsToggled = settings.isMessageVibrate;
+                ringVibrateSwitch.IsToggled = settings.isRingVibrate;
+                ringSwitch.IsToggled = settings.isRingSound;
+                messageSwitch.IsToggled = settings.isMessageSound;
+                actionFeaturesSwitch.IsToggled = settings.isActionComponentVisble;
+
+                try
+                {
+                    var s = credentials.aeonixVersion.Split(".");
+                    double major = Double.Parse(s[0]);
+                    double minor = Double.Parse(s[1]);
+                    addLog($"aeonix version: major is {major}, minor is {minor}");
+                    if (major > 6 || (major == 6 && minor > 2))
+                    {
+                        syncContactsLayout.IsVisible = true;
+                        syncContacts.IsToggled = settings.IsSyncContacts;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    addLog(e.ToString());
+                }
+
+#if WINDOWS_UWP
+                uwpSettings.IsVisible = true;
+                populateMediaDevice(settings.micDevice, settings.inAcallDevice, settings.ringDevice, settings.videoDevice);
+                initHotKeys();
+#endif
+            }
+            catch (Exception e)
+            {
+                addLog(e.ToString());
+            }
+
+
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            SharedData.Instance.isOverideBackBtn = false;
+            AeonixInfoService.Instance.externalContactSyncListener = this;
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            SharedData.Instance.isOverideBackBtn = true;
+            AeonixInfoService.Instance.externalContactSyncListener = null;
+        }
+
+        void Handle_PasswordChanged(object sender, TextChangedEventArgs e)
+        {
+            settings.voiceMailPassword = e.NewTextValue;
+            MyFileSystem.Instance.saveSettings(settings);
+        }
+
+        void Handle_TappedViewPassword(object sender, EventArgs e)
+        {
+            vmPassword.IsPassword = !vmPassword.IsPassword;
+        }
+
+        void onGainMicUp(object sender, EventArgs e)
+        {
+            if (micGainVal < 9)
+            {
+                micGainVal = micGainVal + 3;
+                setMicGain();
+            }
+        }
+
+        private void setMicGain()
+        {
+
+            LinphoneBase.Instance.linphoneCore.MicGainDb = micGainVal;
+            micGainLbl.Text = (micGainVal / 3).ToString();
+            settings.micGain = micGainVal;
+            MyFileSystem.Instance.saveSettings(settings);
+            addLog("mic Gain level is: " + micGainVal);
+        }
+
+        void onGainMicDown(object sender, EventArgs e)
+        {
+            //try
+            //{
+            //    AeonixInfoRepository.Instance.subscribeTr87(AeonixInfoService.Instance);
+            //}
+            //catch (Exception err)
+            //{
+            //    addLog("err: " + err);
+            //}
+            if (micGainVal > 0)
+            {
+                micGainVal = micGainVal - 3;
+                micGainLbl.Text = micGainVal.ToString();
+                setMicGain();
+            }
+        }
+#if WINDOWS_UWP
+
+        private void initHotKeys()
+        {
+            HotkeyList = new List<HotKey>();
+            HotkeyList.Add(HotKey.None);
+            HotkeyList.Add(HotKey.AltQ);
+            HotkeyList.Add(HotKey.AltW);
+            HotkeyList.Add(HotKey.Altf7);
+            HotkeyList.Add(HotKey.AltlT);
+            HotkeyList.Add(HotKey.AltlR);
+            HotkeyList.Add(HotKey.AltlE);
+
+            HotkeyList2 = new List<HotKey>();
+            HotkeyList2.Add(HotKey.None);
+            HotkeyList2.Add(HotKey.Ctrlf7);
+            HotkeyList2.Add(HotKey.CtrlQ);
+            HotkeyList2.Add(HotKey.CtrlW);
+            HotkeyList2.Add(HotKey.CtrlE);
+            HotkeyList2.Add(HotKey.CtrlR);
+            HotkeyList2.Add(HotKey.CtrlT);
+            answerPicker.ItemsSource = HotkeyList;
+            answerPicker.SelectedItem = settings.answerKey;
+            endPicker.ItemsSource = HotkeyList;
+            endPicker.SelectedItem = settings.endKey;
+            callPicker.ItemsSource = HotkeyList2;
+            callPicker.SelectedItem = settings.callKey;
+        }
+
+
+
+        private void populateMediaDevice(string currentMicDevice, string currentinAcallDevice, string currentRingDevice, string currentVideoDevice)
+        {
+
+            ringDeviceList = new List<string>();
+            ringDeviceList.Add((string)Application.Current.Resources["default"]);
+
+            inAcallDeviceList = new List<string>();
+            inAcallDeviceList.Add((string)Application.Current.Resources["default"]);
+
+            MicDeviceList = new List<string>();
+            MicDeviceList.Add((string)Application.Current.Resources["default"]);
+
+            VideoDeviceList = new List<string>();
+            VideoDeviceList.Add((string)Application.Current.Resources["default"]);
+
+            var videoDevices = LinphoneBase.Instance.linphoneCore.VideoDevices;
+            foreach (var vd in videoDevices)
+            {
+                VideoDeviceList.Add(vd);
+            }
+            videoDevicePicker.ItemsSource = VideoDeviceList;
+
+            var devices = LinphoneBase.Instance.linphoneCore.SoundDevices;
+            foreach (var d in devices)
+            {
+                if (LinphoneBase.Instance.linphoneCore.SoundDeviceCanCapture(d))
+                {
+                    MicDeviceList.Add(d);
+                }
+                else if (LinphoneBase.Instance.linphoneCore.SoundDeviceCanPlayback(d))
+                {
+                    inAcallDeviceList.Add(d);
+                    ringDeviceList.Add(d);
+                }
+
+            }
+
+            micDevicePicker.ItemsSource = MicDeviceList;
+            ringDevicePicker.ItemsSource = ringDeviceList;
+            inACallDevicePicker.ItemsSource = inAcallDeviceList;
+
+            micDevicePicker.SelectedIndex = 0;
+            foreach (var a in MicDeviceList)
+            {
+                if (currentMicDevice.Equals(a))
+                {
+                    micDevicePicker.SelectedItem = a;
+                }
+
+            }
+            addLog("currentRingDevice: " + currentRingDevice);
+            ringDevicePicker.SelectedIndex = 0;
+            foreach (var b in ringDeviceList)
+            {
+                if (currentRingDevice.Equals(b))
+                {
+                    ringDevicePicker.SelectedItem = b;
+                }
+
+            }
+            inACallDevicePicker.SelectedIndex = 0;
+            foreach (var c in inAcallDeviceList)
+            {
+                if (currentinAcallDevice.Equals(c))
+                {
+                    inACallDevicePicker.SelectedItem = c;
+                }
+
+            }
+
+            videoDevicePicker.SelectedIndex = 0;
+            foreach (var d in VideoDeviceList)
+            {
+                if (currentVideoDevice.Equals(d))
+                {
+                    videoDevicePicker.SelectedItem = d;
+                }
+
+            }
+        }
+
+        private void OnAnswerKeySelected(object sender, EventArgs e)
+        {
+            var picker = sender as Picker;
+            addLog("OnAnswerKeySelected: " + picker.SelectedItem.ToString());
+            var selected = (HotKey)picker.SelectedItem;
+            if (selected.Equals(settings.answerKey))
+            {
+                //do nothing
+            }
+            else if (selected.Equals(settings.endKey) && selected != HotKey.None)
+            {
+                //this is invalid selection
+                picker.SelectedItem = settings.answerKey;
+                displayInvalidSelection();
+            }
+            else
+            {
+                settings.answerKey = selected;
+                MyFileSystem.Instance.saveSettings(settings);
+                infoAlert();
+            }
+        }
+
+        private void OnEndKeySelected(object sender, EventArgs e)
+        {
+            var picker = sender as Picker;
+            addLog("OnEndKeySelected: " + picker.SelectedItem.ToString());
+            var selected = (HotKey)picker.SelectedItem;
+            if (selected.Equals(settings.endKey))
+            {
+                //do nothing
+            }
+            else if (selected.Equals(settings.answerKey) && selected != HotKey.None)
+            {
+                //this is invalid selection
+                picker.SelectedItem = settings.endKey;
+                displayInvalidSelection();
+
+            }
+            else
+            {
+                settings.endKey = selected;
+                MyFileSystem.Instance.saveSettings(settings);
+                infoAlert();
+            }
+
+        }
+
+        private void OnCallKeySelected(object sender, EventArgs e)
+        {
+            var picker = sender as Picker;
+            addLog("OnCallKeySelected: " + picker.SelectedItem.ToString());
+            var selected = (HotKey)picker.SelectedItem;
+            if (!selected.Equals(settings.callKey))
+            {
+                settings.callKey = selected;
+                MyFileSystem.Instance.saveSettings(settings);
+                infoAlert();
+            }
+        }
+
+        private void displayInvalidSelection()
+        {
+            DisplayAlert("", (string)Application.Current.Resources["invalidSelection"], (string)Application.Current.Resources["cancel"]);
+        }
+
+        private void onMicSelected(object sender, EventArgs e)
+        {
+            try
+            {
+                var picker = sender as Picker;
+                LinphoneBase.Instance.linphoneCore.CaptureDevice = picker.SelectedItem.ToString();
+                addLog("onMicSelected: " + picker.SelectedItem.ToString());
+
+                settings.micDevice = picker.SelectedItem.ToString();
+                MyFileSystem.Instance.saveSettings(settings);
+            }
+            catch (Exception err)
+            {
+                addLog(err.ToString());
+            }
+        }
+
+        private void onRingDeviceSelected(object sender, EventArgs e)
+        {
+            try
+            {
+                var picker = sender as Picker;
+                LinphoneBase.Instance.linphoneCore.RingerDevice = picker.SelectedItem.ToString();
+                addLog("RingerDeviceid: " + picker.SelectedItem.ToString());
+
+                settings.ringDevice = picker.SelectedItem.ToString();
+                MyFileSystem.Instance.saveSettings(settings);
+            }
+            catch (Exception err)
+            {
+                addLog(err.ToString());
+            }
+        }
+
+        private void OnInACallDeviceSelected(object sender, EventArgs e)
+        {
+
+            var picker = sender as Picker;
+            LinphoneBase.Instance.linphoneCore.PlaybackDevice = picker.SelectedItem.ToString();
+            addLog("InACallDeviceid: " + picker.SelectedItem.ToString());
+
+            settings.inAcallDevice = picker.SelectedItem.ToString();
+            MyFileSystem.Instance.saveSettings(settings);
+
+        }
+
+        private void OnVideoDeviceSelected(object sender, EventArgs e)
+        {
+            try
+            {
+                var picker = sender as Picker;
+                LinphoneBase.Instance.linphoneCore.VideoDevice = picker.SelectedItem.ToString();
+                addLog("videoDevice: " + picker.SelectedItem.ToString());
+
+                settings.videoDevice = picker.SelectedItem.ToString();
+                MyFileSystem.Instance.saveSettings(settings);
+            }
+            catch (Exception err)
+            {
+                addLog(err.ToString());
+            }
+
+        }
+
+#endif
+
+        private void onPickerSelected(object sender, EventArgs e)
+        {
+            var picker = sender as Picker;
+            if (!picker.SelectedItem.Equals(settings.lang.ToString()))
+            {
+                switch (picker.SelectedIndex)
+                {
+                    case 0:
+                        settings.lang = Language.ENGLISH;
+                        break;
+                    case 1:
+                        settings.lang = Language.HEBREW;
+                        break;
+                    case 2:
+                        settings.lang = Language.SPANISH;
+                        break;
+                    case 3:
+                        settings.lang = Language.PORTUGUESE;
+                        break;
+                    case 4:
+                        settings.lang = Language.CHINESE;
+                        break;
+                }
+                settings.loadlangResources();
+                MyFileSystem.Instance.saveSettings(settings);
+                infoAlert();
+            }
+
+        }
+
+        private void onRingPickerSelected(object sender, EventArgs e)
+        {
+            var picker = sender as Picker;
+            if (settings.ringFile.ToString().ToLower().IndexOf(picker.SelectedItem.ToString().ToLower()) == -1)
+            {
+                settings.ringFile = $"ring{picker.SelectedIndex + 1}.wav";
+
+                Console.WriteLine("omer566 settings ring has changed: " + settings.ringFile);
+                MyAudioManager.Instance.playFile(settings.ringFile);
+            }
+
+            MyFileSystem.Instance.saveSettings(settings);
+            doSetRing();
+        }
+
+        void onRingToggled(object sender, ToggledEventArgs e)
+        {
+            if (settings.isRingSound != e.Value)
+            {
+                addLog("onRingToggled");
+                settings.isRingSound = e.Value;
+                MyFileSystem.Instance.saveSettings(settings);
+                doSetRing();
+            }
+        }
+
+        private void doSetRing()
+        {
+#if ANDROID
+            var x = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity as RingListener;
+            x.onRingSoundToggled(settings.isRingSound);
+#endif
+#if __IOS__
+            ProviderDelegate.Instance.Provider.Configuration.RingtoneSound = settings.ringFile;    
+#endif
+#if WINDOWS_UWP
+
+            if (settings.isRingSound)
+            {
+                LinphoneBase.Instance.linphoneCore.Ring = "Assets/" + settings.ringFile;
+            }
+            else
+            {
+                LinphoneBase.Instance.linphoneCore.Ring = null;
+            }
+#endif
+        }
+        void onMessageToggled(object sender, ToggledEventArgs e)
+        {
+            if (settings.isMessageSound != e.Value)
+            {
+                addLog("onMessageToggled");
+                settings.isMessageSound = e.Value;
+                MyFileSystem.Instance.saveSettings(settings);
+            }
+        }
+
+        void onActionFeaturesToggled(object sender, ToggledEventArgs e)
+        {
+            if (settings.isActionComponentVisble != e.Value)
+            {
+                addLog("onActionFeaturesToggled");
+                settings.isActionComponentVisble = e.Value;
+                MyFileSystem.Instance.saveSettings(settings);
+                DialSpeedService.Instance.onActionComponentVisibilityChanged(e.Value);
+            }
+        }
+
+        void onRingVibrateToggled(object sender, ToggledEventArgs e)
+        {
+            if (settings.isRingVibrate != e.Value)
+            {
+                addLog("onRingVibrateToggled");
+                settings.isRingVibrate = e.Value;
+                MyFileSystem.Instance.saveSettings(settings);
+            }
+        }
+
+        void onSyncContactsToggled(object sender, ToggledEventArgs e)
+        {
+            if (settings.IsSyncContacts != e.Value)
+            {
+                addLog("onSyncContactsToggledAsync");
+                syncErrLbl.IsVisible = false;
+                syncLoader.IsVisible = true;
+                syncContacts.IsEnabled = false;
+                syncContacts.Opacity = 0.3;
+                syncContactsPB.IsVisible = true;
+                syncProgressVal = -1;
+                syncContactsPB.Progress = 0;
+                if (e.Value)
+                {
+                    settings.IsSyncContacts = true;
+                    MyFileSystem.Instance.saveSettings(settings);
+                    SharedData.Instance.shouldUploadAllcontacts = true;
+                    AeonixInfoService.Instance.updateExternalContacts(true);
+                }
+                else
+                    syncContactsAlertAsync();
+            }
+        }
+
+        void onMessageVibrateToggled(object sender, ToggledEventArgs e)
+        {
+            if (settings.isMessageVibrate != e.Value)
+            {
+                settings.isMessageVibrate = e.Value;
+                MyFileSystem.Instance.saveSettings(settings);
+            }
+        }
+
+        public void onSubscribeStatechanged(bool isOn)
+        {
+            Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+            {
+                // suscribeStatus.Text = isOn.ToString();
+            });
+
+        }
+
+        private void minimize_Clicked(object sender, EventArgs e)
+        {
+#if WINDOWS_UWP
+            ((App)App.Current).goTominimize();
+#endif
+        }
+
+        private void infoAlert()
+        {
+            DisplayAlert("", (string)Application.Current.Resources["changeWillApply"], (string)Application.Current.Resources["ok"]);
+        }
+
+        private async Task syncContactsAlertAsync()
+        {
+            var answer = await DisplayAlert((string)Application.Current.Resources["removeSyncAlert"], (string)Application.Current.Resources["removeSyncAlert2"], (string)Application.Current.Resources["yes"], (string)Application.Current.Resources["no"]);
+            if (answer)
+            {
+                settings.IsSyncContacts = false;
+                MyFileSystem.Instance.saveSettings(settings);
+                AeonixInfoService.Instance.removeAllExternalContacts();
+            }
+            else
+            {
+                syncContacts.IsToggled = !syncContacts.IsToggled;
+                syncFinishedHandler();
+            }
+
+        }
+
+        private void addLog(string s)
+        {
+            Console.WriteLine("omer403: " + s);
+            MyFileSystem.Instance.writeDebug(s, "Settings_Page");
+        }
+
+        public void onSuccessExternalContatctUploaded()
+        {
+            addLog("onSuccessExternalContatctUploaded()");
+            //settings.IsSyncContacts = syncContacts.IsToggled;
+            //MyFileSystem.Instance.saveSettings(settings);
+            syncFinishedHandler();
+        }
+
+        public void onFailExternalContatctUploaded()
+        {
+            addLog("onFailExternalContatctUploaded()");
+            if (syncContacts.IsToggled)
+                syncErrLbl.IsVisible = true;
+            // syncContacts.IsToggled = !syncContacts.IsToggled;
+            syncFinishedHandler();
+        }
+
+        private void syncFinishedHandler()
+        {
+            syncLoader.IsVisible = false;
+            syncContacts.IsEnabled = true;
+            syncContacts.Opacity = 1;
+            syncContactsPB.IsVisible = false;
+        }
+
+        public void onProgressExternalContatctUploaded(int chunkLeft)
+        {
+            if (syncProgressVal == -1)
+            {
+                double doubleVal = Convert.ToDouble(chunkLeft);
+                syncProgressVal = 1 / doubleVal;
+                syncContactsPB.Progress = syncProgressVal;
+            }
+            else
+            {
+                syncContactsPB.Progress += syncProgressVal;
+            }
+
+        }
+    }
+}

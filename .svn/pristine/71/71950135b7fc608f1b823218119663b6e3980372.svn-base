@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StackLayout VerticalOptions="Fill" xmlns="http://xamarin.com/schemas/2014/forms" 
+      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+     x:Class="LinphoneXamarin.components.userControllers.MySearch"
+        xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers"
+       x:Name="SearchView">
+
+    <StackLayout x:Name="stack_layout"  HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Orientation="Vertical" >
+
+        <Frame x:Name="inputComponent" HorizontalOptions="FillAndExpand" CornerRadius="5" HasShadow="false" Padding="10">
+            <Entry  HorizontalOptions="FillAndExpand" FontSize="Large" TextChanged="onSearchedClicked" Text="{Binding}" x:Name="searchInput" Placeholder="{StaticResource search}" />
+        </Frame>
+
+        <ListView  HasUnevenRows="True"
+                  
+                   SeparatorVisibility="None"
+                   VerticalOptions="FillAndExpand"
+                   x:Name="searchList" 
+                   HeightRequest="{Binding Path=Height, Source={x:Reference stack_layout}}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <control:ContactCell CallCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.CallCommand}"
+                                         ContactInfoCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.ContactinfoCommand}"
+                                         MessageCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.MessageCommand}"
+                                         ActionPressedCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.actionPressedCommand}"
+                                         actionType="{Binding Source={x:Reference SearchView} , Path=BindingContext.actionType}" 
+                                         contactType="{Binding type}"  isFav="{Binding isFav}"
+                                         userName="{Binding userName}"
+                                         displayName="{Binding displayName}"
+                                         primaryAlias="{Binding primaryAlias}"
+                                         presence="{Binding presenceStatus}" />
+
+                    <!--<control:ContactCell CallCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.CallCommand}"
+                                         ContactInfoCommand="{Binding Source={x:Reference SearchView}, Path=BindingContext.ContactinfoCommand}"
+                                        contactType="{Binding type}"  isFav="{Binding isFav}"
+                                         userName="{Binding userName}"
+                                         displayName="{Binding displayName}"
+                                         primaryAlias="{Binding primaryAlias}"
+                                         presence="{Binding presenceStatus}" />-->
+
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </StackLayout>
+</StackLayout>

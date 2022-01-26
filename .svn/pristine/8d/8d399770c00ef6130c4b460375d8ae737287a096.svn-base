@@ -1,0 +1,104 @@
+﻿using System;
+using System.ComponentModel;
+using Linphone;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using SQLite;
+using Xamarin.Forms;
+
+namespace LinphoneXamarin.Entities
+{
+    public class MyMessage : INotifyPropertyChanged
+    {
+        [PrimaryKey]
+        public string messageId { set; get; }   //Include messageId as kept in the Aeonix side
+        public string chatId { set; get; }      //Include userId or groupId that the message belong to
+        public string messageText { set; get; }
+
+        private long _messageTime;
+        public long messageTime
+        {
+            get
+            {
+                return _messageTime;
+            }
+            set
+            {
+                _messageTime = value;
+                setFormatedTime();
+            }
+        }
+        public string senderUserId { set; get; }
+        private bool _isRedMessage;
+
+        public bool isRedMessage
+        {
+            get
+            {
+                return _isRedMessage;
+            }
+            set
+            {
+                _isRedMessage = value;
+                OnPropertyChanged("isRedMessage");
+            }
+        }
+
+        public bool isMine { set; get; }
+        public string formattedTime { set; get; }
+        public string formattedDate { set; get; }
+        public bool isTemp { set; get; }
+
+        public MyMessage() { }
+
+        public MyMessage(string messageText, long messageTime, bool isTemp)
+        {
+            this.messageText = messageText;
+            this.messageTime = messageTime;
+            this.isTemp = true;
+        }
+
+        public MyMessage(string messageId, string messageText, long messageTime, string senderUserId, bool isRedMessage)
+        {
+            this.messageId = messageId;
+            this.messageText = messageText;
+            this.messageTime = messageTime;
+            this.senderUserId = senderUserId;
+            this.isMine = senderUserId.Equals(ContactService.Instance.myContact.userName) ? true : false;
+            this.isRedMessage = isRedMessage;
+        }
+
+        public MyMessage(string messageId, string chatId, string messageText, long messageTime, string senderUserId, bool isRedMessage)
+        {
+            this.messageId = messageId;
+            this.chatId = chatId;
+            this.messageText = messageText;
+            this.messageTime = messageTime;
+            this.senderUserId = senderUserId;
+            this.isMine = senderUserId.Equals(ContactService.Instance.myContact.userName) ? true : false;
+            this.isRedMessage = isRedMessage;
+        }
+
+        public void setFormatedTime()
+        {
+            var th = TimeHelper.Instance;
+            formattedTime = th.FromUnixTime(messageTime).ToLocalTime().ToString(th.timeFormat);
+        }
+
+        public void setFormatedDate(bool isToday, DateTime dt, string dateFormat)
+        {
+            formattedDate = isToday ? (string)Application.Current.Resources["today"] : dt.ToString(dateFormat);
+
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string nameOfProperty)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameOfProperty));
+        }
+
+
+    }
+}

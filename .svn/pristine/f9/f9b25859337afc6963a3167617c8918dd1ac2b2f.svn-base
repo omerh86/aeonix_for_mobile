@@ -1,0 +1,86 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+using LinphoneXamarin.Services;
+using System.Windows.Input;
+using LinphoneXamarin.Util;
+using Xamarin.Essentials;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class searchPage : ContentPage
+    {
+
+        public searchPage()
+        {
+            InitializeComponent();
+
+            search.ContactinfoCommand = new Command<string>(onContactInfoPressed);
+            search.MessageCommand = new Command<string[]>(onMessagePressed);
+            search.CallCommand = new Command<string[]>(onCallPressed);
+            search.ScrollCommand = new Command<bool>(onScrolled);
+
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            search.isSearchInput = true;
+            SharedData.Instance.isOverideBackBtn = false;
+           // ((App)App.Current).removeSearchIcon();
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            SharedData.Instance.isOverideBackBtn = true;
+           // ((App)App.Current).addSearchIcon();
+        }
+
+       
+        void onScrolled(bool val)
+        {
+            addLog("onScrolled");
+#if ANDROID
+            var inputMethodManager = Plugin.CurrentActivity.CrossCurrentActivity.Current.AppContext.GetSystemService("input_method") as global::Android.Views.InputMethods.InputMethodManager;
+            var token = Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity.CurrentFocus?.WindowToken;
+            if (inputMethodManager != null && token != null)
+                inputMethodManager.HideSoftInputFromWindow(token, global::Android.Views.InputMethods.HideSoftInputFlags.None);
+#endif
+
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "searchPage");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        void onContactInfoPressed(string userName)
+        {
+            var page = (Page)new contactDetail(userName);
+            Navigation.PushAsync(page, false);
+            //Navigation.RemovePage(this);
+        }
+
+        void onMessagePressed(string[] names)
+        {
+            var page = (Page)new Messages(names[0], names[1]);
+            Navigation.PushAsync(page, false);
+            Navigation.RemovePage(this);
+
+        }
+
+        void onCallPressed(string[] names)
+        {
+            Navigation.RemovePage(this);
+            CallService.Instance.callAsync(names[0], names[1], names[2].Equals("True") ? true : false, names[3]);
+        }
+    }
+}

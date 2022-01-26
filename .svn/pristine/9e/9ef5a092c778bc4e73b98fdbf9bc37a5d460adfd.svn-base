@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ViewCell   xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.userControllers.ContactCell"
+          xmlns:controls="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+            xmlns:Helpers="clr-namespace:LinphoneXamarin.Util">
+
+    <ViewCell.View>
+
+        <StackLayout x:Name="item" VerticalOptions="Center" HorizontalOptions="FillAndExpand" Margin="5" Orientation="Horizontal"  >
+
+            <AbsoluteLayout x:Name="abslayout">
+                <controls:CircleImage Source="{x:Binding image}" Aspect="AspectFill" VerticalOptions="Center" HeightRequest="60" WidthRequest="60">
+                </controls:CircleImage>
+                <ImageButton x:Name="presenceLabel"  CornerRadius="8" WidthRequest="16" HeightRequest="16" BackgroundColor="Transparent"  AbsoluteLayout.LayoutBounds=".01,.01" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                <Label x:Name="presenceBusyLabel" IsVisible="False" AbsoluteLayout.LayoutBounds=".1,.1"  AbsoluteLayout.LayoutFlags="PositionProportional" Text="&#xf095;"  FontSize="8" TextColor="Black">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Label.FontFamily>
+                </Label>
+                <Label ClassId="{StaticResource favorites}" x:Name="ifavBtn"  Text="&#xf005;"  TextColor="{x:Binding isFav, Converter={Helpers:favColorConverter}}" FontSize="Medium" AbsoluteLayout.LayoutBounds=".5,.95" AbsoluteLayout.LayoutFlags="PositionProportional">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Label.FontFamily>
+                </Label>
+            </AbsoluteLayout>
+            <StackLayout HorizontalOptions="FillAndExpand" Padding="5">
+                <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                    <StackLayout Margin="5,0,0,0"  Orientation="Vertical" VerticalOptions="Center" HorizontalOptions="FillAndExpand">
+                        <Label FontSize="Medium" TextColor="Black" Text="{x:Binding displayName, Converter={Helpers:groupNameConverter}}"/>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                            <Label x:Name="descriptionLbl" FontSize="Small" TextColor="Black"/>
+                            <Label FontSize="Small" TextColor="DimGray" HorizontalOptions="StartAndExpand" Text="{x:Binding primaryAlias}"/>
+                        </StackLayout>
+                    </StackLayout>
+
+                    <StackLayout HorizontalOptions="EndAndExpand" Orientation="Horizontal">
+                        <Button  x:Name="icollaborationBtn" Clicked="onCollaborationClicked" ClassId="{StaticResource collaboration}"  Text="&#xf2b5;" HorizontalOptions="Center"  TextColor="#72A2C0" FontSize="Small" WidthRequest="35"  BackgroundColor="Transparent" HeightRequest="35" Margin="3,0,3,0" >
+                            <Button.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                            </Button.FontFamily>
+                        </Button>
+                        <Button  x:Name="imessageBtn" Clicked="onMessageClicked" ClassId="{StaticResource chat}" Text="&#xf075;" HorizontalOptions="Center"  TextColor="#72A2C0" FontSize="Small"  WidthRequest="35"   BackgroundColor="Transparent" HeightRequest="35" Margin="3,0,3,0">
+                            <Button.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                            </Button.FontFamily>
+                        </Button>
+                        <Button x:Name="ivideoCallBtn" Clicked="onVideoCallClicked"  ClassId="{StaticResource video}" Text="&#xf03d;" HorizontalOptions="Center"    TextColor="#72A2C0" FontSize="Small"  WidthRequest="35"   BackgroundColor="Transparent" HeightRequest="35" Margin="3,0,3,0">
+                            <Button.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                            </Button.FontFamily>
+                        </Button>
+                        <Button  Text="&#xf095;" x:Name="iAudioCall"  Clicked="onCallClicked" ClassId="{StaticResource audiocall}" TextColor="#72A2C0" WidthRequest="35"  BackgroundColor="Transparent" HeightRequest="35" Margin="3,0,3,0" >
+                            <Button.FontFamily>
+                                <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                            </Button.FontFamily>
+                        </Button>
+                    </StackLayout>
+                </StackLayout>
+                <BoxView BackgroundColor="DimGray" Opacity="0.1" HeightRequest="1"  HorizontalOptions="FillAndExpand"></BoxView>
+            </StackLayout>
+        </StackLayout>
+
+    </ViewCell.View>
+</ViewCell>

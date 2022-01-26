@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.userControllers.ChatComponent"
+              xmlns:controls="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+              FlowDirection="{StaticResource FlowDirection}">
+    <ContentView.Content>
+
+        <Frame BackgroundColor="White" Padding="7"  CornerRadius="15" VerticalOptions="FillAndExpand">
+            <StackLayout VerticalOptions="FillAndExpand">
+                <Label Text="{StaticResource chat}" HorizontalOptions="FillAndExpand" FontSize="Title" TextColor="Black" FontAttributes="Bold"></Label>
+                <ListView  Margin="0,25,0,0" 
+                ItemTapped="enterChat"
+                          HasUnevenRows="True"
+                          x:Name="chatList"
+                          SeparatorVisibility="None"
+                          BackgroundColor="Transparent"
+                          ItemsSource="{x:Binding}"  
+                        HorizontalOptions="FillAndExpand"
+                         VerticalOptions="FillAndExpand">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <StackLayout  Padding="5" HorizontalOptions="FillAndExpand" Orientation="Vertical">
+
+                                    <StackLayout   HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+                                        <controls:CircleImage Source="{x:Binding image}" Aspect="AspectFill" HeightRequest="60" WidthRequest="60"  HorizontalOptions="Center"  >
+                                        </controls:CircleImage>
+                                        <StackLayout Margin="4" HorizontalOptions="FillAndExpand" VerticalOptions="Center" Orientation="Vertical">
+                                            <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="Center" Orientation="Horizontal">
+                                                <Label FontSize="Medium" HorizontalOptions="StartAndExpand" TextColor="Black" Text="{x:Binding chatName}"/>
+                                                <Label FontAttributes="Bold" Margin="5,0,5,0"  TextColor="Blue" IsVisible="{x:Binding isUnRedMessagesVisible}" Text="{x:Binding unRedMessages}"/>
+
+                                            </StackLayout>
+
+                                            <StackLayout HorizontalOptions="FillAndExpand"  VerticalOptions="Center" Orientation="Horizontal">
+                                                <Label HorizontalOptions="Fill" MaxLines="1" TextColor="DimGray" Text="{x:Binding lastMessageText}"/>
+                                                <Label HorizontalOptions="EndAndExpand" Margin="5,0,5,0" TextColor="DimGray" FontSize="Small" Text="{x:Binding formattedTime}"/>
+                                            </StackLayout>
+
+                                        </StackLayout>
+                                    </StackLayout>
+                                    <BoxView BackgroundColor="DimGray" Opacity="0.1" Margin="5,0,5,0" HeightRequest="1" ></BoxView>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.Footer>
+                        <BoxView  BackgroundColor="Transparent" HeightRequest="100"  />
+                    </ListView.Footer>
+                </ListView>
+                <StackLayout x:Name="AddChatContainer" IsVisible="False" Margin="10" VerticalOptions="FillAndExpand" >
+                    <Image Source="addchat.png" HeightRequest="150" WidthRequest="150" Margin="10"/>
+                    <Label Text="Start Chatting" TextColor="Black" HorizontalOptions="Center" FontSize="Title" Margin="10"/>
+                    <Label Text="use Search to find your team work"  HorizontalOptions="Center" FontSize="Small" Margin="10"/>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+    </ContentView.Content>
+</ContentView>

@@ -1,0 +1,477 @@
+﻿using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class Recent : ContentPage, CalllogListener
+    {
+        CallLogService callLogService;
+        private List<MyCallLog> allCallsLog;
+
+        public List<RecentGroup> groupedCallsLog { get; private set; } = new List<RecentGroup>();
+        public ICommand searchFieldNotEmptyCommand { get; private set; }
+        private MyCallLog selected;
+        private bool _isRefreshing = false;
+        private bool isMoreDataEnabled;
+        private int chunkNumber;
+        public bool IsRefreshing
+        {
+            get { return _isRefreshing; }
+            set
+            {
+                _isRefreshing = value;
+                OnPropertyChanged(nameof(IsRefreshing));
+            }
+        }
+        public ICommand RefreshCommand
+        {
+            get
+            {
+                return new Command(() =>
+                {
+                    IsRefreshing = true;
+                    getCallLogs(true);
+                });
+            }
+        }
+
+        public ICommand MessageCommand { get; private set; }
+
+        public void refresherGurd()
+        {
+            Thread.Sleep(5000);
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                IsRefreshing = false;
+                addLog("refresherGurd");
+            });
+
+        }
+
+        public ICommand ContactinfoCommand { get; private set; }
+
+        public Recent()
+        {
+            addLog("Recent");
+            InitializeComponent();
+            onCallLogListChanged();
+            callLogService = CallLogService.Instance;
+            searchFieldNotEmptyCommand = new Command<bool>(onSearchFieldChanged);
+            ContactinfoCommand = new Command<Contact>(onContactInfoPressed);
+            //  search.BindingContext = searchFieldNotEmptyCommand;
+            MessageCommand = new Command<string[]>(onMessagePressed);
+            this.BindingContext = this;
+            callsLog.BindingContext = this;
+            AeonixInfoService.Instance.calllogListener = this;
+            ImgService.Instance.calllogListener = this;
+            favBtn.GestureRecognizers.Add(
+                    new TapGestureRecognizer()
+                    {
+                        Command = new Command(() =>
+                        {
+                            onToggleContactFavStatus();
+                        })
+                    });
+        }
+
+        protected override void OnAppearing()
+        {
+
+            base.OnAppearing();
+            addLog("OnAppearing recent page");
+            isMoreDataEnabled = true;
+            loadingLbl.IsVisible = false;
+            chunkNumber = 0;
+            toggleCallLogFrame(false);
+
+        }
+
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            addLog("OnDisappearing recent page");
+            if (LinphoneBase.Instance.linphoneCore.CallsNb == 0 && callLogService.missedCallcounter > 0)
+            {
+                AeonixInfoService.Instance.sendDismissMissedCalls();
+                callLogService.setMissedCounter(0);
+            }
+        }
+
+        void onContactInfoPressed(Contact c)
+        {
+            //var page = (Page)new contactDetail(c.userName, c);
+            //Navigation.PushAsync(page, false);
+        }
+
+        void switcher_Toggled(object sender, ToggledEventArgs e)
+        {
+            onCallLogListChanged();
+        }
+
+        void onSearchFieldChanged(bool isEmpty)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                callLogsComponent.IsVisible = isEmpty;
+            });
+        }
+
+        public void onCallLogListChanged()
+        {
+            addLog("onCallLogListChanged");
+            Device.BeginInvokeOnMainThread(() =>
+                        {
+                            loadingLbl.IsVisible = false;
+                            resetCallLog();
+                            isMoreDataEnabled = true;
+                            if (allCallsLog.Count == 0)
+                                loadMore.IsVisible = false;
+                            else
+                                loadMore.IsVisible = true;
+                            IsRefreshing = false;
+                        });
+        }
+
+        public void resetCallLog()
+        {
+            //allCallsLog = new List<MyCallLog>();
+            allCallsLog = callLogService.allCallsLog;
+
+            if (missedCallSwitch.IsToggled)
+            {
+                allCallsLog = allCallsLog.FindAll(delegate (MyCallLog c)
+                {
+                    List<CallInfo> callInfoArr = c.callsInfo.FindAll(delegate (CallInfo i)
+                    {
+                        return i.callDirection == CallDirection.Missed;
+                    });
+                    if (callInfoArr != null && callInfoArr.Count > 0)
+                    {
+                        c.callsInfo = callInfoArr;
+                        return true;
+                    }
+                    return false;
+
+                });
+            }
+
+            populateGroupedCallsLog();
+            callsLog.ItemsSource = groupedCallsLog;
+
+        }
+
+        private void populateGroupedCallsLog()
+        {
+            groupedCallsLog = new List<RecentGroup>
+            {
+               new RecentGroup ((string)Application.Current.Resources["noCalls"])
+             };
+
+            if (allCallsLog.Count > 0 && allCallsLog[0].callsInfo.Count > 0)
+            {
+                TimeHelper th = TimeHelper.Instance;
+                var currentDate = th.FromUnixTime(allCallsLog[0].callsInfo[0].time);
+                groupedCallsLog[0].Title = th.isSameDay(currentDate, DateTime.Now) ? (string)Application.Current.Resources["today"] : getDateTitle(currentDate);
+                for (int i = 0; i < allCallsLog.Count; i++)
+                {
+                    if (!th.isSameDay(currentDate, th.FromUnixTime(allCallsLog[i].callsInfo[0].time)))
+                    {
+                        currentDate = th.FromUnixTime(allCallsLog[i].callsInfo[0].time);
+                        groupedCallsLog.Add(new RecentGroup(getDateTitle(currentDate)));
+                    }
+                    groupedCallsLog[groupedCallsLog.Count - 1].Add(allCallsLog[i]);
+                }
+            }
+        }
+
+        private string getDateTitle(DateTime date)
+        {
+            return date.ToShortDateString();
+        }
+
+        void onMessagePressed(string[] names)
+        {
+            Console.WriteLine("omer60: " + names[0]);
+            var page = (Page)new Messages(names[0], names[1]);
+            Navigation.PushAsync(page, false);
+        }
+
+        public class RecentGroup : List<MyCallLog>
+        {
+            public string Title { get; set; }
+
+            public RecentGroup(string title)
+            {
+                Title = title;
+
+            }
+
+            public static IList<Contact> All { private set; get; }
+        }
+
+        private void itemAppearing(object sender, ItemVisibilityEventArgs e)
+        {
+#if __IOS__ || ANDROID
+            if (isMoreDataEnabled)
+            {
+                var cl = e.Item as MyCallLog;
+
+                if (cl != null &&
+                    cl.id != null &&
+                    allCallsLog.Count > 0 &&
+                    cl.id.Equals(allCallsLog[allCallsLog.Count - 1].id))
+                {
+                    Console.WriteLine("omer458: last item");
+                    getCallLogs(false);
+                }
+            }
+#endif
+        }
+
+        private void getCallLogs(bool isRefresh)
+        {
+            if (isRefresh)
+            {
+                IsRefreshing = true;
+                chunkNumber = 0;
+            }
+            else
+            {
+                chunkNumber++;
+            }
+            loadingLbl.Text = "  " + (string)Application.Current.Resources["loading"] + "  ";
+            loadingLbl.IsVisible = true;
+            AeonixInfoService.Instance.getCallLogs(chunkNumber);
+            isMoreDataEnabled = false;
+            loadMore.IsVisible = false;
+            new Thread(refresherGurd).Start();
+        }
+
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "Recent");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        public void OnFrameTapped(object sender, EventArgs e)
+        {
+            toggleCallLogFrame();
+        }
+
+        private void toggleCallLogFrame(bool isDefault = true)
+        {
+            if (!isDefault)
+            {
+                callogframe.IsVisible = false;
+                callsLog.Opacity = 1;
+            }
+            else
+                changeCalllogFrameVisibilty(!callogframe.IsVisible);
+
+        }
+
+        private async void changeCalllogFrameVisibilty(bool shouldVisible)
+        {
+
+            if (shouldVisible)
+            {
+#if ANDROID
+                callogframe.TranslationX = -200;
+                callogframe.TranslateTo(0, 0, 350);
+#endif
+                callogframe.IsVisible = true;
+                await callogframe.FadeTo(1, 350);
+                callsLog.Opacity = 0.2;
+            }
+            else
+            {
+                callogframe.IsVisible = false;
+                callsLog.Opacity = 1;
+            }
+
+        }
+
+        private void setFavIconColor(bool isFav)
+        {
+            if (isFav)
+                favBtn.TextColor = Color.IndianRed;
+            else
+            {
+                favBtn.TextColor = Color.DimGray;
+            }
+        }
+
+        void onItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            toggleCallLogFrame();
+            if (callogframe.IsVisible)
+            {
+                selected = e.Item as MyCallLog;
+                actionBar.Children.Clear();
+
+                actionBar.Children.Add(favBtn, 0, 1);
+                actionBar.Children.Add(callBtn, 1, 1);
+                actionBar.Children.Add(videoBtn, 2, 1);
+                actionBar.Children.Add(infoBtn, 3, 1);
+                actionBar.Children.Add(messageBtn, 4, 1);
+                if (SharedData.Instance.isCollaborateAllowed)
+                    actionBar.Children.Add(icollaborationBtn, 5, 1);
+
+                frameTitle.Text = selected.contact.displayName;
+                favBtn.IsEnabled = (selected.contact.type & (ContactType.Aeonix | ContactType.External | ContactType.Group)) != 0;
+                infoBtn.IsEnabled = selected.contact.type != ContactType.Group;
+                videoBtn.IsEnabled = selected.contact.type == ContactType.Aeonix;
+                messageBtn.IsEnabled = selected.contact.type == ContactType.Aeonix;
+                Device.StartTimer(TimeSpan.FromMilliseconds(500), () =>
+                {
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        setFavIconColor(selected.contact.isFav);
+                    });
+                    return false;
+                });
+
+
+
+                for (int i = 0; i < selected.callsInfo.Count; i++)
+                {
+                    var direction = new Label();
+                    direction.Text = MyEnumHelper.Instance.getCallDirectionAsString(selected.callsInfo[i].callDirection);
+                    direction.HorizontalOptions = LayoutOptions.Center;
+                    direction.TextColor = Color.Black;
+                    direction.FontSize = 14;
+
+                    var duration = new Label();
+                    duration.Text = selected.callsInfo[i].duration.ToString();
+                    duration.HorizontalOptions = LayoutOptions.Center;
+                    duration.TextColor = Color.Black;
+                    duration.FontSize = 14;
+
+                    var time = new Label();
+                    time.Text = selected.callsInfo[i].formattedTime;
+                    time.FontSize = 14;
+                    time.TextColor = Color.Black;
+                    time.HorizontalOptions = LayoutOptions.Center;
+
+
+                    actionBar.Children.Add(direction, 0, 2, i + 2, i + 3);
+                    actionBar.Children.Add(time, 2, 4, i + 2, i + 3);
+                    actionBar.Children.Add(duration, 4, 6, i + 2, i + 3);
+                }
+            }
+        }
+
+        private void onToggleContactFavStatus()
+        {
+            if (selected != null)
+            {
+                if (selected.contact.type == ContactType.Group)
+                    selected.contact.isFav = ContactService.Instance.toggleContactFavStatus(selected.contact.primaryAlias, true);
+                else
+                    selected.contact.isFav = ContactService.Instance.toggleContactFavStatus(selected.contact.userName, false);
+
+                foreach (var i in allCallsLog)
+                {
+                    if (i.contact.userName.Equals(selected.contact.userName))
+                        i.contact.isFav = selected.contact.isFav;
+                }
+                setFavIconColor(selected.contact.isFav);
+            }
+        }
+
+        private void onCallClicked(object sender, EventArgs e)
+        {
+            if (selected != null)
+            {
+                CallService.Instance.callAsync(selected.alias.ToString(), selected.contact.userName, false, selected.contact.displayName);
+            }
+        }
+
+        public void onCollaborationClicked(object sender, EventArgs e)
+        {
+            if (selected != null)
+            {
+                AeonixInfoService.Instance.startCollaboration("PARTNER", selected.contact.userName, null);
+            }
+        }
+
+        private void onInfoClicked(object sender, EventArgs e)
+        {
+            if (selected != null)
+            {
+                onContactInfoPressed(selected.contact);
+            }
+        }
+
+        private void onMessageClicked(object sender, EventArgs e)
+        {
+            if (selected != null)
+            {
+                var s = new string[2] { selected.contact.userName, selected.contact.displayName };
+                onMessagePressed(s);
+            }
+        }
+
+        private void onVideoCallClicked(object sender, EventArgs e)
+        {
+            if (selected != null)
+            {
+                CallService.Instance.callAsync(selected.alias.ToString(), selected.contact.userName, true, selected.contact.displayName);
+            }
+        }
+
+        private void onLoadMoreBtn(object sender, EventArgs e)
+        {
+            if (isMoreDataEnabled)
+            {
+                getCallLogs(false);
+            }
+        }
+        public void onCallLogRequestError(InfoErr err)
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                IsRefreshing = false;
+                loadingLbl.Text = MyEnumHelper.Instance.getInfoErrAsString(err);
+
+                if (err == InfoErr.NO_DATA)
+                {
+                    isMoreDataEnabled = false;
+                    loadMore.IsVisible = false;
+                }
+                else
+                {
+                    isMoreDataEnabled = true;
+                    loadMore.IsVisible = true;
+
+                    if (chunkNumber > 0)
+                        chunkNumber--;
+
+
+                }
+
+                Device.StartTimer(TimeSpan.FromMilliseconds(1500), () =>
+                {
+                    loadingLbl.IsVisible = false;
+                    Console.WriteLine("omer929: busyLbl");
+                    return false;
+                });
+            });
+
+        }
+    }
+}

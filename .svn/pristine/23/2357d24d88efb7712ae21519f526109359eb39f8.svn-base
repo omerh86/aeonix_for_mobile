@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Plugin.ContactService</name>
+    </assembly>
+    <members>
+        <member name="T:Plugin.ContactService.Shared.Contact">
+            <summary>
+            Crossplatform contact model.
+            </summary>
+        </member>
+        <member name="P:Plugin.ContactService.Shared.Contact.Name">
+            <summary>
+            Display Name of Contact
+            </summary>
+        </member>
+        <member name="P:Plugin.ContactService.Shared.Contact.PhotoUri">
+            <summary>
+            If photo assigned, photo uri of this contact
+            </summary>
+        </member>
+        <member name="P:Plugin.ContactService.Shared.Contact.PhotoUriThumbnail">
+            <summary>
+            If photo assigned photo thumbnail uri of this contact
+            </summary>
+        </member>
+        <member name="P:Plugin.ContactService.Shared.Contact.Number">
+            <summary>
+            Phone number of this contact
+            </summary>
+        </member>
+        <member name="P:Plugin.ContactService.Shared.Contact.Email">
+            <summary>
+            Email address of this contact
+            </summary>
+        </member>
+        <member name="P:Plugin.ContactService.Shared.Contact.Numbers">
+            <summary>
+            If contact have multiple phone numbers 
+            </summary>
+        </member>
+        <member name="P:Plugin.ContactService.Shared.Contact.Emails">
+            <summary>
+            IF contact have multiple email addresses
+            </summary>
+        </member>
+        <member name="M:Plugin.ContactService.Shared.Contact.#ctor">
+            <summary>
+            Default Constructor
+            </summary>
+        </member>
+        <member name="M:Plugin.ContactService.Shared.Contact.ToString">
+            <summary>
+            Displays contact name
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Plugin.ContactService.CrossContactService">
+            <summary>
+            Cross ContactService
+            </summary>
+        </member>
+        <member name="P:Plugin.ContactService.CrossContactService.IsSupported">
+            <summary>
+            Gets if the plugin is supported on the current platform.
+            </summary>
+        </member>
+        <member name="P:Plugin.ContactService.CrossContactService.Current">
+            <summary>
+            Current plugin implementation to use
+            </summary>
+        </member>
+        <member name="M:Plugin.ContactService.IContactService.GetContactListAsync">
+            <summary>
+            Gets contact in an awaitable background task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Plugin.ContactService.IContactService.GetContactList">
+            <summary>
+            Gets contacts in main thread
+            !!!NOT RECOMMENDED
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

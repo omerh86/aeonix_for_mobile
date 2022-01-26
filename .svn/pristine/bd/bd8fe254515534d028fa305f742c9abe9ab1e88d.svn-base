@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.VoiceMailPage"
+              xmlns:Helpers="clr-namespace:LinphoneXamarin.Util"
+             FlowDirection="{StaticResource FlowDirection}"
+               x:Name="root"
+             Title="{StaticResource VoiceMail}">
+    <ContentPage.Content>
+
+        <StackLayout HorizontalOptions="FillAndExpand" Margin="10" >
+            <Picker x:Name="filterPicker" WidthRequest="100" HorizontalOptions="StartAndExpand" FontSize="Medium" TextColor="Black" FontAttributes="Bold" SelectedIndexChanged="onFilterSelected" />
+            <Label x:Name="errLbl" Margin="5" TextColor="Black" HorizontalOptions="Center" FontSize="Small" ></Label>
+            <CollectionView x:Name="vmMessageList"  VerticalOptions="FillAndExpand"  VerticalScrollBarVisibility="Always" HorizontalOptions="FillAndExpand"  >
+                <CollectionView.ItemTemplate>
+                    <DataTemplate >
+                        <AbsoluteLayout Padding="10" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand"  >
+                            <StackLayout AbsoluteLayout.LayoutBounds="0,0,1,1" AbsoluteLayout.LayoutFlags="All" >
+                                <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+                                    <Label FontSize="Small"  TextColor="{x:Binding heard ,Converter={Helpers:VMAudioLblColorConverter}}" HorizontalOptions="StartAndExpand" FontAttributes="Bold" Text="{x:Binding from}"/>
+                                    <Label FontSize="Small"  TextColor="{x:Binding heard ,Converter={Helpers:VMAudioLblColorConverter}}" HorizontalOptions="End" FontAttributes="Bold" Text="{x:Binding durationSec}"/>
+                                    <Label FontSize="Small"  TextColor="{x:Binding heard ,Converter={Helpers:VMAudioLblColorConverter}}" HorizontalOptions="End" FontAttributes="Bold" Text="sec"/>
+                                </StackLayout>
+
+                                <StackLayout Orientation="Horizontal">
+                                    <Label FontSize="Small"  TextColor="{x:Binding heard ,Converter={Helpers:VMAudioLblColorConverter}}" Text="{x:Binding dateTime ,Converter={Helpers:VMTimeConverter}}"/>
+                                    <Label FontSize="Small" TextColor="{x:Binding heard ,Converter={Helpers:VMAudioLblColorConverter}}" Text="{x:Binding messageImportance}"/>
+                                </StackLayout>
+                                <Label FontSize="Small" HorizontalOptions="StartAndExpand" TextColor="DimGray" FontAttributes="Italic" Text="{x:Binding transcription ,Converter={Helpers:VMMessageTextConverter}}"/>
+
+                                <StackLayout Orientation="Horizontal" Margin="5" HorizontalOptions="FillAndExpand">
+                                    <Button Text="&#xf1f8;" IsVisible="{x:Binding isDeleteEnabled}" Margin="5" Clicked="onDeletePressed" BackgroundColor="#Transparent" CornerRadius="20" WidthRequest="40" HeightRequest="40" FontSize="Small"   TextColor="#B4D0DE" >
+                                        <Button.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                        </Button.FontFamily>
+                                    </Button>
+                                    <Button Text="&#xf0c7;" Clicked="onSavePressed" Margin="5" IsVisible="{x:Binding isSaveEnabled}"  BackgroundColor="#Transparent" CornerRadius="20" WidthRequest="40" HeightRequest="40" FontSize="Small"  TextColor="#B4D0DE"  >
+                                        <Button.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                        </Button.FontFamily>
+                                    </Button>
+                                    <Button Text="&#xf01e;" Clicked="onRestorePressed" Margin="5" IsVisible="{x:Binding isRestoredEnabled}" BackgroundColor="Transparent" CornerRadius="20" WidthRequest="40" HeightRequest="40" FontSize="Small"   TextColor="#B4D0DE"  >
+                                        <Button.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                        </Button.FontFamily>
+                                    </Button>
+                                    <Button Text="&#xf1e0;" IsVisible="{x:Binding Source={x:Reference root}, Path=BindingContext.canSendVoicemailViaEmail}"  Clicked="onSendMailPressed" Margin="5" BackgroundColor="Transparent" CornerRadius="20" WidthRequest="40" HeightRequest="40" FontSize="Small"   TextColor="#B4D0DE" >
+                                        <Button.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                        </Button.FontFamily>
+                                    </Button>
+                                    <Button   Text="{x:Binding isPlaying ,Converter={Helpers:VMPlayingConverter}}" Margin="5" TextColor="#0091D3" Clicked="onAudioPressed" IsEnabled="{x:Binding isloading ,Converter={Helpers:InverseBoolConverter}}" BackgroundColor="#Transparent" CornerRadius="25" WidthRequest="50" HeightRequest="50" FontSize="Large" >
+                                        <Button.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                        </Button.FontFamily>
+                                    </Button>
+
+                                </StackLayout>
+
+                            </StackLayout>
+                            <Label   FontSize="Large"  IsVisible="{x:Binding isloading}" FontAttributes="Bold" Text="&#xf017;" AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional">
+                                <Label.FontFamily>
+                                    <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                </Label.FontFamily>
+                            </Label>
+                            <ProgressBar Progress="{x:Binding progress}" AbsoluteLayout.LayoutBounds=".1,.99,1,.015" AbsoluteLayout.LayoutFlags="All"/>
+                            <!--<BoxView Color="#eee" HeightRequest="1"  AbsoluteLayout.LayoutBounds=".1,.99,0.9,.02" AbsoluteLayout.LayoutFlags="All">-->
+
+                            <!--</BoxView>-->
+                        </AbsoluteLayout>
+
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button   Text="&#xf095;" Margin="20" TextColor="White" HorizontalOptions="End" BackgroundColor="#eee" CornerRadius="30" WidthRequest="60"  HeightRequest="60"  Clicked="onCallPressed" FontSize="Small" >
+                <Button.FontFamily>
+                    <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                </Button.FontFamily>
+                <Button.Background>
+                    <LinearGradientBrush  EndPoint="0,1">
+                        <GradientStop Color="#BAE9FF" Offset="0.1" />
+                        <GradientStop Color="#0091D3" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Button.Background>
+            </Button>
+
+        </StackLayout>
+
+
+    </ContentPage.Content>
+</ContentPage>

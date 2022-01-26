@@ -1,0 +1,329 @@
+﻿using System;
+using LinphoneXamarin.Entities;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Linphone;
+using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
+using System.Text.RegularExpressions;
+using LinphoneXamarin.Util;
+using static LinphoneXamarin.Util.MySendRequestHelper;
+using Plugin.Vibrate;
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class MessagesService : MYImMessagesListener, MySearchListener
+    {
+        public string currentChatId { set; get; }
+        public LinphoneXamarin.Entities.Contact currentUser { set; get; }
+        public int unRedMessagesCounter { set; get; }
+
+        private messageDBRepository _messageDBRepository = messageDBRepository.Instance;
+
+        public MyMessage currentMessage;
+        public MYImMessagesListener mYImMessagesListener1 { set; get; }
+        public MYImMessagesListener mYImMessagesListener2 { set; get; }
+        public IMissedCounterListener missedCounterListener { set; get; }
+        private static MessagesService instance = null;
+        private static readonly object padlock = new object();
+
+
+
+        MessagesService()
+        {
+
+            unRedMessagesCounter = 0;
+        }
+
+        public static MessagesService Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new MessagesService();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public ObservableCollection<MyChat> getAllChats()
+        {
+            var c = _messageDBRepository.getAllChats();
+            var res = new ObservableCollection<MyChat>();
+            foreach (var i in c)
+                res.Add(i);
+
+            return res;
+        }
+
+        public List<MyMessage> getAllMessages()
+        {
+            var c = _messageDBRepository.getAllMessagesByChatId(currentChatId);
+            addLog("found " + c.Count + "relevant messages");
+            var res = new List<MyMessage>();
+            if (c != null)
+            {
+                var th = TimeHelper.Instance;
+                var formatedTime = th.timeFormat;
+                int maxMessages = 100;
+                if (c.Count <= maxMessages)
+                {
+                    foreach (var i in c)
+                    {
+                        i.formattedTime = th.FromUnixTime(i.messageTime).ToString(formatedTime);
+                        res.Add(i);
+                    }
+                }
+                else
+                {
+                    for (int k = c.Count - maxMessages; k < c.Count; k++)
+                    {
+                        res.Add(c[k]);
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "Message_Service");
+            Console.WriteLine("omer:252 " + message);
+        }
+
+        public void enterChat(string userId)
+        {
+            addLog("enterChat() userid :" + userId);
+            this.currentChatId = userId;
+            var c = ContactService.Instance.getContactByUserName(currentChatId);
+            if (c != null)
+            {
+                this.currentUser = c;
+                addLog("enterChat() current username is: " + currentUser.userName + ", current User alias is: " + currentUser.primaryAlias);
+            }
+            else
+                AeonixInfoService.Instance.getContact(this, userId);
+
+
+            readAllMessages();
+        }
+
+        public void leaveChat()
+        {
+            this.currentChatId = null;
+            this.currentUser = null;
+        }
+
+        public void sendMessage(string message)
+        {
+            addLog("sendMessage() current chatId :" + currentChatId);
+
+            if (currentUser != null && currentUser.primaryAlias != null && currentUser.primaryAlias.Length > 0 && ContactService.Instance.myContact.userName != null &&
+                 ContactService.Instance.myContact.userName.Length > 0)
+            {
+                this.currentMessage = new MyMessage(null, currentChatId, message, TimeHelper.Instance.ToUnixTime(DateTime.Now.ToUniversalTime()), MyFileSystem.Instance.loadLoginCardential(CardentialState.Aeonix).userName, false);
+                AeonixInfoService.Instance.sendMessage(message, currentUser.primaryAlias);
+            }
+            else
+            {
+                addLog("sendMessage()  cant send message");
+                onMessageSendErr(InfoErr.NO_DATA);
+            }
+        }
+
+        public void onMessageRecieved(MyMessage myMessage, Destination d)
+        {
+            addLog("onMessageRecieved() is red: " + myMessage.isRedMessage);
+            if (myMessage.messageId == null || myMessage.messageId.Length == 0)
+                return;
+
+            var i = _messageDBRepository.getMessageByMessageId(myMessage.messageId);
+            if (i != null)
+            {
+                //message exists
+                i.isRedMessage = myMessage.isRedMessage;
+                this._messageDBRepository.updateMessage(i);
+                if (mYImMessagesListener1 != null)
+                    mYImMessagesListener1.onMessageRead(myMessage.messageId, myMessage.isRedMessage);
+
+                if (mYImMessagesListener2 != null)
+                    mYImMessagesListener2.onMessageRead(myMessage.messageId, myMessage.isRedMessage);
+            }
+            else
+            {
+                //new message
+                if (myMessage.isMine)
+                    myMessage.chatId = d.value;
+                else
+                    myMessage.chatId = myMessage.senderUserId;
+
+                string chatName = myMessage.chatId;
+                Entities.Contact c = ContactService.Instance.getContactByUserName(myMessage.chatId);
+                if (c != null)
+                    chatName = c.displayName;
+
+                this._messageDBRepository.addMessage(myMessage, chatName, ChatType.SINGLE);
+
+                if (mYImMessagesListener1 != null)
+                    mYImMessagesListener1.onMessageRecieved(myMessage, null);
+
+                if (mYImMessagesListener2 != null)
+                    mYImMessagesListener2.onMessageRecieved(myMessage, null);
+
+            }
+
+#if WINDOWS_UWP
+            AlertHelper.Instance.ShowUwpMessage("new message from " + myMessage.senderUserId, "", false);
+#endif
+            if (((App)App.Current).isForeground && !myMessage.isMine && !myMessage.isRedMessage && myMessage.chatId != currentChatId)
+            {
+
+                var settings = MyFileSystem.Instance.loadSettings();
+                if (settings.isMessageSound)
+                    MyAudioManager.Instance.playFile("notification_sound.mp3");
+                if (settings.isMessageVibrate)
+                    CrossVibrate.Current.Vibration();
+
+            }
+
+            if (myMessage.chatId == currentChatId)
+                readAllMessages();
+            else
+                fireOnMessageCounterchanged();
+
+
+            if (myMessage.chatId == currentChatId && !myMessage.isMine)
+            {
+                readAllMessages();
+            }
+
+        }
+
+        public void onMessageIdRecieved(string messageId)
+        {
+            addLog("onMessageIdRecieved()");
+            if (currentMessage != null)
+            {
+                var i = _messageDBRepository.getMessageByMessageId(messageId);
+                if (i == null)
+                {
+                    //new message
+                    currentMessage.messageId = messageId;
+                    string chatName = currentMessage.chatId;
+                    Entities.Contact c = ContactService.Instance.getContactByUserName(currentMessage.chatId);
+                    if (c != null)
+                    {
+                        chatName = c.displayName;
+                    }
+                    this._messageDBRepository.addMessage(currentMessage, chatName, ChatType.SINGLE);
+                    if (mYImMessagesListener1 != null)
+                        mYImMessagesListener1.onMessageRecieved(currentMessage, null);
+
+                    if (mYImMessagesListener2 != null)
+                        mYImMessagesListener2.onMessageRecieved(currentMessage, null);
+
+                }
+            }
+        }
+
+        public void onSearchResponse(List<Entities.Contact> contacts)
+        {
+            if (contacts != null && contacts.Count > 0 && contacts[0] != null)
+            {
+                this.currentUser = contacts[0];
+                addLog("onSearchResponse(), current user is: " + currentUser.userName);
+            }
+            else
+                addLog("cant find contact");
+
+        }
+
+        private void readAllMessages()
+        {
+            addLog("readAllMessages():");
+            var c = _messageDBRepository.getAllMessagesByChatId(currentChatId);
+            List<MyMessage> unredMessages = new List<MyMessage>();
+            if (c != null)
+            {
+                for (int i = c.Count - 1; i >= 0; i--)
+                {
+                    if (!c[i].isRedMessage && !c[i].isMine)
+                    {
+                        unredMessages.Add(c[i]);
+                    }
+                    else
+                        break;
+                }
+            }
+            addLog("readAllMessages(): unred messages: " + unredMessages.Count);
+            _messageDBRepository.setAllMessagesAsRed(this.currentChatId);
+            fireOnMessageCounterchanged();
+
+            AeonixInfoService aeonixInfoService = AeonixInfoService.Instance;
+            aeonixInfoService.updateRedMessages(unredMessages);
+
+        }
+
+        public void fireOnMessageCounterchanged()
+        {
+            if (missedCounterListener != null)
+            {
+                var nu = _messageDBRepository.countAllUnRedMessages();
+                missedCounterListener.onMessageCounterchanged(nu);
+                addLog("updateRedMessages(): AllUnRedMessages: " + nu);
+            }
+        }
+
+        public void fireOnMessageDeleted()
+        {
+            if (mYImMessagesListener1 != null)
+                mYImMessagesListener1.onMessageDeleted();
+
+            if (mYImMessagesListener2 != null)
+                mYImMessagesListener2.onMessageDeleted();
+        }
+
+        public void onMessageSendErr(InfoErr err)
+        {
+            if (mYImMessagesListener1 != null)
+                mYImMessagesListener1.onMessageSendErr(err);
+
+            if (mYImMessagesListener2 != null)
+                mYImMessagesListener2.onMessageSendErr(err);
+
+        }
+
+        public void deleteChat(string chatId)
+        {
+            _messageDBRepository.deleteAllChatMessages(chatId);
+        }
+
+        public void deleteMessage(MyMessage message)
+        {
+            _messageDBRepository.DeleteMessageItem(message, currentChatId, ChatType.SINGLE);
+        }
+
+        public void onMessageRead(string myMessageId, bool isRead)
+        {
+        }
+
+        public void onSearchResponse(Entities.Contact contact)
+        {
+            if (contact != null)
+            {
+                this.currentUser = contact;
+                addLog("onSearchResponse(), current user is: " + currentUser.userName);
+            }
+        }
+
+        public void onMessageDeleted()
+        {
+          
+        }
+    }
+}

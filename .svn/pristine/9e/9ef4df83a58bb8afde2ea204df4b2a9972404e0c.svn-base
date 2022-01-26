@@ -1,0 +1,26 @@
+﻿using System;
+using Linphone;
+using LinphoneXamarin.Util;
+
+namespace LinphoneXamarin.Entities
+{
+    public class CallInfo
+    {
+
+        public CallDirection callDirection { set; get; }
+        public string duration { set; get; }
+        public long time { set; get; }
+        public string formattedTime { set; get; }
+
+
+        public CallInfo(CallDirection callDirection, string duration, long time)
+        {
+            var timeHelper = TimeHelper.Instance;
+            this.callDirection = callDirection;
+            this.duration = timeHelper.timeFromSec(duration);
+            this.time = time;
+            this.formattedTime = timeHelper.FromUnixTime(time).ToLocalTime().ToString(timeHelper.timeFormat);
+        }
+
+    }
+}

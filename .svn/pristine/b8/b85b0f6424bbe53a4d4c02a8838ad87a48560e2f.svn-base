@@ -1,0 +1,488 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>3140639c-dbdb-458f-9284-68875c7c6374</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>LinphoneXamarin</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\bugReport.xaml.cs">
+      <DependentUpon>bugReport.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\ContactTabbedPage.xaml.cs">
+      <DependentUpon>ContactTabbedPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\DialPad.xaml.cs">
+      <DependentUpon>DialPad.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\Groups.xaml.cs">
+      <DependentUpon>Groups.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\Messages.xaml.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\MorePage.xaml.cs">
+      <DependentUpon>MorePage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\navBar.xaml.cs">
+      <DependentUpon>navBar.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\contactDetail.xaml.cs">
+      <DependentUpon>contactDetail.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\navBarMaster.xaml.cs">
+      <DependentUpon>navBarMaster.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\navBarMenuItem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\Recent.xaml.cs">
+      <DependentUpon>Recent.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\RegistrationLostPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\RootPage.xaml.cs">
+      <DependentUpon>RootPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\searchPage.xaml.cs">
+      <DependentUpon>searchPage.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\speedDialEditorPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\speedDialPage.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\CallListView.xaml.cs">
+      <DependentUpon>CallListView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\CameraPreview.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\ChatComponent.xaml.cs">
+      <DependentUpon>ChatComponent.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\DraggableView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\FavotireComponent.xaml.cs">
+      <DependentUpon>FavotireComponent.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\LongPressedEffect.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\messageViewCell.xaml.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\MyPresenceComponent.xaml.cs">
+      <DependentUpon>MyPresenceComponent.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\MyContanctVM.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\RecentComponent.xaml.cs">
+      <DependentUpon>RecentComponent.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\SelectableLabel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\MyListView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\MYVideo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\SlideToActive.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\CallLogCell.xaml.cs">
+      <DependentUpon>CallLogCell.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\ContactCell.xaml.cs">
+      <DependentUpon>ContactCell.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\info.xaml.cs">
+      <DependentUpon>info.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\MySearch.xaml.cs">
+      <DependentUpon>MySearch.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\SpeedDialComponent.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\speedDialView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\userControllers\TopBarComponent.xaml.cs">
+      <DependentUpon>TopBarComponent.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\vm.xaml.cs">
+      <DependentUpon>vm.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\BaseContact.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\CrossContactService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\MyCallLog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\myTransfer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\MyMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\MyChat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\CallInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\MyImgItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\Enums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\LoginInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\Contact.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\mySettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\MyVmMessage.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\NotificationTokens.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\PhoneBookContact.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\SpeedDial.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EsfUtil\EsfCommandHandler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LinphoneWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MyCallKit\ActiveCall.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MyCallKit\ActiveCallManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MyCallKit\ProviderDelegate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MyCallKit\StartCallRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\DialSpeedService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\MessagesService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\messageDBRepository.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\ImgService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\aeonixInfoRepository.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\aeonixInfoService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\CallLogService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\ContactService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\CallService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\Login.xaml.cs">
+      <DependentUpon>Login.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Services\imgDBRepository.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\LinphoneBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\LoginService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\MyAudioManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\RegistrationService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\Interfaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Entities\MyCall.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)components\Tabs.xaml.cs">
+      <DependentUpon>Tabs.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\Favorites.xaml.cs">
+      <DependentUpon>Favorites.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)components\MyChatsPage.xaml.cs">
+      <DependentUpon>MyChatsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Services\SharedData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)styles\dialpadEntry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)styles\GradientView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\AlertHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\CallLogDisplayNameColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\CallLogCounterConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\TrimmedDisplayNameConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\VMAudioLblColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\VMTimeConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\VMPlayingConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\VMAudioColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\FeatureButtonStatusColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\HotKeyConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\InverseBoolConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\SpeedDialTextConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\SpeedDialIconConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\favColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\FieldVisibility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\AliasTypeConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\messageCheckConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\callDirectionColorConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\callDirectionConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\groupNameConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\MyEnumHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\MySendRequestHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\MyFileSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\TimeHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\Login.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\Tabs.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\Favorites.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\MyChatsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\MySearch.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\ContactCell.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\DialPad.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)share_res\oldphone.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)share_res\ring.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)share_res\pacman.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\navBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\navBarMaster.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\contactDetail.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\ContactTabbedPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\Recent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\Groups.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\info.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\CallLogCell.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\CallListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\messageViewCell.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\Messages.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\vm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\bugReport.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\ch.txt" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\pt.txt" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\sp.txt" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\en.txt" />
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\he.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\searchPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\RegistrationLostPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\components\HotKeys.xaml.cs">
+      <DependentUpon>HotKeys.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\components\hotKyes.xaml.cs">
+      <DependentUpon>hotKyes.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\components\RegistrationLostPage.xaml.cs">
+      <DependentUpon>RegistrationLostPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\components\speedDialEditorPage.xaml.cs">
+      <DependentUpon>speedDialEditorPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\components\speedDialPage.xaml.cs">
+      <DependentUpon>speedDialPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\components\userControllers\ContactCellLight.xaml.cs">
+      <DependentUpon>ContactCellLight.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\components\userControllers\DraggableView.xaml.cs">
+      <DependentUpon>DraggableView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\components\userControllers\SpeedDialComponent.xaml.cs">
+      <DependentUpon>SpeedDialComponent.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\components\userControllers\speedDialView.xaml.cs">
+      <DependentUpon>speedDialView.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\Entities\SpeedDial.xaml.cs">
+      <DependentUpon>SpeedDial.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="C:\Xamarin\LinphoneXamarin\LinphoneXamarin\styles\HeaderTemplate.xaml.cs">
+      <DependentUpon>HeaderTemplate.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\speedDialPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\speedDialEditorPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\speedDialView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\SpeedDialComponent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\DraggableView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\TopBarComponent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\MorePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\RootPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\FavotireComponent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\RecentComponent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\ChatComponent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)components\userControllers\MyPresenceComponent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Android.App;
+using Android.Content;
+using Android.Net.Wifi;
+using Android.OS;
+using Android.Runtime;
+using Android.Views;
+using Android.Widget;
+using Linphone;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using static Android.Net.Wifi.WifiManager;
+
+namespace LinphoneXamarin.Android
+{
+    [Service]
+    class RegistrationLostService : Service, LoginRegistrationListener
+    {
+        public override IBinder OnBind(Intent intent)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task onLoginFailedAsync(LoginError loginError)
+        {
+            Console.WriteLine("omer190: onLoginFailed");
+            ActivityManager am = (ActivityManager)GetSystemService(ActivityService);
+            am.KillBackgroundProcesses(PackageName);
+            Process.KillProcess(global::Android.OS.Process.MyPid());
+            Java.Lang.JavaSystem.Exit(0);
+        }
+
+        public void onLoginLevelUp(int precent, MyRegistrationState registrationState)
+        {
+
+        }
+
+        public void onLoginSuccsses()
+        {
+            Console.WriteLine("omer190:onLoginSuccsses");
+            ActivityManager am = (ActivityManager)GetSystemService(ActivityService);
+            am.KillBackgroundProcesses(PackageName);
+            Process.KillProcess(global::Android.OS.Process.MyPid());
+            Java.Lang.JavaSystem.Exit(0);
+        }
+
+        public override StartCommandResult OnStartCommand(Intent intent, StartCommandFlags flags, int startId)
+        {
+            // This method executes on the main thread of the application.
+            Console.WriteLine("omer190: RegistrationLostService started");
+
+            try
+            {
+                Java.Lang.JavaSystem.LoadLibrary("bctoolbox");
+                Java.Lang.JavaSystem.LoadLibrary("ortp");
+                Java.Lang.JavaSystem.LoadLibrary("mediastreamer_base");
+                Java.Lang.JavaSystem.LoadLibrary("mediastreamer_voip");
+                Java.Lang.JavaSystem.LoadLibrary("linphone");
+
+                LinphoneAndroid.setAndroidContext(JNIEnv.Handle, Plugin.CurrentActivity.CrossCurrentActivity.Current.AppContext.Handle);
+                LinphoneBase.Instance.startBackgroundItreation();
+                var ls = LoginService.Instance;
+                ls.loginRegistrationListener = this;
+                LoginService.Instance.register(RegisterCommands.ReRegister);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("omer190: error: " + e);
+            }
+
+
+            return StartCommandResult.NotSticky;
+        }
+
+    }
+}

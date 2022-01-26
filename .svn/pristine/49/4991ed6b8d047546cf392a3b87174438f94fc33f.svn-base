@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage    xmlns="http://xamarin.com/schemas/2014/forms"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                x:Class="LinphoneXamarin.components.navBarMaster"
+                Title="{StaticResource menu}" 
+                xmlns:controls="clr-namespace:ImageCircle.Forms.Plugin.Abstractions;assembly=ImageCircle.Forms.Plugin"
+                FlowDirection="{StaticResource FlowDirection}">
+    <StackLayout Orientation="Vertical" HorizontalOptions="StartAndExpand">
+        <StackLayout.GestureRecognizers>
+            <TapGestureRecognizer
+      Tapped="OnLayoutTapped"
+      NumberOfTapsRequired="1"/>
+        </StackLayout.GestureRecognizers>
+        <StackLayout  Padding="30" Orientation="Vertical" HorizontalOptions="FillAndExpand" BackgroundColor="#00688f">
+
+            <AbsoluteLayout HorizontalOptions="CenterAndExpand">
+                <AbsoluteLayout.GestureRecognizers>
+                    <TapGestureRecognizer
+      Tapped="OnImageTapped"
+      NumberOfTapsRequired="1"/>
+                </AbsoluteLayout.GestureRecognizers>
+                <!--<Image Source="{Binding myImage}" AbsoluteLayout.LayoutFlags="All"  AbsoluteLayout.LayoutBounds=".4,.4,.6,.6"/>-->
+                <controls:CircleImage Source="{Binding myImage}" Aspect="AspectFill"  AbsoluteLayout.LayoutFlags="All"  AbsoluteLayout.LayoutBounds=".4,.4,.7,.7">
+                </controls:CircleImage>
+                <Frame x:Name="presenceLabel"  BorderColor="#00688f"  AbsoluteLayout.LayoutBounds=".2,.2,.11,.12" AbsoluteLayout.LayoutFlags="All"
+            BackgroundColor="{Binding myStatuscolor}" CornerRadius="10" />
+                <StackLayout IsVisible="False" BackgroundColor="White" Padding="5"  AbsoluteLayout.LayoutBounds=".9,.9,-1,-1" AbsoluteLayout.LayoutFlags="PositionProportional"  x:Name="presenceList" Orientation="Vertical">
+
+                    <Label x:Name="AvaliableLbl" Text="{StaticResource available}" VerticalOptions="Center" FontSize="Medium" TextColor="Green"></Label>
+                    <BoxView Color="Black" HeightRequest="1.5"></BoxView>
+                    <Label x:Name="busyLbl" Text="{StaticResource atAMeeting}" VerticalOptions="Center" FontSize="Medium" TextColor="#FFA500"></Label>
+                    <BoxView Color="Black" HeightRequest="1.5"></BoxView>
+                    <Label x:Name="dndLbl" Text="{StaticResource doNotDisturb}"  FontSize="Medium" TextColor="Red"></Label>
+                </StackLayout>
+
+            </AbsoluteLayout>
+            <StackLayout Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="Center">
+                <Label Margin="2" Text="{Binding myName}" VerticalOptions="Center" FontSize="Small" TextColor="White"></Label>
+                <Label Margin="2" Text="{Binding myAlias}" VerticalOptions="End" FontSize="Small" TextColor="White"></Label>
+            </StackLayout>
+        </StackLayout>
+        <ListView x:Name="MenuItemsListView"
+          SeparatorVisibility="None"
+          HasUnevenRows="true"
+          ItemsSource="{Binding MenuItems}" >
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Padding="20,20" HorizontalOptions="FillAndExpand">
+                            <StackLayout Orientation="Horizontal">
+                                <Label VerticalOptions="FillAndExpand"
+                                    VerticalTextAlignment="Center"
+                                    Text="{Binding Title}"
+                                       TextColor="Black"
+                                    FontSize="Medium"
+                                    FontAttributes="Bold"/>
+                            </StackLayout>
+
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>

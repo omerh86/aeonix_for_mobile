@@ -1,0 +1,99 @@
+﻿using LinphoneXamarin.Entities;
+using SQLite;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using LinphoneXamarin.Util;
+
+namespace LinphoneXamarin.Services
+{
+    public sealed class ImgDBRepository
+    {
+        private static ImgDBRepository instance = null;
+        private static readonly object padlock = new object();
+
+        private SQLiteConnection conn;
+
+        public static ImgDBRepository Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        var path = "";
+#if WINDOWS_UWP
+                        path = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\SQLite.db3";
+#else
+                        path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SQLite.db3");
+#endif
+                        instance = new ImgDBRepository(path);
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public ImgDBRepository(string dbPath)
+        {
+#if WINDOWS_UWP
+            var databasePath = Windows.Storage.ApplicationData.Current.LocalFolder.Path + "\\MyDB.db";
+#else
+            var databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "MyDB.db");
+#endif
+            conn = new SQLiteConnection(databasePath);
+            conn.CreateTable<MyImgItem>();
+            Console.WriteLine("Table created!");
+        }
+
+        public void resetTable()
+        {
+            var items = GetItems();
+            List<string> users = new List<string>();
+            foreach (var i in items)
+            {
+                users.Add(i.userName);
+            }
+            MyFileSystem.Instance.deleteUserIdImage(users);
+            conn.DropTable<MyImgItem>();
+            conn.CreateTable<MyImgItem>();
+        }
+
+        public List<MyImgItem> GetItems()
+        {
+            return conn.Table<MyImgItem>().ToList();
+        }
+
+        public MyImgItem getItemByUserName(string userName)
+        {
+            return conn.Table<MyImgItem>().Where(i => i.userName == userName).FirstOrDefault();
+        }
+
+        public MyImgItem getItemByImageSignature(long imgSignature)
+        {
+            return conn.Table<MyImgItem>().Where(i => i.imgSignature == imgSignature).FirstOrDefault();
+        }
+
+        public void setItem(MyImgItem item)
+        {
+            var i = getItemByUserName(item.userName);
+            if (i != null)
+            {
+                i.imgSignature = item.imgSignature;
+                conn.Update(i);
+            }
+            else
+            {
+                conn.Insert(item);
+            }
+        }
+
+        public bool isExists(string userName)
+        {
+            var t = conn.Table<MyImgItem>().Where(i => i.userName.Equals(userName)).FirstOrDefault();
+            return t != null;
+
+        }
+    }
+}

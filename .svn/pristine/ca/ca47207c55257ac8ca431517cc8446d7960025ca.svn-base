@@ -1,0 +1,11 @@
+ICSharpCode.SharpZipLib
+ImageCircle.Forms.Plugin
+Newtonsoft.Json
+Plugin.ContactService
+Plugin.CurrentActivity
+Plugin.DeviceInfo
+Plugin.LocalNotifications.Abstractions
+Plugin.LocalNotifications
+System.Diagnostics.Tracer
+System.Net.Mqtt
+System.Runtime

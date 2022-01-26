@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LinphoneXamarin.components.Recent"
+             x:Name="RecentView"
+             Title="Recent"
+             xmlns:control="clr-namespace:LinphoneXamarin.components.userControllers"
+             FlowDirection="{StaticResource FlowDirection}">
+    <ContentPage.Content>
+        <StackLayout  x:Name="stack_layout" VerticalOptions="Fill" HorizontalOptions="Fill" Orientation="Vertical" Spacing="0" >
+
+            <control:TopBarComponent  VerticalOptions="StartAndExpand" Margin="5"></control:TopBarComponent>
+            <control:CallListView ></control:CallListView>
+            <control:SpeedDialComponent  HeightRequest="180" HorizontalOptions="FillAndExpand" ></control:SpeedDialComponent>
+            <StackLayout x:Name="callLogsComponent" VerticalOptions="Fill" >
+                <Frame  BackgroundColor="White" Padding="7" Margin="0,5,0,0" CornerRadius="10">
+                    <StackLayout>
+                        <StackLayout  Orientation="Horizontal"  Margin="4" Padding="2" HorizontalOptions="FillAndExpand">
+                            <Label Text="{StaticResource showMissedCalls}" FontAttributes="Bold" TextColor="#00688f" FontSize="Medium" VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+                            <Switch x:Name="missedCallSwitch" VerticalOptions="Center" HorizontalOptions="End"  Toggled="switcher_Toggled"></Switch>
+                        </StackLayout>
+                        <AbsoluteLayout>
+
+                            <ListView  IsPullToRefreshEnabled="True" AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1"
+                          RefreshCommand="{Binding RefreshCommand}"
+                          IsRefreshing="{Binding IsRefreshing}"
+                          IsGroupingEnabled="True"
+                          GroupDisplayBinding="{Binding Title}"
+                          HasUnevenRows="True"
+                          SeparatorVisibility="None"
+                          x:Name="callsLog"
+                               CachingStrategy="RecycleElementAndDataTemplate"
+                        ItemAppearing="itemAppearing"
+                               ItemTapped="onItemTapped"
+                          ItemsSource="{Binding}"
+                               >
+                                <ListView.GroupHeaderTemplate>
+                                    <DataTemplate>
+                                        <ViewCell>
+                                            <StackLayout BackgroundColor="Transparent">
+                                                <Label Text="{Binding Title}"  TextColor="#00688f" FontAttributes="Bold"  FontSize="Small" VerticalOptions="Center" HorizontalOptions="Center"></Label>
+                                            </StackLayout>
+                                        </ViewCell>
+                                    </DataTemplate>
+                                </ListView.GroupHeaderTemplate>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <control:CallLogCell 
+                                    MessageCommand="{x:Binding Source={x:Reference RecentView} , Path=BindingContext.MessageCommand}" 
+                                    ContactInfoCommand="{x:Binding Source={x:Reference RecentView} , Path=BindingContext.ContactinfoCommand}"
+                                    image="{x:Binding image}"
+                                    contactType="{x:Binding contact.type}" 
+                                    isFav="{x:Binding contact.isFav}"
+                                    userName="{x:Binding contact.userName}"
+                                    displayName="{x:Binding displayName}"
+                                    alias="{x:Binding alias}"  
+                                    presence="{x:Binding contact.presenceStatus}" />
+
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                                <ListView.Footer>
+                                    <Button x:Name="loadMore" HeightRequest="100" Clicked="onLoadMoreBtn" IsVisible="False" Text="&#xf103;" BackgroundColor="Transparent" TextColor="DimGray" HorizontalOptions="Center" Margin="5" >
+                                        <Button.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="Font Awesome 5 Free"  />
+                                        </Button.FontFamily>
+                                    </Button>
+                                </ListView.Footer>
+                            </ListView>
+
+                            <Frame x:Name="callogframe" CornerRadius="10" IsVisible="false" AbsoluteLayout.LayoutBounds=".5,.20,.9,.50" OutlineColor="Silver" BorderColor="Silver"  BackgroundColor="White" AbsoluteLayout.LayoutFlags="All">
+                                <AbsoluteLayout>
+
+                                    <ScrollView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
+
+                                        <Grid  x:Name="actionBar" >
+
+
+                                            <Label x:Name="favBtn" ClassId="{StaticResource favorites}" Text="&#xf004;" HorizontalOptions="Center" VerticalOptions="Center"  BackgroundColor="White"  TextColor="DimGray" FontSize="Small">
+                                                <Label.FontFamily>
+                                                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"/>
+                                                </Label.FontFamily>
+                                            </Label>
+                                            <Button  x:Name="icollaborationBtn" Clicked="onCollaborationClicked" ClassId="{StaticResource audiocall}" Text="&#xf2b5;" HorizontalOptions="Center"   BackgroundColor="White"  TextColor="#72A2C0" FontSize="Small">
+                                                <Button.FontFamily>
+                                                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"/>
+                                                </Button.FontFamily>
+                                            </Button>
+                                            <Button  x:Name="callBtn" Clicked="onCallClicked" ClassId="{StaticResource audiocall}" Text="&#xf095;" HorizontalOptions="Center"   BackgroundColor="White"  TextColor="#72A2C0" FontSize="Small">
+                                                <Button.FontFamily>
+                                                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"/>
+                                                </Button.FontFamily>
+                                            </Button>
+                                            <Button  x:Name="videoBtn" Clicked="onVideoCallClicked" ClassId="{StaticResource video}" Text="&#xf03d;" HorizontalOptions="Center"   BackgroundColor="White" TextColor="#72A2C0" FontSize="Small">
+                                                <Button.FontFamily>
+                                                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                                </Button.FontFamily>
+                                            </Button>
+                                            <Button  x:Name="infoBtn" Clicked="onInfoClicked" ClassId="{StaticResource information}" Text="&#xf129;" HorizontalOptions="Center"  BackgroundColor="White" TextColor="#72A2C0" FontSize="Small">
+                                                <Button.FontFamily>
+                                                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                                </Button.FontFamily>
+                                            </Button>
+                                            <Button  x:Name="messageBtn" Clicked="onMessageClicked"  Text="&#xf075;" ClassId="{StaticResource chat}" HorizontalOptions="Center"   BackgroundColor="White" TextColor="#72A2C0" FontSize="Small">
+                                                <Button.FontFamily>
+                                                    <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                                                </Button.FontFamily>
+                                            </Button>
+                                        </Grid>
+                                    </ScrollView>
+                                    <Label  x:Name="frameTitle" BackgroundColor="White" TextColor="Black" FontAttributes="Bold" FontSize="Small" AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0.5,0" ></Label>
+                                    <Label x:Name="cancelBtn" Text="&#xf00d;" HorizontalTextAlignment="Start" VerticalTextAlignment="Start"  TextColor="Black"  FontSize="Medium" AbsoluteLayout.LayoutFlags="PositionProportional" AbsoluteLayout.LayoutBounds="0,0">
+                                        <Label.FontFamily>
+                                            <OnPlatform x:TypeArguments="x:String"  WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="Font Awesome 5 Free"  />
+                                        </Label.FontFamily>
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer
+      Tapped="OnFrameTapped"
+      NumberOfTapsRequired="1"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </AbsoluteLayout>
+                            </Frame>
+
+                            <Label x:Name="loadingLbl" IsVisible="False" BackgroundColor="White" FontSize="Medium" HorizontalOptions="CenterAndExpand" FontAttributes="Bold" TextColor="Gray" AbsoluteLayout.LayoutBounds=".5,.9"  AbsoluteLayout.LayoutFlags="PositionProportional"></Label>
+                        </AbsoluteLayout>
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+
+        </StackLayout>
+
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="LinphoneXamarin.components.userControllers.speedDialView"
+             xmlns:Helpers="clr-namespace:LinphoneXamarin.Util">
+    <ContentView.Content>
+
+        <StackLayout Padding="5">
+            <AbsoluteLayout>
+                <Image x:Name="btn" BackgroundColor="Transparent" HeightRequest="55" WidthRequest="55" AbsoluteLayout.LayoutBounds=".5,.5" AbsoluteLayout.LayoutFlags="PositionProportional" Source="{x:Binding Type, Converter={Helpers:SpeedDialIconConverter}}" />
+
+                <ImageButton x:Name="presenceLabel"  CornerRadius="6" WidthRequest="12" HeightRequest="12" BackgroundColor="{x:Binding Status, Converter={Helpers:FeatureButtonStatusColorConverter}}"  AbsoluteLayout.LayoutBounds=".5,1"  AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                <Label Text="&#xf044;" FontSize="Medium" IsVisible="{x:Binding Edit}" AbsoluteLayout.LayoutBounds=".05,.01" TextColor="Black" AbsoluteLayout.LayoutFlags="PositionProportional">
+                    <Label.FontFamily>
+                        <OnPlatform x:TypeArguments="x:String" WinPhone="Assets/fa-solid-900.ttf#Font Awesome 5 Free Solid" Android="fa-solid-900.ttf#Font Awesome 5 Free Regular" iOS="FontAwesome5FreeSolid"  />
+                    </Label.FontFamily>
+                </Label>
+                <Label x:Name="counterLbl" IsVisible="False"  FontSize="Medium" AbsoluteLayout.LayoutBounds=".9,.01" TextColor="Red" FontAttributes="Bold" AbsoluteLayout.LayoutFlags="PositionProportional"/>
+            </AbsoluteLayout>
+
+            <Label  LineBreakMode="WordWrap" HorizontalTextAlignment="Center" FontAttributes="Bold" FontSize="Micro" Padding="1"  MaxLines="2" Text="{x:Binding Label}" />
+
+        </StackLayout>
+
+    </ContentView.Content>
+</ContentView>

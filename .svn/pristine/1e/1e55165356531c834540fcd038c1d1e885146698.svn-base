@@ -1,0 +1,314 @@
+﻿using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using Xamarin.Essentials;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+using static LinphoneXamarin.components.speedDialPage;
+
+namespace LinphoneXamarin.components.userControllers
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class speedDialView : ContentView, IMissedCounterListener
+    {
+
+
+        public speedDialView(int position, SpeedDialType speedDialType, FeatureButtonStatus status, string Label, bool hasFrame, ICommand DragEndCommand, ICommand ShortPressedCommand, ICommand EditPressedCommand, ICommand DragProgressCommand)
+        {
+            InitializeComponent();
+            this.BindingContext = this;
+            this.position = position;
+            this.Type = speedDialType;
+            if (this.Type == SpeedDialType.VM)
+            {
+                var cs = CallLogService.Instance;
+                cs.featureMissedCounterListeners.Add(this);
+                onVMCounterChanged(MyFileSystem.Instance.loadVMCounter());
+            }
+
+            this.Status = status;
+            this.Label = Label;
+            this.Edit = false;
+            this.DragEndCommand = DragEndCommand;
+            this.ShortPressedCommand = ShortPressedCommand;
+            this.EditPressedCommand = EditPressedCommand;
+            this.DragProgressCommand = DragProgressCommand;
+        }
+
+        public event EventHandler DragStart = delegate { };
+        public event EventHandler DragEnd = delegate { };
+
+        public static readonly BindableProperty DragDirectionProperty = BindableProperty.Create(
+            propertyName: "DragDirection",
+            returnType: typeof(DragDirectionType),
+            declaringType: typeof(speedDialView),
+            defaultValue: DragDirectionType.All,
+            defaultBindingMode: BindingMode.TwoWay);
+
+        public DragDirectionType DragDirection
+        {
+            get { return (DragDirectionType)GetValue(DragDirectionProperty); }
+            set { SetValue(DragDirectionProperty, value); }
+        }
+
+        public static readonly BindableProperty DragModeProperty = BindableProperty.Create(
+           propertyName: "DragMode",
+           returnType: typeof(DragMode),
+           declaringType: typeof(speedDialView),
+           defaultValue: DragMode.LongPress,
+           defaultBindingMode: BindingMode.TwoWay);
+
+        public DragMode DragMode
+        {
+            get { return (DragMode)GetValue(DragModeProperty); }
+            set { SetValue(DragModeProperty, value); }
+        }
+
+        public static readonly BindableProperty IsDraggingProperty = BindableProperty.Create(
+          propertyName: "IsDragging",
+          returnType: typeof(bool),
+          declaringType: typeof(speedDialView),
+          defaultValue: false,
+          defaultBindingMode: BindingMode.TwoWay);
+
+        public bool IsDragging
+        {
+            get { return (bool)GetValue(IsDraggingProperty); }
+            set { SetValue(IsDraggingProperty, value); }
+        }
+
+        public static readonly BindableProperty RestorePositionCommandProperty = BindableProperty.Create(nameof(RestorePositionCommand), typeof(ICommand), typeof(DraggableView), default(ICommand), BindingMode.TwoWay, null, OnRestorePositionCommandPropertyChanged);
+
+        static void OnRestorePositionCommandPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+        {
+            var source = bindable as speedDialView;
+            if (source == null)
+            {
+                return;
+            }
+            source.OnRestorePositionCommandChanged();
+        }
+
+        private void OnRestorePositionCommandChanged()
+        {
+            OnPropertyChanged("RestorePositionCommand");
+        }
+
+        public ICommand RestorePositionCommand
+        {
+            get
+            {
+                return (ICommand)GetValue(RestorePositionCommandProperty);
+            }
+            set
+            {
+                SetValue(RestorePositionCommandProperty, value);
+            }
+        }
+
+        public void DragStarted()
+        {
+            if (DragMode == DragMode.None)
+                return;
+            DragStart(this, default(EventArgs));
+            IsDragging = true;
+            Edit = true;
+        }
+
+        public void clicked()
+        {
+            Device.BeginInvokeOnMainThread(() =>
+           {
+               if (Edit)
+               {
+                   Execute(EditPressedCommand, position);
+                   Edit = false;
+               }
+               else
+               {
+                   Execute(ShortPressedCommand, position);
+               }
+           });
+        }
+
+        public void DragEnded(float x, float y)
+        {
+            if (DragMode == DragMode.None)
+                return;
+            IsDragging = false;
+            DragEnd(this, default(EventArgs));
+            Execute(DragEndCommand, new DragObj(new float[] { x, y }, position));
+        }
+
+        public void DragInProgress(float x, float y)
+        {
+            if (DragMode == DragMode.None)
+                return;
+
+            Execute(DragProgressCommand, new DragObj(new float[] { x, y }, position));
+
+        }
+
+        public static readonly BindableProperty DragProgressCommandProperty =
+BindableProperty.Create("DragProgressCommand", typeof(ICommand), typeof(speedDialView), null);
+        public ICommand DragProgressCommand
+        {
+            get { return (ICommand)GetValue(DragProgressCommandProperty); }
+            set { SetValue(DragProgressCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty DragEndCommandProperty =
+BindableProperty.Create("DragEndCommand", typeof(ICommand), typeof(speedDialView), null);
+        public ICommand DragEndCommand
+        {
+            get { return (ICommand)GetValue(DragEndCommandProperty); }
+            set { SetValue(DragEndCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty ShortPressedCommandProperty =
+BindableProperty.Create("ShortPressedCommand", typeof(ICommand), typeof(speedDialView), null);
+        public ICommand ShortPressedCommand
+        {
+            get { return (ICommand)GetValue(ShortPressedCommandProperty); }
+            set { SetValue(ShortPressedCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty EditPressedCommandProperty =
+        BindableProperty.Create("EditPressedCommand", typeof(ICommand), typeof(speedDialView), null);
+        public ICommand EditPressedCommand
+        {
+            get { return (ICommand)GetValue(EditPressedCommandProperty); }
+            set { SetValue(EditPressedCommandProperty, value); }
+        }
+
+        public static readonly BindableProperty TypeProperty =
+BindableProperty.Create("Type", typeof(SpeedDialType), typeof(speedDialView), SpeedDialType.PageQ);
+
+        public SpeedDialType Type
+        {
+            get
+            {
+                SpeedDialType Type = (SpeedDialType)GetValue(TypeProperty);
+                return Type;
+            }
+            set
+            {
+                SetValue(TypeProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty StatusProperty =
+BindableProperty.Create("Status", typeof(FeatureButtonStatus), typeof(speedDialView), FeatureButtonStatus.Inactive);
+
+        public FeatureButtonStatus Status
+        {
+            get
+            {
+                FeatureButtonStatus Status = (FeatureButtonStatus)GetValue(StatusProperty);
+                return Status;
+            }
+            set
+            {
+                SetValue(StatusProperty, value);
+            }
+        }
+
+
+        public static readonly BindableProperty LabelProperty =
+BindableProperty.Create("Label", typeof(string), typeof(speedDialView), "");
+
+        public string Label
+        {
+            get
+            {
+                string Label = (string)GetValue(LabelProperty);
+                return Label;
+            }
+            set
+            {
+                SetValue(LabelProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty EditProperty =
+BindableProperty.Create("Edit", typeof(bool), typeof(speedDialView), false);
+
+        public bool Edit
+        {
+            get
+            {
+                bool Edit = (bool)GetValue(EditProperty);
+                return Edit;
+            }
+            set
+            {
+                SetValue(EditProperty, value);
+            }
+        }
+
+        public static readonly BindableProperty positionProperty =
+BindableProperty.Create("position", typeof(int), typeof(speedDialView), -1);
+
+        public int position
+        {
+            get
+            {
+                int position = (int)GetValue(positionProperty);
+                return position;
+            }
+            set
+            {
+                SetValue(positionProperty, value);
+            }
+        }
+
+        public static void Execute(ICommand command, object val)
+        {
+            if (command == null) return;
+            if (command.CanExecute(null))
+            {
+                command.Execute(val);
+            }
+        }
+
+        public void onVMCounterChanged(int counter)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+                       {
+                           if (counter > 0)
+                           {
+                               counterFrame.IsVisible = true;
+                               counterLbl.IsVisible = true;
+                               counterLbl.Text = counter.ToString();
+                           }
+                           else
+                           {
+                               counterFrame.IsVisible = false;
+                               counterLbl.IsVisible = false;
+                           }
+                       });
+        }
+
+        public void onMessageCounterchanged(int counter)
+        {
+
+        }
+
+        public void onCallCounterchanged(int counter)
+        {
+
+        }
+
+        private void addLog(string message)
+        {
+            Console.WriteLine("omer3232: " + message);
+            MyFileSystem.Instance.writeDebug(message, "speedDialView");
+        }
+    }
+}

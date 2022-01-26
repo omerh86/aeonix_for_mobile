@@ -1,0 +1,2331 @@
+﻿
+using LinphoneXamarin.Entities;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+
+namespace LinphoneXamarin.Util
+{
+    public sealed class MySendRequestHelper
+    {
+        private static MySendRequestHelper instance = null;
+        private static readonly object padlock = new object();
+
+        MySendRequestHelper() { }
+        public static MySendRequestHelper Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if (instance == null)
+                    {
+                        instance = new MySendRequestHelper();
+                    }
+                    return instance;
+                }
+            }
+        }
+
+        public string getMonitorRequest(string userName, string endPoint)
+        {
+
+            string deviceObject = "N</" + endPoint + ">" + userName;
+            MonitorstartrequestRootobject monitorstartrequestRootobject = new MonitorstartrequestRootobject();
+            monitorstartrequestRootobject.MonitorStartRequest.monitorObject.deviceObject = deviceObject;
+            return objToJson<MonitorstartrequestRootobject>(monitorstartrequestRootobject);
+        }
+
+        public string getFavMonitorRequest(List<UserNameProp> userNamePropArr)
+        {
+            string deviceObject = "";
+            foreach (UserNameProp u in userNamePropArr)
+            {
+                deviceObject += "N<>" + u.userName + ",";
+            };
+            // string deviceObject = "N<>" + userNameProp.userName;
+            FavMonitorstartrequestRootobject favMonitorstartrequestRootobject = new FavMonitorstartrequestRootobject();
+            favMonitorstartrequestRootobject.MonitorStartRequest.monitorObject.deviceObject = deviceObject;
+            return objToJson<FavMonitorstartrequestRootobject>(favMonitorstartrequestRootobject);
+        }
+
+        public string getSendMessageRequest(string messageContent, string from, string epId, string to)
+        {
+            SendMessageRequest sendMessageRequest = new SendMessageRequest(messageContent, from, epId, to);
+            return objToJson<SendMessageRequest>(sendMessageRequest);
+        }
+
+        public string getConnectionRequest(ConnectionProp connectionProp)
+        {
+            ConnectionRequest connectionRequest = new ConnectionRequest(connectionProp);
+            return objToJson<ConnectionRequest>(connectionRequest);
+        }
+
+        public string getAddExternalContactsRequest(AddExternalContacts addExternalContacts)
+        {
+            AddExternalContactsRequest addExternalContactsRequest = new AddExternalContactsRequest(addExternalContacts);
+            return objToJson<AddExternalContactsRequest>(addExternalContactsRequest);
+        }
+
+        public string getRemoveExternalContactsRequest(RemoveExternalContacts removeExternalContacts)
+        {
+            RemoveExternalContactsRequest removeExternalContactsRequest = new RemoveExternalContactsRequest(removeExternalContacts);
+            return objToJson<RemoveExternalContactsRequest>(removeExternalContactsRequest);
+        }
+
+        public string getRemoveAllExternalContactsRequest(RemoveAllExternalContacts removeAllExternalContacts)
+        {
+            RemoveAllExternalContactsRequest removeAllExternalContactsRequest = new RemoveAllExternalContactsRequest(removeAllExternalContacts);
+            return objToJson<RemoveAllExternalContactsRequest>(removeAllExternalContactsRequest);
+        }
+
+        public string getAddFavRequest(AddFavProp addFavProp)
+        {
+            AddFavRequest addFavRequest = new AddFavRequest(addFavProp);
+            return objToJson<AddFavRequest>(addFavRequest);
+        }
+        public string setFeatureButtonsRequest(string userName, List<SpeedDial> speedDials)
+        {
+            SetFeatureButtonsRequest setFeatureButtonsRequest = new SetFeatureButtonsRequest(userName, speedDials);
+            return objToJson<SetFeatureButtonsRequest>(setFeatureButtonsRequest);
+        }
+
+        public string getFeatureButtonsRequest(UserNameProp userNameProp)
+        {
+            GetFeatureButtonsRequest getFeatureButtonsRequest = new GetFeatureButtonsRequest(userNameProp);
+            return objToJson<GetFeatureButtonsRequest>(getFeatureButtonsRequest);
+        }
+
+        public string getFeatureButtonsStatusRequest(string deviceID)
+        {
+            GetFeatureButtonsStatusRequest getFeatureButtonsStatusRequest = new GetFeatureButtonsStatusRequest(deviceID);
+            return objToJson<GetFeatureButtonsStatusRequest>(getFeatureButtonsStatusRequest);
+        }
+
+        public string getFeatureButtonsActionRequest(int id, string userName)
+        {
+            FeatureButtonsActionRequest f = new FeatureButtonsActionRequest(id, userName);
+            return objToJson<FeatureButtonsActionRequest>(f);
+        }
+
+        public string getAddGroupFavRequest(AddGroupFavProp addGroupFavProp)
+        {
+            AddGroupFavRequest addGroupFavRequest = new AddGroupFavRequest(addGroupFavProp);
+            return objToJson<AddGroupFavRequest>(addGroupFavRequest);
+        }
+
+        public string getRemoveFavRequest(RemoveFavProp removeFavProp)
+        {
+            RemoveFavRequest removeFavRequest = new RemoveFavRequest(removeFavProp);
+            return objToJson<RemoveFavRequest>(removeFavRequest);
+        }
+
+        public string getRemoveGroupFavRequest(RemoveGroupFavProp removeGroupFavProp)
+        {
+            RemoveGroupFavRequest removeGroupFavRequest = new RemoveGroupFavRequest(removeGroupFavProp);
+            return objToJson<RemoveGroupFavRequest>(removeGroupFavRequest);
+        }
+
+        public string getFcmRequest(FcmProp fcmProp)
+        {
+            FcmRequest fcmRequest = new FcmRequest(fcmProp);
+            return objToJson<FcmRequest>(fcmRequest);
+        }
+
+        public string getVMGetMessageListRequest(VMGetMessageListObj vMGetMessageListObj)
+        {
+            VMGetMessageListRequest vMGetMessageListRequest = new VMGetMessageListRequest(vMGetMessageListObj);
+            return objToJson<VMGetMessageListRequest>(vMGetMessageListRequest);
+        }
+
+        public string getVMGetAudioMessageRequest(VMGetVMAudioMessageObj vMGetVMAudioMessageObj)
+        {
+            VMGetAudioMessageRequest vMGetAudioMessageRequest = new VMGetAudioMessageRequest(vMGetVMAudioMessageObj);
+            return objToJson<VMGetAudioMessageRequest>(vMGetAudioMessageRequest);
+        }
+
+        public string getVMGetMessageCommandRequest(VMGetVMMessageCommandObj vMGetMessageCommandObj)
+        {
+            VMGetMessageCommandRequest vMGetMessageCommandRequest = new VMGetMessageCommandRequest(vMGetMessageCommandObj);
+            return objToJson<VMGetMessageCommandRequest>(vMGetMessageCommandRequest);
+        }
+
+        public string getFavoritesRequest(UserNameProp userNameProp)
+        {
+            FavoritesRequest favoritesRequest = new FavoritesRequest(userNameProp);
+            return objToJson<FavoritesRequest>(favoritesRequest);
+        }
+
+        public string getContactRequest(UserNameProp userNameProp)
+        {
+            ContactRequest contactRequest = new ContactRequest(userNameProp);
+            return objToJson<ContactRequest>(contactRequest);
+        }
+
+
+        public string getStartMonitorInstantMessagesRequest(UserNameProp userNameProp)
+        {
+            StartMonitorInstantMessagesRequest startMonitorInstantMessagesRequest = new StartMonitorInstantMessagesRequest(userNameProp);
+            return objToJson<StartMonitorInstantMessagesRequest>(startMonitorInstantMessagesRequest);
+        }
+
+        public string getCalllogRequest(CalllogProp calllogProp)
+        {
+            CallLogRequest callLogRequest = new CallLogRequest(calllogProp);
+            return objToJson<CallLogRequest>(callLogRequest);
+        }
+
+        public string getCreateAccountRequest(CreateAccountProp createAccountProp)
+        {
+            CreateAccountRequest createAccountRequest = new CreateAccountRequest(createAccountProp);
+            return objToJson<CreateAccountRequest>(createAccountRequest);
+        }
+
+        public string GetRsUserRequest(UserNameProp userNameProp)
+        {
+            RsUserRequest rsUserRequest = new RsUserRequest(userNameProp);
+            return objToJson<RsUserRequest>(rsUserRequest);
+        }
+
+        public string getStartMonitorUserRequest(UserNameProp userNameProp)
+        {
+            StartMonitorUserRequest startMonitorUserRequest = new StartMonitorUserRequest(userNameProp);
+            return objToJson<StartMonitorUserRequest>(startMonitorUserRequest);
+        }
+
+        public string getStartCollaborationRequest(StartCollaborationRequestObj startCollaborationRequestObj)
+        {
+            _StartCollaborationRequest s = new _StartCollaborationRequest(startCollaborationRequestObj);
+            return objToJson<_StartCollaborationRequest>(s);
+        }
+
+        public string getCollaborationOfferStatus(CollaborationOfferStatusObj collaborationOfferStatusObj)
+        {
+            _CollaborationOfferStatus s = new _CollaborationOfferStatus(collaborationOfferStatusObj);
+            return objToJson<_CollaborationOfferStatus>(s);
+        }
+
+        public string getCancelCollaborationRequest(CancelCollaborationRequestObj cancelCollaborationRequestObj)
+        {
+            _CancelCollaborationRequest s = new _CancelCollaborationRequest(cancelCollaborationRequestObj);
+            return objToJson<_CancelCollaborationRequest>(s);
+        }
+
+        public string GetGroupRequest(UserNameProp userNameProp)
+        {
+            GroupsRequest groupsRequest = new GroupsRequest(userNameProp);
+            return objToJson<GroupsRequest>(groupsRequest);
+        }
+
+        public string getDismissMissedCallsRequest(UserNameProp userNameProp)
+        {
+            DismissMissedCallsRequest dismissMissedCallsRequest = new DismissMissedCallsRequest(userNameProp);
+            return objToJson<DismissMissedCallsRequest>(dismissMissedCallsRequest);
+        }
+
+        public string GetPictureRequest(UserNameProp userNameProp)
+        {
+            PicturerRequest picturerRequest = new PicturerRequest(userNameProp);
+            return objToJson<PicturerRequest>(picturerRequest);
+        }
+
+        public string getMissedCallCounterRequest(UserNameProp userNameProp)
+        {
+            MissedCallCounterRequest missedCallCounterRequest = new MissedCallCounterRequest(userNameProp);
+            return objToJson<MissedCallCounterRequest>(missedCallCounterRequest);
+        }
+
+        public string getSnapShotDeviceRequest(SnapShotProp snapShotProp)
+        {
+            SnapShotDeviceRequest snapShotDeviceRequest = new SnapShotDeviceRequest(snapShotProp);
+            return objToJson<SnapShotDeviceRequest>(snapShotDeviceRequest);
+        }
+
+        public string getStopMonitorRequest()
+        {
+            StopMonitorRequest stopMonitorRequest = new StopMonitorRequest();
+            return objToJson<StopMonitorRequest>(stopMonitorRequest);
+        }
+
+        public string getStopMonitorRequest(string refID)
+        {
+            StopMonitorRequest stopMonitorRequest = new StopMonitorRequest(refID);
+            return objToJson<StopMonitorRequest>(stopMonitorRequest);
+        }
+
+        public string GetNextResponseRequest()
+        {
+            NextResponseRequest nextResponseRequest = new NextResponseRequest(new object());
+            return objToJson<NextResponseRequest>(nextResponseRequest);
+        }
+
+        public string getContactListRequest(ContactListProp contactListProp)
+        {
+            ContactListRequest contactListRequest = new ContactListRequest(contactListProp);
+            return objToJson<ContactListRequest>(contactListRequest);
+        }
+
+        public string getPresenceListRequest(PresenceProp presenceProp)
+        {
+            PresenceRequest presenceRequest = new PresenceRequest(presenceProp);
+            return objToJson<PresenceRequest>(presenceRequest);
+        }
+
+        public string setPresenceStatusRequest(PresenceStateChangeProp presenceStateChangeProp)
+        {
+            SetPresenceStateRequest setPresenceStateRequest = new SetPresenceStateRequest(presenceStateChangeProp);
+            return objToJson<SetPresenceStateRequest>(setPresenceStateRequest);
+        }
+
+        public string getConferenceRequest(_ConferenceCall c)
+        {
+            ConferenceRequest conferenceRequest = new ConferenceRequest(c);
+            return objToJson<ConferenceRequest>(conferenceRequest);
+        }
+
+        public string getMarkInstantMessageRequest(string userName, string ep, string messageId)
+        {
+            MarkInstantMessageRequest m = new MarkInstantMessageRequest(userName, ep, messageId);
+            return objToJson<MarkInstantMessageRequest>(m);
+        }
+
+        public struct UserNameProp
+        {
+            public string userName;
+
+            public UserNameProp(string userName)
+            {
+                this.userName = userName;
+            }
+        }
+
+        public struct FeatureButtonsActionProp
+        {
+            public int id;
+            public string userName;
+
+            public FeatureButtonsActionProp(int id, string userName)
+            {
+                this.id = id;
+                this.userName = userName;
+            }
+        }
+
+        public class MarkinstantmessageProp
+        {
+            public string userName { get; set; }
+            public string epID { get; set; }
+            public bool read { get; set; }
+            public string messageId { get; set; }
+
+            public MarkinstantmessageProp(string userName, string ep, string messageId)
+            {
+                this.userName = userName;
+                this.messageId = messageId;
+                this.read = true;
+                this.epID = ep;
+            }
+        }
+
+        public struct PresenceStateChangeProp
+        {
+            public string userName;
+            public string explicitPresence;
+
+            public PresenceStateChangeProp(string userName, string explicitPresence)
+            {
+                this.userName = userName;
+                this.explicitPresence = explicitPresence;
+            }
+        }
+
+        public class SendInstantmessageProp
+        {
+            public Destination destination { get; set; }
+            public string messageContent { get; set; }
+            public string userName { get; set; }
+            public long time { get; set; }
+            public string epID { get; set; }
+
+            public SendInstantmessageProp(string messageContent, string from, string epID, string to)
+            {
+                this.destination = new Destination();
+                this.destination.type = "ALIAS";
+                this.destination.value = to;
+                this.messageContent = messageContent;
+                this.userName = from;
+                this.time = TimeHelper.Instance.ToUnixTime(DateTime.Now.ToUniversalTime());
+                this.epID = epID;
+            }
+        }
+
+        public class BaseExternalContacts
+        {
+            public string userId { get; set; }
+            public string platform { get; set; }
+        }
+        public class AddExternalContacts : BaseExternalContacts
+        {
+            public List<PhonebookContactInfo> contactList { get; set; }
+            public bool isLastChunk { get; set; }
+
+            public AddExternalContacts(string userName, List<PhonebookContactInfo> ExternalContacts, string platform, bool isLastChunk)
+            {
+                this.userId = userName;
+                this.contactList = ExternalContacts;
+                this.platform = platform;
+                this.isLastChunk = isLastChunk;
+            }
+        }
+
+        public class RemoveExternalContacts : BaseExternalContacts
+        {
+
+            public List<string> contactIdList { get; set; }
+
+            public RemoveExternalContacts(string userName, List<string> contactIdList, string platform)
+            {
+                this.userId = userName;
+                this.contactIdList = contactIdList;
+                this.platform = platform;
+            }
+        }
+
+        public class RemoveAllExternalContacts : BaseExternalContacts
+        {
+            public RemoveAllExternalContacts(string userName, string platform)
+            {
+                this.userId = userName;
+                this.platform = platform;
+            }
+        }
+
+        public struct AddFavProp
+        {
+            public string userName;
+            public string favoriteUserLogiName;
+
+            public AddFavProp(string userName, string favoriteUserLogiName)
+            {
+                this.userName = userName;
+                this.favoriteUserLogiName = favoriteUserLogiName;
+            }
+        }
+        public struct AddGroupFavProp
+        {
+            public string userName;
+            public AITAlias favoriteAliases;
+
+            public AddGroupFavProp(string userName, string alias)
+            {
+                this.userName = userName;
+                this.favoriteAliases = new AITAlias(alias);
+            }
+        }
+        public struct RemoveFavProp
+        {
+            public string userName;
+            public string[] usersToRemove;
+
+            public RemoveFavProp(string userName, string[] usersToRemove)
+            {
+                this.userName = userName;
+                this.usersToRemove = usersToRemove;
+            }
+        }
+
+        public struct RemoveGroupFavProp
+        {
+            public string userName;
+            public AITAlias[] aliasesToRemove;
+
+            public RemoveGroupFavProp(string userName, string alias)
+            {
+                this.userName = userName;
+                this.aliasesToRemove = new AITAlias[] { new AITAlias(alias) };
+            }
+        }
+
+        public struct AITAlias
+        {
+            public string value;
+            public string type;
+
+
+            public AITAlias(string value)
+            {
+                this.value = value;
+                this.type = "Group";
+            }
+        }
+
+        public struct FcmProp
+        {
+            public string userName;
+            public string token;
+            public string tokenIOS;
+            public string language;
+            public string customHub;
+
+
+            public FcmProp(string userName, string token, string tokenIOS, string language, string customHub)
+            {
+                this.userName = userName;
+                this.token = token;
+                this.tokenIOS = tokenIOS;
+                this.language = language;
+                this.customHub = customHub;
+            }
+        }
+
+        public struct SnapShotProp
+        {
+            public string snapshotObject;
+
+            public SnapShotProp(string snapshotObject)
+            {
+                this.snapshotObject = snapshotObject;
+
+            }
+        }
+
+        public struct ConnectionProp
+        {
+            public string userName;
+            public string deviceId;
+
+            public ConnectionProp(string userName, string deviceId)
+            {
+                this.userName = userName;
+                this.deviceId = deviceId;
+
+            }
+        }
+
+        public struct AITSettingsProp
+        {
+            public string userName;
+            public string epID;
+
+            public AITSettingsProp(string userName, string epID)
+            {
+                this.userName = userName;
+                this.epID = epID;
+            }
+        }
+
+        public struct PresenceProp
+        {
+            public string[] userIDList;
+            public string[] aliasList;
+
+            public PresenceProp(string[] userIDList)
+            {
+                this.userIDList = userIDList;
+                this.aliasList = new string[] { "" };
+            }
+        }
+
+        public struct ContactListProp
+        {
+            public int startIndex;
+            public int endIndex;
+            public string sortingMethod;
+            public string sortingOrder;
+            public string filter;
+            public bool filterAliasOnly;
+
+
+            public ContactListProp(int startIndex, int endIndex, string filter)
+            {
+                this.startIndex = startIndex;
+                this.endIndex = endIndex;
+                this.sortingMethod = "LAST_NAME";
+                this.sortingOrder = "ASCENDING";
+                this.filter = filter;
+                this.filterAliasOnly = false;
+
+            }
+        }
+
+        public struct CalllogProp
+        {
+            public string userName;
+            public int start;
+            public int end;
+            public string selectedIntervalType;
+            public bool dismissMissedCalls;
+
+            public CalllogProp(string userName, int chunk)
+            {
+                this.userName = userName;
+                this.start = chunk * 10;
+                this.end = ((chunk + 1) * 10) - 1;
+                this.selectedIntervalType = "groupedCalls";
+                this.dismissMissedCalls = false;
+            }
+        }
+
+        public class ConferenceCallBase
+        {
+            public string callID;
+            public string deviceID;
+
+
+            public ConferenceCallBase(string callID, string deviceID)
+            {
+                this.callID = callID;
+                this.deviceID = deviceID;
+            }
+        }
+
+        public class _ConferenceCall
+        {
+            public ConferenceCallBase heldCall;
+            public ConferenceCallBase activeCall;
+
+
+            public _ConferenceCall(ConferenceCallBase heldCall, ConferenceCallBase activeCall)
+            {
+                this.heldCall = heldCall;
+                this.activeCall = activeCall;
+            }
+        }
+
+        private struct ConnectionRequest
+        {
+            public ConnectionProp GetConnection;
+
+            public ConnectionRequest(ConnectionProp p)
+            {
+                GetConnection = p;
+            }
+        }
+
+        private struct ContactListRequest
+        {
+            public ContactListProp GetContactList;
+
+            public ContactListRequest(ContactListProp p)
+            {
+                GetContactList = p;
+            }
+        }
+
+        public class MarkInstantMessageRequest
+        {
+            public MarkinstantmessageProp MarkInstantMessage { get; set; }
+
+            public MarkInstantMessageRequest(string userName, string ep, string messageId)
+            {
+                MarkInstantMessage = new MarkinstantmessageProp(userName, ep, messageId);
+            }
+        }
+
+        private struct PresenceRequest
+        {
+            public PresenceProp GetPresences;
+
+            public PresenceRequest(PresenceProp p)
+            {
+                GetPresences = p;
+            }
+        }
+
+        private class SendMessageRequest
+        {
+            public SendInstantmessageProp SendInstantMessage;
+
+            public SendMessageRequest(string messageContent, string from, string epId, string to)
+            {
+                SendInstantMessage = new SendInstantmessageProp(messageContent, from, epId, to);
+            }
+        }
+
+        private struct SetPresenceStateRequest
+        {
+            public PresenceStateChangeProp SetExplicitPresenceInfo;
+
+            public SetPresenceStateRequest(PresenceStateChangeProp p)
+            {
+                SetExplicitPresenceInfo = p;
+            }
+        }
+
+
+
+        private struct CallLogRequest
+        {
+            public CalllogProp GetCallLog;
+
+            public CallLogRequest(CalllogProp p)
+            {
+                GetCallLog = p;
+            }
+        }
+
+        private struct ConferenceRequest
+        {
+            public _ConferenceCall ConferenceCall;
+
+            public ConferenceRequest(_ConferenceCall p)
+            {
+                ConferenceCall = p;
+            }
+        }
+
+
+        public struct CreateAccountProp
+        {
+            public string userLoginName;
+            public string productName;
+            public bool hasSoftPhone;
+            public string deviceID;
+            public bool isMobile;
+
+            public CreateAccountProp(string userLoginName, string productName, bool hasSoftPhone, string deviceID, bool isMobile)
+            {
+                this.userLoginName = userLoginName;
+                this.productName = productName;
+                this.hasSoftPhone = hasSoftPhone;
+                this.deviceID = deviceID;
+                this.isMobile = isMobile;
+            }
+        }
+
+        private class SetFeatureButtonsRequest
+        {
+            public FeatureButtons SetFeatureButtons;
+
+            public SetFeatureButtonsRequest(string userName, List<SpeedDial> speedDials)
+            {
+                var buttons = new FeatureButton[speedDials.Count];
+                for (var i = 0; i < speedDials.Count; i++)
+                    buttons[i] = new FeatureButton(speedDials[i].position, speedDials[i].Label, speedDials[i].Number, getNumberFromSpeeddialType(speedDials[i].Type));
+
+
+                SetFeatureButtons = new FeatureButtons(userName, buttons);
+            }
+
+            public int getNumberFromSpeeddialType(SpeedDialType speedDialType)
+            {
+                switch (speedDialType)
+                {
+                    case SpeedDialType.VM:
+                        return 1;
+                    case SpeedDialType.Emergency:
+                        return 2;
+                    case SpeedDialType.GroupPickup:
+                        return 3;
+                    case SpeedDialType.PageQ:
+                        return 4;
+                    case SpeedDialType.Rod:
+                        return 5;
+                    case SpeedDialType.Speedial:
+                        return 6;
+                    case SpeedDialType.Url:
+                        return 7;
+                    case SpeedDialType.Acc_EndWrapUP:
+                        return 8;
+                    case SpeedDialType.Acc_ExtendWrapUp:
+                        return 9;
+                    case SpeedDialType.Acc_GroupLog:
+                        return 10;
+                    case SpeedDialType.Acc_GroupQInfo:
+                        return 11;
+                    case SpeedDialType.Acc_LogPrimaryGroup:
+                        return 12;
+                    case SpeedDialType.Acc_Release_Resume:
+                        return 13;
+                    case SpeedDialType.Acc_Release_ResumeWithCode:
+                        return 14;
+                    case SpeedDialType.Acc_WrapUpWithcode:
+                        return 15;
+                    default:
+                        return 0;
+                }
+            }
+        }
+
+        private struct AddExternalContactsRequest
+        {
+            public AddExternalContacts AddExternalContacts;
+
+            public AddExternalContactsRequest(AddExternalContacts p)
+            {
+                AddExternalContacts = p;
+            }
+        }
+
+        private struct RemoveExternalContactsRequest
+        {
+            public RemoveExternalContacts RemoveExternalContacts;
+
+            public RemoveExternalContactsRequest(RemoveExternalContacts p)
+            {
+                RemoveExternalContacts = p;
+            }
+        }
+
+        private struct RemoveAllExternalContactsRequest
+        {
+            public RemoveAllExternalContacts RemoveAllExternalContacts;
+
+            public RemoveAllExternalContactsRequest(RemoveAllExternalContacts p)
+            {
+                RemoveAllExternalContacts = p;
+            }
+        }
+
+        private struct AddFavRequest
+        {
+            public AddFavProp AddFavorites;
+
+            public AddFavRequest(AddFavProp p)
+            {
+                AddFavorites = p;
+            }
+        }
+
+        private struct AddGroupFavRequest
+        {
+            public AddGroupFavProp AddFavoritesByAlias;
+
+            public AddGroupFavRequest(AddGroupFavProp p)
+            {
+                AddFavoritesByAlias = p;
+            }
+        }
+
+        private struct RemoveFavRequest
+        {
+            public RemoveFavProp RemoveFavorites;
+
+            public RemoveFavRequest(RemoveFavProp p)
+            {
+                RemoveFavorites = p;
+            }
+        }
+
+        private struct RemoveGroupFavRequest
+        {
+            public RemoveGroupFavProp RemoveFavoritesByAlias;
+
+            public RemoveGroupFavRequest(RemoveGroupFavProp p)
+            {
+                RemoveFavoritesByAlias = p;
+            }
+        }
+
+        private struct StartMonitorInstantMessagesRequest
+        {
+            public UserNameProp StartMonitorInstantMessages;
+
+            public StartMonitorInstantMessagesRequest(UserNameProp p)
+            {
+                StartMonitorInstantMessages = p;
+            }
+        }
+
+        private struct FcmRequest
+        {
+            public FcmProp FcmToken;
+
+            public FcmRequest(FcmProp p)
+            {
+                FcmToken = p;
+            }
+        }
+
+        private struct VMGetMessageListRequest
+        {
+            public VMGetMessageListObj VMGetMessageList;
+
+            public VMGetMessageListRequest(VMGetMessageListObj obj)
+            {
+                VMGetMessageList = obj;
+            }
+        }
+        private struct VMGetAudioMessageRequest
+        {
+            public VMGetVMAudioMessageObj VMGetMessageAudio;
+
+            public VMGetAudioMessageRequest(VMGetVMAudioMessageObj obj)
+            {
+                VMGetMessageAudio = obj;
+            }
+        }
+
+        private struct VMGetMessageCommandRequest
+        {
+            public VMGetVMMessageCommandObj VMMessageCommand;
+
+            public VMGetMessageCommandRequest(VMGetVMMessageCommandObj obj)
+            {
+                VMMessageCommand = obj;
+            }
+        }
+
+        private struct CreateAccountRequest
+        {
+            public CreateAccountProp CreateAccount;
+
+            public CreateAccountRequest(CreateAccountProp p)
+            {
+                CreateAccount = p;
+            }
+        }
+
+        private struct StartMonitorUserRequest
+        {
+            public UserNameProp StartMonitorUser;
+
+            public StartMonitorUserRequest(UserNameProp p)
+            {
+                StartMonitorUser = p;
+            }
+        }
+
+        private struct MissedCallCounterRequest
+        {
+            public UserNameProp GetCallLogCountersRequest;
+
+            public MissedCallCounterRequest(UserNameProp p)
+            {
+                GetCallLogCountersRequest = p;
+            }
+        }
+
+        private struct GroupsRequest
+        {
+            public UserNameProp GetGroups;
+
+            public GroupsRequest(UserNameProp p)
+            {
+                GetGroups = p;
+            }
+        }
+
+        private struct DismissMissedCallsRequest
+        {
+            public UserNameProp DismissMissedCalls;
+
+            public DismissMissedCallsRequest(UserNameProp p)
+            {
+                DismissMissedCalls = p;
+            }
+        }
+
+        private struct SnapShotDeviceRequest
+        {
+            public SnapShotProp SnapshotDevice;
+
+            public SnapShotDeviceRequest(SnapShotProp p)
+            {
+                SnapshotDevice = p;
+            }
+        }
+
+        private struct RsUserRequest
+        {
+            public UserNameProp GetRsUser;
+
+            public RsUserRequest(UserNameProp p)
+            {
+                GetRsUser = p;
+            }
+        }
+
+        private struct FavoritesRequest
+        {
+            public UserNameProp GetFavorites;
+
+            public FavoritesRequest(UserNameProp p)
+            {
+                GetFavorites = p;
+            }
+        }
+
+        private struct GetFeatureButtonsRequest
+        {
+            public UserNameProp GetFeatureButtons;
+
+            public GetFeatureButtonsRequest(UserNameProp p)
+            {
+                GetFeatureButtons = p;
+            }
+        }
+
+        private struct GetFeatureButtonsStatusRequest
+        {
+            public GetLampMode GetLampMode;
+
+            public GetFeatureButtonsStatusRequest(string device)
+            {
+                GetLampMode = new GetLampMode(device);
+            }
+        }
+
+        public class GetLampMode
+        {
+            public string device { get; set; }
+
+            public GetLampMode(string device)
+            {
+                this.device = device;
+            }
+        }
+
+        private struct FeatureButtonsActionRequest
+        {
+            public FeatureButtonsActionProp FeatureButtonsAction;
+
+            public FeatureButtonsActionRequest(int id, string userName)
+            {
+                FeatureButtonsAction = new FeatureButtonsActionProp(id, userName);
+            }
+        }
+
+        private struct ContactRequest
+        {
+            public UserNameProp GetContact;
+
+            public ContactRequest(UserNameProp p)
+            {
+                GetContact = p;
+            }
+        }
+
+        private struct PicturerRequest
+        {
+            public UserNameProp GetPicture;
+
+            public PicturerRequest(UserNameProp p)
+            {
+                GetPicture = p;
+            }
+        }
+
+
+        private struct NextResponseRequest
+        {
+            public object GetNextResponse;
+
+            public NextResponseRequest(object GetNextResponse)
+            {
+                this.GetNextResponse = GetNextResponse;
+            }
+        }
+
+
+        private class StopMonitorRequest
+        {
+            public object MonitorStopRequest;
+
+            public StopMonitorRequest(string refID = null)
+            {
+                if (refID == null)
+                    this.MonitorStopRequest = new object();
+                else
+                    this.MonitorStopRequest = new MonitorCrossRefID(refID);
+
+            }
+        }
+
+
+        private struct MonitorCrossRefID
+        {
+            public object monitorCrossRefID;
+
+            public MonitorCrossRefID(string monitorCrossRefID)
+            {
+                this.monitorCrossRefID = monitorCrossRefID;
+            }
+        }
+
+        private T jsonToObj<T>(string val)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(val);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("omer456: " + e);
+                return default(T);
+            }
+        }
+
+        private string objToJson<T>(T obj)
+        {
+            string res = JsonConvert.SerializeObject(obj);
+            return res;
+        }
+
+        public FeatureButtonsRootObj getFeatureButtonsRootObject(string json)
+        {
+            return jsonToObj<FeatureButtonsRootObj>(json);
+        }
+
+        public FeatureButtonsStatusRootObj getFeatureButtonsStatusRootObject(string json)
+        {
+            return jsonToObj<FeatureButtonsStatusRootObj>(json);
+        }
+
+
+        public FavRootobjectResponse getServerFavRootObject(string json)
+        {
+            return jsonToObj<FavRootobjectResponse>(json);
+        }
+
+        public BaseContainerInfoRootObjResponse getBaseContainerInfoRootObjResponse(string json)
+        {
+            return jsonToObj<BaseContainerInfoRootObjResponse>(json);
+        }
+
+
+        public ContactlistRootobjectResponse getServerContactListRootObject(string json)
+        {
+            return jsonToObj<ContactlistRootobjectResponse>(json);
+        }
+
+        public ContactRootobjectResponse getServerContactRootObject(string json)
+        {
+            return jsonToObj<ContactRootobjectResponse>(json);
+        }
+
+        public ConnectionconfigurationRootobjectResponse getServerConnectionconfigurationRootObject(string json)
+        {
+            return jsonToObj<ConnectionconfigurationRootobjectResponse>(json);
+        }
+
+        public CallLogRootobjectResponse getServerCallLogRootObject(string json)
+        {
+            return jsonToObj<CallLogRootobjectResponse>(json);
+        }
+
+        public GroupRootobjectResponse getGroupRootobjectResponse(string json)
+        {
+            return jsonToObj<GroupRootobjectResponse>(json);
+        }
+
+        public RsUserRootobjectResponse getRSUserRootobjectResponse(string json)
+        {
+            return jsonToObj<RsUserRootobjectResponse>(json);
+        }
+
+        public MonitorStartResponseRootobject getMonitorStartResponseRootobject(string json)
+        {
+            return jsonToObj<MonitorStartResponseRootobject>(json);
+        }
+
+        public PresencestateeventRootobject onPresencestateEvent(string json)
+        {
+            return jsonToObj<PresencestateeventRootobject>(json);
+        }
+
+        public PresenceListRootobject getPresenceListRootobject(string json)
+        {
+            return jsonToObj<PresenceListRootobject>(json);
+        }
+
+        public CalllogcountersresponseRootobject getcalllogcountersresponseRootobject(string json)
+        {
+            return jsonToObj<CalllogcountersresponseRootobject>(json);
+        }
+
+        public PictuerResponseRootobject getPictureResponseRootobject(string json)
+        {
+            return jsonToObj<PictuerResponseRootobject>(json);
+        }
+
+        public EstablishedeventRootobject getEstablishedeventRootobject(string json)
+        {
+            return jsonToObj<EstablishedeventRootobject>(json);
+        }
+
+        public DeliveredeventRootobject getDeliveredeventRootobject(string json)
+        {
+            return jsonToObj<DeliveredeventRootobject>(json);
+        }
+
+        public FailedeventRootobject getFailedeventRootobject(string json)
+        {
+            return jsonToObj<FailedeventRootobject>(json);
+        }
+
+        public ConferencedeventRootobject getConferencedeventRootobject(string json)
+        {
+            return jsonToObj<ConferencedeventRootobject>(json);
+        }
+
+        public ConnectionclearedeventRootobject getConnectionclearedeventRootobject(string json)
+        {
+            return jsonToObj<ConnectionclearedeventRootobject>(json);
+        }
+
+        public InstantmessageRootobject getInstantmessageRootobject(string json)
+        {
+            return jsonToObj<InstantmessageRootobject>(json);
+        }
+
+        public SendInstantmessageResponseRootobject getSendInstantmessageResponseRootobject(string json)
+        {
+            return jsonToObj<SendInstantmessageResponseRootobject>(json);
+        }
+
+        public TransferedeventRootobject getTransferedeventRootobject(string json)
+        {
+            return jsonToObj<TransferedeventRootobject>(json);
+        }
+
+        public HeldeventRootobject getHeldeventRootobject(string json)
+        {
+            return jsonToObj<HeldeventRootobject>(json);
+        }
+
+        public RetrievedeventRootobject getRetrievedeventRootobject(string json)
+        {
+            return jsonToObj<RetrievedeventRootobject>(json);
+        }
+
+        public SnapShotRootobject getSnapShotRootobject(string json)
+        {
+            return jsonToObj<SnapShotRootobject>(json);
+        }
+
+        public ESFCommandEvent getESFCommandEvent(string json)
+        {
+            return jsonToObj<ESFCommandEvent>(json);
+        }
+
+        public FeatureButtonsDisplayEventRootObj getFeatureButtonsDisplayEvent(string json)
+        {
+            return jsonToObj<FeatureButtonsDisplayEventRootObj>(json);
+        }
+
+        public VMMessageListResponseRootObj getVMMessageListResponseRootObj(string json)
+        {
+            return jsonToObj<VMMessageListResponseRootObj>(json);
+        }
+
+        public VMMessageAudioResponseRootObj getVMMessageAudioResponseRootObj(string json)
+        {
+            return jsonToObj<VMMessageAudioResponseRootObj>(json);
+        }
+
+        public _CollaborationOfferStatus getCollaborationOfferStatusRootObj(string json)
+        {
+            return jsonToObj<_CollaborationOfferStatus>(json);
+        }
+
+        public OfferCollaborationRequestRootObj getOfferCollaborationRequestRootObj(string json)
+        {
+            return jsonToObj<OfferCollaborationRequestRootObj>(json);
+        }
+
+        public _CancelCollaborationRequest getCancelCollaborationRequestRootObj(string json)
+        {
+            return jsonToObj<_CancelCollaborationRequest>(json);
+        }
+
+        public StartCollaborationErrorRootObj getStartCollaborationErrorRootObj(string json)
+        {
+            return jsonToObj<StartCollaborationErrorRootObj>(json);
+        }
+
+        //classes
+
+        public class SnapShotRootobject
+        {
+            public Snapshotdeviceresponse SnapshotDeviceResponse { get; set; }
+        }
+
+        public class RetrievedeventRootobject
+        {
+            public Retrievedevent RetrievedEvent { get; set; }
+        }
+
+        public class HeldeventRootobject
+        {
+            public Heldevent HeldEvent { get; set; }
+        }
+
+        public class TransferedeventRootobject
+        {
+            public Transferedevent TransferedEvent { get; set; }
+        }
+
+        public class SendInstantmessageResponseRootobject
+        {
+            public Sendinstantmessageresponse SendInstantMessageResponse { get; set; }
+        }
+
+        public class InstantmessageRootobject
+        {
+            public Instantmessage InstantMessage { get; set; }
+        }
+
+        public class ConnectionclearedeventRootobject
+        {
+            public Connectionclearedevent ConnectionClearedEvent { get; set; }
+        }
+
+        public class ConferencedeventRootobject
+        {
+            public Conferencedevent ConferencedEvent { get; set; }
+        }
+
+        public class PictuerResponseRootobject
+        {
+            public Getpictureresponse GetPictureResponse { get; set; }
+        }
+
+        public class CalllogcountersresponseRootobject
+        {
+            public Getcalllogcountersresponse GetCallLogCountersResponse { get; set; }
+        }
+
+        public class PresenceListRootobject
+        {
+            public Presenceslistresponse PresencesListResponse { get; set; }
+        }
+
+        public class PresencestateeventRootobject
+        {
+            public Presencestateevent PresenceStateEvent { get; set; }
+        }
+
+        public class MonitorStartResponseRootobject
+        {
+            public Monitorstartresponse MonitorStartResponse { get; set; }
+        }
+
+        public class RsUserRootobjectResponse
+        {
+            public Rsuserresponse RsUserResponse { get; set; }
+        }
+
+        public class GroupRootobjectResponse
+        {
+            public Getgroupsresponse GetGroupsResponse { get; set; }
+        }
+
+        public class CallLogRootobjectResponse
+        {
+            public Calllogrecords CallLogRecords { get; set; }
+        }
+
+        public class FavRootobjectResponse
+        {
+            public Containerinfo containerInfo { get; set; }
+        }
+
+        public class BaseContainerInfoRootObjResponse
+        {
+            public BaseContainerInfo containerInfo { get; set; }
+        }
+
+        public class ContactlistRootobjectResponse
+        {
+            public Contactlistresponse ContactListResponse { get; set; }
+        }
+
+        public class ContactRootobjectResponse
+        {
+            public Contactresponse ContactResponse { get; set; }
+        }
+
+        public class EstablishedeventRootobject
+        {
+            public Establishedevent EstablishedEvent { get; set; }
+        }
+
+        public class DeliveredeventRootobject
+        {
+            public DeliveredEvent DeliveredEvent { get; set; }
+        }
+
+        public class FailedeventRootobject
+        {
+            public Failedevent FailedEvent { get; set; }
+        }
+
+        public class Contactresponse : BaseContainerInfo
+        {
+            public Contact contact { get; set; }
+        }
+
+        public class Contactlistresponse : BaseContainerInfo
+        {
+            public Contactspresence[] contactsPresence { get; set; }
+        }
+
+        public class Containerinfo : BaseContainerInfo
+        {
+            public string type { get; set; }
+            public Contact[] favorits { get; set; }
+        }
+
+        public class Contactspresence
+        {
+            public Contact contact { get; set; }
+            public Presense presense { get; set; }
+            public Presense presenceState { get; set; }
+        }
+
+        public class Contact
+        {
+            public Alias[] aliases { get; set; }
+            public string displayName { get; set; }
+            public string emailAddress { get; set; }
+            public object[] extAliases { get; set; }
+            public string primaryNumber { get; set; }
+            public string firstName { get; set; }
+            public long imageSignature { get; set; }
+            public string lastName { get; set; }
+            public string serviceType { get; set; }
+            public string userName { get; set; }
+            public string company { get; set; }
+            public string department { get; set; }
+            public string description { get; set; }
+            public string phonebook { get; set; }
+            public string homeAddress { get; set; }
+            public ExtNumber[] extNumbers { get; set; }
+
+        }
+
+        public class PhonebookContactInfo
+        {
+            public string contactId { get; set; }
+            public string phonebookId { get; set; }
+            public string firstName { get; set; }
+            public string lastName { get; set; }
+
+            public string email { get; set; }
+
+            public List<ExtNumber> phonesList { get; set; }
+        }
+
+        public class ExtNumber
+        {
+            public string phoneNumber { get; set; }
+            public string phoneNumberType { get; set; }
+            public bool isMain { get; set; }
+
+            public ExtNumber(string type, string number)
+            {
+                this.phoneNumber = number;
+                this.phoneNumberType = type;
+            }
+        }
+
+        public class Rsuser
+        {
+            public Featuresprofile featuresProfile { get; set; }
+            public Geninfo genInfo { get; set; }
+            public Rsuserinfo rsUserInfo { get; set; }
+        }
+
+        public class Featuresprofile
+        {
+            public int aAdelay { get; set; }
+            public bool autoAnswer { get; set; }
+        }
+
+        public class Geninfo
+        {
+            public string displayName { get; set; }
+            public string firstName { get; set; }
+            public string lastName { get; set; }
+        }
+
+        public class Rsuserinfo
+        {
+            public Alias[] aliases { get; set; }
+            public string applicationEpId { get; set; }
+            public bool defaultPassword { get; set; }
+            public object[] extAliases { get; set; }
+            public long imageSignature { get; set; }
+            public string userLoginName { get; set; }
+            public bool mailBoxExists { get; set; }
+            public string mailBoxNumber { get; set; }
+            public string vm { get; set; }
+            public bool collaborationAllowed { get; set; }
+        }
+
+        public class Alias
+        {
+            public string completeAliasName { get; set; }
+            public bool completeInterGroupAccess { get; set; }
+            public string configuration { get; set; }
+        }
+
+        public class Presense
+        {
+            public Presence presence { get; set; }
+        }
+
+        public class Presence
+        {
+            public string explicitPresence { get; set; }
+            public string implicitPresence { get; set; }
+        }
+
+        public class ConnectionconfigurationRootobjectResponse
+        {
+            public Connectionconfiguration ConnectionConfiguration { get; set; }
+        }
+
+        public class BaseContainerInfo
+        {
+            public int errCode { get; set; }
+            public string errDesc { get; set; }
+            public int totalNumber { get; set; }
+        }
+
+        public class Connectionconfiguration : BaseContainerInfo
+        {
+            public string[] serversIp { get; set; }
+            public object[] SBCsIpAddr { get; set; }
+            public Serverlist[] serverList { get; set; }
+            public string preferedServ { get; set; }
+            public Deviceconnectionconfiguration deviceConnectionConfiguration { get; set; }
+            public bool nonControlModeEnable { get; set; }
+            public int port { get; set; }
+            public int serverRetryCounts { get; set; }
+            public string transport { get; set; }
+            public string userName { get; set; }
+            public string[] emergencyNumbers { get; set; }
+            public Versioninfo versionInfo { get; set; }
+            public bool supportVoicemailSSO { get; set; }
+            public bool canSendVoicemailViaEmail { get; set; }
+        }
+
+        public class Serverlist
+        {
+            public string server { get; set; }
+            public string transport { get; set; }
+            public string proxy { get; set; }
+        }
+
+
+        public class Deviceconnectionconfiguration
+        {
+            public string endpointPassword { get; set; }
+            public string endponintId { get; set; }
+            public string tenantPrefix { get; set; }
+        }
+
+        public class Versioninfo
+        {
+            public string aTouchPCVersion { get; set; }
+            public string aeonixVersion { get; set; }
+        }
+
+
+        public class Calllogrecords : BaseContainerInfo
+        {
+            public int newCallsNumber { get; set; }
+            public int newMissedCalls { get; set; }
+            public Recentrecordinfo[] recentRecordInfo { get; set; }
+        }
+
+        public class Recentrecordinfo : Contactspresence
+        {
+            public Callloglist[] callLogList { get; set; }
+            public bool isNew { get; set; }
+        }
+
+        public class Presencestate
+        {
+            public Presence presence { get; set; }
+        }
+
+        public class Callloglist
+        {
+            public bool answered { get; set; }
+            public string callType { get; set; }
+            public bool isPstnCall { get; set; }
+            public string remoteName { get; set; }
+            public string remoteNumber { get; set; }
+            public long startTime { get; set; }
+            public string alias2Dial { get; set; }
+            public int callDuration { get; set; }
+            public string callLogID { get; set; }
+            public bool isExternal { get; set; }
+            public bool isRestricted { get; set; }
+            public string lastRedirectionUser { get; set; }
+        }
+
+
+        public class Getgroupsresponse : BaseContainerInfo
+        {
+            public Listgroupinfo[] listGroupInfo { get; set; }
+        }
+
+        public class Listgroupinfo
+        {
+            public string alias { get; set; }
+            public string description { get; set; }
+            public string serviceName { get; set; }
+        }
+
+
+        public class Rsuserresponse : BaseContainerInfo
+        {
+            public Rsuser rsUser { get; set; }
+        }
+
+
+        public class MonitorstartrequestRootobject
+        {
+            public Monitorstartrequest MonitorStartRequest = new Monitorstartrequest();
+        }
+
+        public class Monitorstartrequest
+        {
+            public Monitorobject monitorObject = new Monitorobject();
+            public Requestedmonitorfilter requestedMonitorFilter = new Requestedmonitorfilter();
+        }
+
+        public class Monitorobject
+        {
+            public string deviceObject { get; set; }
+        }
+
+        public class Requestedmonitorfilter
+        {
+            public Callcontrol callcontrol = new Callcontrol();
+            public Callassociated callAssociated = new Callassociated();
+            public Mediaattachment mediaAttachment = new Mediaattachment();
+            public Physicaldevicefeature physicalDeviceFeature = new Physicaldevicefeature();
+            public Maintenance maintenance = new Maintenance();
+            public Voice voice = new Voice();
+        }
+
+        public class FavMonitorstartrequestRootobject
+        {
+            public FavMonitorstartrequest MonitorStartRequest = new FavMonitorstartrequest();
+        }
+
+        public class FavMonitorstartrequest
+        {
+            public Monitorobject monitorObject = new Monitorobject();
+            public FavRequestedmonitorfilter requestedMonitorFilter = new FavRequestedmonitorfilter();
+        }
+
+        public class FavRequestedmonitorfilter
+        {
+            public FavstCallcontrol callcontrol = new FavstCallcontrol();
+            public Callassociated callAssociated = new Callassociated();
+            public Mediaattachment mediaAttachment = new Mediaattachment();
+            public Physicaldevicefeature physicalDeviceFeature = new Physicaldevicefeature();
+            public Maintenance maintenance = new Maintenance();
+            public Voice voice = new Voice();
+        }
+
+        public class FavstCallcontrol
+        {
+            public string bridged = "true";
+            public string callCleared = "true";
+            public string conferenced = "true";
+            public string connectionCleared = "true";
+            public string delivered = "true";
+            public string digitsDialed = "true";
+            public string diverted = "true";
+            public string established = "true";
+            public string failed = "true";
+            public string held = "true";
+            public string networkCapabilitiesChanged = "true";
+            public string networkReached = "true";
+            public string offered = "true";
+            public string originated = "true";
+            public string queued = "true";
+            public string retrieved = "true";
+            public string serviceInitiated = "true";
+            public string transferred = "true";
+        }
+
+        public class Callcontrol
+        {
+            public string bridged = "true";
+            public string callCleared = "true";
+            public string conferenced = "false";
+            public string connectionCleared = "false";
+            public string delivered = "false";
+            public string digitsDialed = "true";
+            public string diverted = "true";
+            public string established = "false";
+            public string failed = "false";
+            public string held = "false";
+            public string networkCapabilitiesChanged = "true";
+            public string networkReached = "true";
+            public string offered = "true";
+            public string originated = "true";
+            public string queued = "true";
+            public string retrieved = "false";
+            public string serviceInitiated = "true";
+            public string transferred = "false";
+        }
+
+        public class Callassociated
+        {
+            public string callInformation = "true";
+            public string charging = "true";
+            public string digitsGenerated = "true";
+            public string telephonyTonesGenerated = "true";
+            public string serviceCompletionFailure = "true";
+        }
+
+        public class Mediaattachment
+        {
+            public string mediaAttached = "true";
+            public string mediaDetached = "true";
+        }
+
+        public class Physicaldevicefeature
+        {
+            public string buttonInformation = "true";
+            public string buttonPress = "true";
+            public string displayUpdated = "true";
+            public string hookswitch = "true";
+            public string lampMode = "true";
+            public string messageWaiting = "true";
+            public string microphoneGain = "true";
+            public string microphoneMute = "true";
+            public string ringerStatus = "true";
+            public string speakerMute = "true";
+            public string speakerVolume = "true";
+        }
+
+        public class Maintenance
+        {
+            public string backInService = "true";
+            public string deviceCapabilityChanged = "true";
+            public string outOfService = "true";
+            public string partiallyInService = "true";
+        }
+
+        public class Voice
+        {
+            public string bookmarkReached = "true";
+            public string completed = "true";
+            public string dtmfDetected = "true";
+            public string emptied = "true";
+            public string interruptionDetected = "true";
+            public string notRecognized = "true";
+            public string play = "true";
+            public string recognized = "true";
+            public string record = "true";
+            public string review = "true";
+            public string started = "true";
+            public string silenceTimeoutExpired = "true";
+            public string speechDetected = "true";
+            public string stop = "true";
+            public string suspendPlay = "true";
+            public string suspendRecord = "true";
+            public string voiceAttributesChanged = "true";
+            public string voiceErrorOccurred = "true";
+        }
+
+
+        public class Monitorstartresponse
+        {
+            public string monitorCrossRefID { get; set; }
+        }
+
+        public class Presencestateevent
+        {
+            public string monitorCrossRefID { get; set; }
+            public deviceIdentifierWrapper device { get; set; }
+            public Presencestate2 presenceState { get; set; }
+        }
+
+        public class Presencestate2
+        {
+            public bool available { get; set; }
+            public bool busy { get; set; }
+            public bool calling { get; set; }
+            public bool dnd { get; set; }
+            public bool meeting { get; set; }
+            public bool offline { get; set; }
+            public bool unknown { get; set; }
+            public bool applicationSpec0 { get; set; }
+        }
+
+        public class Presenceslistresponse : BaseContainerInfo
+        {
+            public Presenceslist[] presencesList { get; set; }
+        }
+
+        public class Presenceslist
+        {
+            public deviceIdentifierWrapper device { get; set; }
+            public string idType { get; set; }
+            public Presencestate2 presenceState { get; set; }
+        }
+
+        public class Getcalllogcountersresponse : BaseContainerInfo
+        {
+            public int newCallsNumber { get; set; }
+            public int newMissedCalls { get; set; }
+        }
+
+
+        public class Getpictureresponse : BaseContainerInfo
+        {
+            public string imageContent { get; set; }
+            public long imageSignature { get; set; }
+            public string userName { get; set; }
+        }
+
+
+        public class DeliveredEvent
+        {
+            public Connection connection { get; set; }
+            public deviceIdentifierWrapper alertingDevice { get; set; }
+            public deviceIdentifierWrapper callingDevice { get; set; }
+            public Extensions extensions { get; set; }
+        }
+
+        public class Establishedevent
+        {
+            public string monitorCrossRefID { get; set; }
+            public Connection establishedConnection { get; set; }
+            public deviceIdentifierWrapper answeringDevice { get; set; }
+            public deviceIdentifierWrapper callingDevice { get; set; }
+            public deviceIdentifierWrapper calledDevice { get; set; }
+            public string localConnectionInfo { get; set; }
+            public string cause { get; set; }
+            public Callcharacteristics callCharacteristics { get; set; }
+            public Extensions extensions { get; set; }
+        }
+
+        public class Callcharacteristics
+        {
+            public bool encryptedCall { get; set; }
+        }
+
+        public class Extensions
+        {
+            public Privatedata privateData { get; set; }
+        }
+
+        public class Privatedata
+        {
+            public Private @private { get; set; }
+        }
+
+        public class Private
+        {
+            public Eventprivatedata[] EstablishedEventPrivateData { get; set; }
+            public Eventprivatedata[] DeliveredEventPrivateData { get; set; }
+        }
+
+        public class Eventprivatedata
+        {
+            public string monitoredDevice { get; set; }
+            public deviceIdentifierWrapper originalCalledInfo { get; set; }
+        }
+
+        public class deviceIdentifierWrapper
+        {
+            public string deviceIdentifier { get; set; }
+        }
+
+        public class Conferencedevent
+        {
+            public string monitorCrossRefID { get; set; }
+            public Connection primaryOldCall { get; set; }
+            public Connection secondaryOldCall { get; set; }
+            public deviceIdentifierWrapper conferencingDevice { get; set; }
+            public deviceIdentifierWrapper addedParty { get; set; }
+            public Conferenceconnections conferenceConnections { get; set; }
+            public string localConnectionInfo { get; set; }
+            public string cause { get; set; }
+            public Extensions2 extensions { get; set; }
+        }
+
+
+
+        public class Conferenceconnections
+        {
+            public Connectionlistitem[] connectionListItem { get; set; }
+        }
+
+        public class Connectionlistitem
+        {
+            public Connection newConnection { get; set; }
+            public Connection oldConnection { get; set; }
+            public Endpoint endpoint { get; set; }
+            public Resultingconnectioninfo resultingConnectionInfo { get; set; }
+        }
+
+        public class Connection
+        {
+            public string[] callID { get; set; }
+            public string[] deviceID { get; set; }
+        }
+
+        public class Endpoint
+        {
+            public string deviceID { get; set; }
+        }
+
+        public class Resultingconnectioninfo
+        {
+            public string flowDirection { get; set; }
+        }
+
+        public class Extensions2
+        {
+            public Privatedata2 privateData { get; set; }
+        }
+
+        public class Privatedata2
+        {
+            public Private2 _private { get; set; }
+        }
+
+        public class Private2
+        {
+            public Conferencedeventprivatedata[] ConferencedEventPrivateData { get; set; }
+        }
+
+        public class Conferencedeventprivatedata
+        {
+            public string monitoredDevice { get; set; }
+        }
+
+        public class Connectionclearedevent
+        {
+            public string monitorCrossRefID { get; set; }
+            public Connection droppedConnection { get; set; }
+            public deviceIdentifierWrapper releasingDevice { get; set; }
+            public string localConnectionInfo { get; set; }
+            public string cause { get; set; }
+            public Extensions extensions3 { get; set; }
+        }
+
+        public class Extensions3
+        {
+            public Privatedata privateData { get; set; }
+        }
+
+        public class Privatedata3
+        {
+            public Private _private { get; set; }
+        }
+
+        public class Private3
+        {
+            public Connectionclearedeventprivatedata[] ConnectionClearedEventPrivateData { get; set; }
+        }
+
+        public class Connectionclearedeventprivatedata
+        {
+            public string monitoredDevice { get; set; }
+        }
+
+        public class Instantmessage
+        {
+            public Imentity imEntity { get; set; }
+            public string messageId { get; set; }
+            public bool read { get; set; }
+            public bool remove { get; set; }
+        }
+
+        public class Imentity
+        {
+            public Destination destination { get; set; }
+            public string message { get; set; }
+            public string sendingUser { get; set; }
+            public long time { get; set; }
+        }
+
+        public class Destination
+        {
+            public string type { get; set; }
+            public string value { get; set; }
+
+        }
+
+        public class Sendinstantmessageresponse : BaseContainerInfo
+        {
+            public string messageID { get; set; }
+        }
+
+        public class Transferedevent
+        {
+            public string monitorCrossRefID { get; set; }
+            public Connection primaryOldCall { get; set; }
+            public Connection secondaryOldCall { get; set; }
+            public deviceIdentifierWrapper transferringDevice { get; set; }
+            public deviceIdentifierWrapper transferredToDevice { get; set; }
+            public Transferredconnections transferredConnections { get; set; }
+            public string localConnectionInfo { get; set; }
+            public string cause { get; set; }
+            public Callcharacteristics callCharacteristics { get; set; }
+            public Extensions extensions { get; set; }
+        }
+
+
+        public class Transferredconnections
+        {
+            public Connectionlistitem[] connectionListItem { get; set; }
+        }
+
+        public class Transferedeventprivatedata
+        {
+            public string monitoredDevice { get; set; }
+            public Transfereddevinfo transferedDevInfo { get; set; }
+        }
+
+        public class Transfereddevinfo
+        {
+            public string description { get; set; }
+            public string location { get; set; }
+        }
+
+        public class Heldevent
+        {
+            public string monitorCrossRefID { get; set; }
+            public Connection heldConnection { get; set; }
+            public deviceIdentifierWrapper holdingDevice { get; set; }
+            public string localConnectionInfo { get; set; }
+            public string cause { get; set; }
+            public Extensions extensions { get; set; }
+        }
+
+
+        public class Heldeventprivatedata
+        {
+            public string monitoredDevice { get; set; }
+            public deviceIdentifierWrapper heldedDevice { get; set; }
+        }
+
+
+        public class Retrievedevent
+        {
+            public string monitorCrossRefID { get; set; }
+            public Connection retrievedConnection { get; set; }
+            public deviceIdentifierWrapper retrievingDevice { get; set; }
+            public string localConnectionInfo { get; set; }
+            public string cause { get; set; }
+            public Callcharacteristics callCharacteristics { get; set; }
+            public Extensions extensions { get; set; }
+        }
+
+
+        public class Retrievedeventprivatedata
+        {
+            public string monitoredDevice { get; set; }
+            public deviceIdentifierWrapper retrievedDevice { get; set; }
+        }
+
+
+        public class Failedevent
+        {
+            public string monitorCrossRefID { get; set; }
+            public Connection failedConnection { get; set; }
+            public deviceIdentifierWrapper callingDevice { get; set; }
+            public deviceIdentifierWrapper calledDevice { get; set; }
+            public string localConnectionInfo { get; set; }
+            public string cause { get; set; }
+            public Extensions extensions { get; set; }
+        }
+
+
+
+        public class Snapshotdeviceresponse
+        {
+            public Crossrefidorsnapshotdata crossRefIDorSnapshotData { get; set; }
+            public Extensions4 extensions { get; set; }
+        }
+
+        public class Crossrefidorsnapshotdata
+        {
+            public Snapshotdata snapshotData { get; set; }
+        }
+
+        public class Snapshotdata
+        {
+            public Snapshotdeviceresponseinfo[] snapshotDeviceResponseInfo { get; set; }
+        }
+
+        public class Snapshotdeviceresponseinfo
+        {
+            public Connection connectionIdentifier { get; set; }
+            public deviceIdentifierWrapper otherPartyDevice { get; set; }
+            public Localcallstate localCallState { get; set; }
+        }
+
+
+
+        public class Localcallstate
+        {
+            public string simpleCallState { get; set; }
+        }
+
+        public class Extensions4
+        {
+            public Privatedata4 privateData { get; set; }
+        }
+
+        public class Privatedata4
+        {
+            public Private4 _private { get; set; }
+        }
+
+        public class Private4
+        {
+            public Snapshotdeviceresponseprivatedata[] SnapshotDeviceResponsePrivateData { get; set; }
+        }
+
+        public class Snapshotdeviceresponseprivatedata
+        {
+            public string device { get; set; }
+            public string deviceStatus { get; set; }
+        }
+
+        public class FeatureButtonsRootObj
+        {
+            public FeatureButtonsResponseInfo FeatureButtonsResponse { get; set; }
+        }
+
+        public class FeatureButtonsStatusRootObj
+        {
+            public FeatureButtonsStatusEvent FeatureButtonsStatusEvent { get; set; }
+        }
+
+        public class FeatureButtonsResponseInfo : BaseContainerInfo
+        {
+            public FeatureButton[] buttons { get; set; }
+        }
+
+        public class FeatureButtons
+        {
+            public string userName { get; set; }
+            public FeatureButton[] buttons { get; set; }
+
+            public FeatureButtons(string userName, FeatureButton[] featureButtons)
+            {
+                this.userName = userName;
+                this.buttons = featureButtons;
+            }
+        }
+
+
+
+        public struct FeatureButton
+        {
+            public int id { get; set; }
+            public string value { get; set; }
+            public string label { get; set; }
+            public int type { get; set; }
+
+            public FeatureButton(int id, string label, string value, int type)
+            {
+                this.id = id;
+                this.label = label;
+                this.type = type;
+                this.value = value;
+            }
+        }
+        public class FeatureButtonsStatusEvent
+        {
+            public FeatureButtonStatus[] buttons { get; set; }
+        }
+
+        public struct FeatureButtonStatus
+        {
+            public int id { get; set; }
+            public string color { get; set; }
+            public string state { get; set; }
+
+        }
+
+        public class ESFCommandEvent
+        {
+            public ESFCommandObj ESFCommand { get; set; }
+        }
+
+        public class ESFCommandObj
+        {
+            public string request { get; set; }
+            public string callId { get; set; }
+            public string from { get; set; }
+            public string to { get; set; }
+            public string digits { get; set; }
+            public bool isMuted { get; set; }
+
+        }
+
+        public class FeatureButtonsDisplayEventRootObj
+        {
+            public FeatureButtonsDisplayEventObj FeatureButtonsDisplayEvent { get; set; }
+        }
+
+
+        public class StartCollaborationErrorRootObj
+        {
+            public StartCollaborationErrorObj StartCollaborationError { get; set; }
+        }
+
+        public class _StartCollaborationRequest
+        {
+            public StartCollaborationRequestObj StartCollaborationRequest { get; set; }
+
+            public _StartCollaborationRequest(StartCollaborationRequestObj startCollaborationRequestObj)
+            {
+                this.StartCollaborationRequest = startCollaborationRequestObj;
+            }
+        }
+
+        public class _CollaborationOfferStatus
+        {
+            public CollaborationOfferStatusObj OfferCollaborationStatus { get; set; }
+
+            public _CollaborationOfferStatus(CollaborationOfferStatusObj collaborationOfferStatusObj)
+            {
+                this.OfferCollaborationStatus = collaborationOfferStatusObj;
+            }
+        }
+
+        public class _CancelCollaborationRequest
+        {
+            public CancelCollaborationRequestObj CancelCollaborationRequest { get; set; }
+
+            public _CancelCollaborationRequest(CancelCollaborationRequestObj cancelCollaborationRequestObj)
+            {
+                this.CancelCollaborationRequest = cancelCollaborationRequestObj;
+            }
+        }
+
+        public class OfferCollaborationRequestRootObj
+        {
+            public OfferCollaborationRequestObj OfferCollaborationRequest { get; set; }
+
+        }
+
+        public class FeatureButtonsDisplayEventObj
+        {
+            public string title { get; set; }
+            public int timeout { get; set; }
+            public string text { get; set; }
+        }
+        public class StartCollaborationRequestObj
+        {
+            public string option { get; set; }
+            public string callId { get; set; }
+            public string partner { get; set; }
+        }
+
+        public class OfferCollaborationRequestObj
+        {
+            public string role { get; set; }
+            public string link { get; set; }
+            public string conferenceName { get; set; }
+            public bool autoStart { get; set; }
+            public string initUser { get; set; }
+            public string initDevice { get; set; }
+        }
+
+        public class CollaborationOfferStatusObj
+        {
+           public string result { get; set; }
+            public string initUser { get; set; }
+            public string initDevice { get; set; }
+        }
+
+        public class CancelCollaborationRequestObj
+        {
+            public string cause { get; set; }
+        }
+
+        public class StartCollaborationErrorObj
+        {
+            public string cause { get; set; }
+           
+        }
+
+        public class VMGetMessageListObj
+        {
+            public string userId { get; set; }
+            public string pin { get; set; }
+            //public VmMessageStatus filter { get; set; }
+            public string filter { get; set; }
+
+            public VMGetMessageListObj(string userName, string pin, string filter)
+            {
+                this.userId = userName;
+                this.pin = pin;
+                this.filter = filter;
+            }
+        }
+
+        public class VMMessageListResponseRootObj
+        {
+            public VMMessageListResponseObj VMMessageListResponse { get; set; }
+        }
+
+        public class VMMessageListResponseObj
+        {
+            public string userId { get; set; }
+            public MyVmMessage[] messageList { get; set; }
+            public int errCode { get; set; }
+            public string errDesc { get; set; }
+        }
+
+        public class VMGetVMMessageCommandObj
+        {
+            public string userId { get; set; }
+            public string pin { get; set; }
+            public string messageId { get; set; }
+            public string command { get; set; }
+
+            public VMGetVMMessageCommandObj(string userName, string pin, string messageId, string command)
+            {
+                this.userId = userName;
+                this.pin = pin;
+                this.messageId = messageId;
+                this.command = command;
+            }
+        }
+        public class VMGetVMAudioMessageObj
+        {
+            public string userId { get; set; }
+            public string pin { get; set; }
+            public string messageId { get; set; }
+            public string messageName { get; set; }
+
+            public VMGetVMAudioMessageObj(string userName, string pin, string messageId, string messageName)
+            {
+                this.userId = userName;
+                this.pin = pin;
+                this.messageId = messageId;
+                this.messageName = messageName;
+            }
+        }
+        public class VMMessageAudioResponseObj : BaseContainerInfo
+        {
+            public string userId { get; set; }
+            public string messageId { get; set; }
+            public string massageContent { get; set; }
+            public string type { get; set; }
+
+        }
+
+        public class VMMessageAudioResponseRootObj
+        {
+            public VMMessageAudioResponseObj VMMessageAudioResponse { get; set; }
+        }
+
+    }
+}
+
+
+

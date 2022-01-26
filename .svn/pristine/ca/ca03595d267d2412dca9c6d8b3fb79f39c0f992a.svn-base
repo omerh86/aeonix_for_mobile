@@ -1,0 +1,213 @@
+﻿using LinphoneXamarin.components.userControllers;
+using LinphoneXamarin.Entities;
+using LinphoneXamarin.Services;
+using LinphoneXamarin.Util;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+using System.Windows.Input;
+using Xamarin.Essentials;
+using Xamarin.Forms;
+using Xamarin.Forms.Xaml;
+
+namespace LinphoneXamarin.components
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
+    public partial class RootPage : ContentPage, IMissedCounterListener
+    {
+        public ICommand SelectPresenceCommand { get; private set; }
+        SpeedDialComponent speedDialComponent;
+        public RootPage()
+        {
+            addLog("RootPage()");
+            InitializeComponent();
+            BindingContext = this;
+            NavigationPage.SetHasNavigationBar(this, false);
+            speedDialComponent = new SpeedDialComponent();
+            speedDialComponent.visibiltyCommand = new Command<bool>(onActionComponentVisibilityChanged);
+            speedDialComponent.HeightRequest = 170;
+            speedDialComponent.HorizontalOptions = LayoutOptions.FillAndExpand;
+            if (MyFileSystem.Instance.loadSettings().isActionComponentVisble)
+                onActionComponentVisibilityChanged(true);
+
+            tabHandler(0, true);
+            topBarComponent.SelectPresenceCommand = new Command<object>(onChangePresence);
+            topBarComponent.SearchCommand = new Command<object>(goToSearch);
+            myPresenceComponent.SelectedCommand = new Command<object>(onSelectedPresence);
+            MessagesService.Instance.missedCounterListener = this;
+            CallLogService.Instance.missedCounterListener = this;
+        }
+
+        protected override void OnAppearing()
+        {
+            addLog("OnAppearing favorite page");
+            base.OnAppearing();
+        }
+
+        protected override void OnDisappearing()
+        {
+            addLog("OnDisappearing favorite page");
+            base.OnDisappearing();
+        }
+
+        void goToSearch(object obj)
+        {
+            Navigation.PushAsync(new searchPage());
+        }
+
+        void onChangePresence(object obj)
+        {
+            addLog("onChangePresence");
+            myPresenceComponent.IsVisible = !myPresenceComponent.IsVisible;
+
+        }
+        void onSelectedPresence(object obj)
+        {
+            addLog("onSelectedPresence");
+            myPresenceComponent.IsVisible = !myPresenceComponent.IsVisible;
+        }
+
+        private void onFavClicked(object sender, EventArgs e)
+        {
+            tabHandler(0);
+        }
+
+        private void onRecentClicked(object sender, EventArgs e)
+        {
+            tabHandler(1);
+        }
+        private void onChatClicked(object sender, EventArgs e)
+        {
+            tabHandler(2);
+        }
+        private void onMoreClicked(object sender, EventArgs e)
+        {
+            tabHandler(4);
+        }
+        private void onDialClicked(object sender, EventArgs e)
+        {
+            tabHandler(3);
+        }
+
+        private void addLog(string message)
+        {
+            MyFileSystem.Instance.writeDebug(message, "Favorites");
+            Console.WriteLine($"omer56: {message}");
+        }
+
+        private void onActionComponentVisibilityChanged(bool isVisible)
+        {
+            addLog($"onActionComponentVisibilityChanged(),isVisible: {isVisible}");
+            if (isVisible)
+                rootContainer.Children.Insert(1, speedDialComponent);
+            else
+                rootContainer.Children.RemoveAt(1);
+        }
+
+        private void tabHandler(int newTabIndex, bool force = false)
+        {
+            var tabIndex = SharedData.Instance.tabIndex;
+            if (!force && tabIndex == newTabIndex) return;
+            switch (newTabIndex)
+            {
+                case 0:
+                    SharedData.Instance.tabIndex = newTabIndex;
+                    resetAllTabs();
+                    favTab.TextColor = Color.FromRgb(0, 145, 211);
+                    favLbl.TextColor = Color.FromRgb(0, 145, 211);
+                    listcontainer.Children.Clear();
+                    listcontainer.Children.Add(new FavotireComponent());
+                    break;
+                case 1:
+                    SharedData.Instance.tabIndex = newTabIndex;
+                    resetAllTabs();
+                    recentTab.TextColor = Color.FromRgb(0, 145, 211);
+                    recentLbl.TextColor = Color.FromRgb(0, 145, 211);
+                    listcontainer.Children.Clear();
+                    listcontainer.Children.Add(new RecentComponent());
+                    AeonixInfoService.Instance.sendDismissMissedCalls();
+                    CallLogService.Instance.setMissedCounter(0);
+
+                    break;
+                case 2:
+                    SharedData.Instance.tabIndex = newTabIndex;
+                    resetAllTabs();
+                    ChatTab.TextColor = Color.FromRgb(0, 145, 211);
+                    chatLbl.TextColor = Color.FromRgb(0, 145, 211);
+                    listcontainer.Children.Clear();
+                    listcontainer.Children.Add(new ChatComponent());
+                    break;
+                case 3:
+                    Navigation.PushAsync(new DialPad());
+                    break;
+                case 4:
+                    Navigation.PushAsync(new MorePage());
+                    break;
+            }
+        }
+
+        private void resetAllTabs()
+        {
+            favTab.TextColor = Color.DimGray;
+            favLbl.TextColor = Color.DimGray;
+            recentTab.TextColor = Color.DimGray;
+            recentLbl.TextColor = Color.DimGray;
+            ChatTab.TextColor = Color.DimGray;
+            chatLbl.TextColor = Color.DimGray;
+            DialPadTab.TextColor = Color.DimGray;
+            DialPadTab.TextColor = Color.DimGray;
+            MoreTab.TextColor = Color.DimGray;
+            moreLbl.TextColor = Color.DimGray;
+        }
+
+        public void onMessageCounterchanged(int counter)
+        {
+            addLog($"onMessageCounterchanged() {counter}");
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (counter > 0)
+                {
+                    chatCounter1.IsVisible = true;
+                    chatCounter2.IsVisible = true;
+                    chatCounter2.Text = counter.ToString();
+                }
+                else
+                {
+                    chatCounter1.IsVisible = false;
+                    chatCounter2.IsVisible = false;
+                }
+
+            });
+        }
+
+        public void onCallCounterchanged(int counter)
+        {
+            addLog($"onCallCounterchanged, counter: {counter}");
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (counter > 0 && SharedData.Instance.tabIndex != 1)
+                {
+                    recentCounter1.IsVisible = true;
+                    recentCounter2.IsVisible = true;
+                    recentCounter2.Text = counter.ToString();
+                }
+                else
+                {
+                    recentCounter1.IsVisible = false;
+                    recentCounter2.IsVisible = false;
+                }
+            });
+        }
+
+        public void onVMCounterChanged(int counter)
+        {
+            addLog($"onCallCounterchanged, counter: {counter}");
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+
+
+            });
+        }
+    }
+}
